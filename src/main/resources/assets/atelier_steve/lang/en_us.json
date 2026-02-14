@@ -1,0 +1,20 @@
+{
+  "itemGroup.atelier_steve": "Atelier Steve",
+  "block.atelier_steve.gathering_basket": "Gathering Basket",
+
+  "tooltip.atelier_steve.alchemy_data": "Alchemy Data",
+  "tooltip.atelier_steve.traits": "Traits:",
+  "tooltip.atelier_steve.elements": "Elements:",
+
+  "trait.atelier_steve.hp_boost_small": "HP Boost (Small)",
+  "trait.atelier_steve.hp_boost_small.desc": "Increases max health by 1 heart",
+
+  "element.atelier_steve.fire": "Fire",
+  "element.atelier_steve.water": "Water",
+  "element.atelier_steve.ice": "Ice",
+  "element.atelier_steve.thunder": "Thunder",
+  "element.atelier_steve.wind": "Wind",
+
+  "tooltip.atelier_steve.normal_count": "Normal:%s",
+  "tooltip.atelier_steve.link_count": "Link:%s"
+}

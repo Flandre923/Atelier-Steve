@@ -1,0 +1,20 @@
+{
+  "itemGroup.atelier_steve": "史蒂夫的炼金工房",
+  "block.atelier_steve.gathering_basket": "采集篮",
+
+  "tooltip.atelier_steve.alchemy_data": "炼金数据",
+  "tooltip.atelier_steve.traits": "特性:",
+  "tooltip.atelier_steve.elements": "成分:",
+
+  "trait.atelier_steve.hp_boost_small": "HP提升（小）",
+  "trait.atelier_steve.hp_boost_small.desc": "最大生命值增加1颗心",
+
+  "element.atelier_steve.fire": "火",
+  "element.atelier_steve.water": "水",
+  "element.atelier_steve.ice": "冰",
+  "element.atelier_steve.thunder": "雷",
+  "element.atelier_steve.wind": "风",
+
+  "tooltip.atelier_steve.normal_count": "普通:%s",
+  "tooltip.atelier_steve.link_count": "连结:%s"
+}
