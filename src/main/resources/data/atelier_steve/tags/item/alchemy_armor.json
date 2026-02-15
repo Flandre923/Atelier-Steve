@@ -1,5 +1,8 @@
 {
   "replace": false,
   "values": [
+    "#atelier_steve:category_armor",
+    "minecraft:elytra",
+    "minecraft:turtle_helmet"
   ]
 }

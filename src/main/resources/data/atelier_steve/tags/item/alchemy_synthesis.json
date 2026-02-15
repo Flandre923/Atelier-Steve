@@ -1,5 +1,27 @@
 {
   "replace": false,
   "values": [
+    "#atelier_steve:category_plant",
+    "#atelier_steve:category_flower",
+    "#atelier_steve:category_medicinal",
+    "#atelier_steve:category_poisonous_material",
+    "#atelier_steve:category_sand",
+    "#atelier_steve:category_stone",
+    "#atelier_steve:category_ore",
+    "#atelier_steve:category_raw_stone",
+    "#atelier_steve:category_food_material",
+    "#atelier_steve:category_tree_fruit",
+    "#atelier_steve:category_mushroom",
+    "#atelier_steve:category_fish_shell",
+    "#atelier_steve:category_insect",
+    "#atelier_steve:category_thread",
+    "#atelier_steve:category_wood",
+    "#atelier_steve:category_material",
+    "#atelier_steve:category_animal_material",
+    "#atelier_steve:category_general_goods",
+    "#atelier_steve:category_metal",
+    "#atelier_steve:category_gem",
+    "#atelier_steve:category_seed",
+    "#atelier_steve:category_catalyst"
   ]
 }

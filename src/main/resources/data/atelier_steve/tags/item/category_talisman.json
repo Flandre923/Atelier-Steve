@@ -1,8 +1,8 @@
 {
   "replace": false,
   "values": [
-    "#atelier_steve:category_talisman",
     "minecraft:totem_of_undying",
-    "minecraft:ender_eye"
+    "minecraft:ender_eye",
+    "minecraft:nether_star"
   ]
 }

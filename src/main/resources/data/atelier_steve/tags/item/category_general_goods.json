@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:bucket",
+    "minecraft:bowl",
+    "minecraft:paper",
+    "minecraft:book",
+    "minecraft:glass_bottle",
+    "minecraft:flint"
+  ]
+}

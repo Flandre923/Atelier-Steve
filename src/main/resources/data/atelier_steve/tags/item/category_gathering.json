@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:shears",
+    "minecraft:fishing_rod",
+    "minecraft:brush",
+    "minecraft:spyglass",
+    "minecraft:map",
+    "minecraft:compass"
+  ]
+}

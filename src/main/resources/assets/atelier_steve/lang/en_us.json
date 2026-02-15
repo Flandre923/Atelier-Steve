@@ -2,6 +2,7 @@
   "itemGroup.atelier_steve": "Atelier Steve",
   "block.atelier_steve.gathering_basket": "Gathering Basket",
   "tooltip.atelier_steve.alchemy_data": "Alchemy Data",
+  "tooltip.atelier_steve.cole": "Cole: %s",
   "tooltip.atelier_steve.traits": "Traits:",
   "tooltip.atelier_steve.elements": "Elements:",
   "element.atelier_steve.fire": "Fire",

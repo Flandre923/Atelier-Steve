@@ -37,6 +37,11 @@ public class AlchemyTooltipHandler {
         tooltip.add(Component.translatable("tooltip.atelier_steve.alchemy_data")
                 .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
 
+        if (data.cole() > 0) {
+            tooltip.add(Component.translatable("tooltip.atelier_steve.cole", data.cole())
+                    .withStyle(ChatFormatting.YELLOW));
+        }
+
         // Add traits
         if (!data.traits().isEmpty()) {
             tooltip.add(Component.translatable("tooltip.atelier_steve.traits")

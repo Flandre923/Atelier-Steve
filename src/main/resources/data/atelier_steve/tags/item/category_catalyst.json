@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:redstone",
+    "minecraft:glowstone_dust",
+    "minecraft:blaze_powder",
+    "minecraft:amethyst_shard",
+    "minecraft:echo_shard"
+  ]
+}

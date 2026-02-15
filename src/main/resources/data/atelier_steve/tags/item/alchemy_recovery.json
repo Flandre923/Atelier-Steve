@@ -1,5 +1,11 @@
 {
   "replace": false,
   "values": [
+    "#atelier_steve:category_medicine",
+    "minecraft:carrot",
+    "minecraft:golden_apple",
+    "minecraft:enchanted_golden_apple",
+    "minecraft:honey_bottle",
+    "minecraft:milk_bucket"
   ]
 }

@@ -1,5 +1,10 @@
 {
   "replace": false,
   "values": [
+    "#atelier_steve:category_gathering",
+    "minecraft:spyglass",
+    "minecraft:compass",
+    "minecraft:clock",
+    "minecraft:map"
   ]
 }

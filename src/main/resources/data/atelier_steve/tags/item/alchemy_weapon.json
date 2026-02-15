@@ -1,5 +1,10 @@
 {
   "replace": false,
   "values": [
+    "#atelier_steve:category_weapon",
+    "minecraft:bow",
+    "minecraft:crossbow",
+    "minecraft:trident",
+    "minecraft:mace"
   ]
 }

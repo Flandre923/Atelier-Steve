@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "#atelier_steve:category_accessory",
     "minecraft:clock",
     "minecraft:compass"
   ]
