@@ -83,28 +83,22 @@ public class AlchemyTooltipHandler {
 
                 // Render each row of the shape grid
                 for (int y = 0; y < shape.getHeight(); y++) {
-                    // Find last non-empty cell to trim trailing spaces
-                    int lastFilled = -1;
-                    for (int x = shape.getWidth() - 1; x >= 0; x--) {
-                        if (shape.getCellAt(x, y) != CellType.EMPTY) {
-                            lastFilled = x;
-                            break;
-                        }
-                    }
-
-                    if (lastFilled < 0) continue; // skip fully empty rows
-
                     MutableComponent row = Component.literal("  ");
-                    for (int x = 0; x <= lastFilled; x++) {
+                    for (int x = 0; x < shape.getWidth(); x++) {
                         CellType cell = shape.getCellAt(x, y);
                         String symbol = switch (cell) {
                             case NORMAL -> "\u25A0"; // ■
                             case LINK -> "\u2605";   // ★
-                            case EMPTY -> " ";
+                            case EMPTY -> "\u2591";  // ░
                         };
-                        row.append(symbol);
+                        String cellText = symbol + " ";
+                        row.append(
+                                cell == CellType.EMPTY
+                                        ? Component.literal(cellText).withStyle(ChatFormatting.DARK_GRAY)
+                                        : Component.literal(cellText).withStyle(style -> style.withColor(color))
+                        );
                     }
-                    tooltip.add(row.withStyle(style -> style.withColor(color)));
+                    tooltip.add(row);
                 }
             }
         }
