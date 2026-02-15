@@ -1,5 +1,6 @@
 package com.ateliersteve;
 
+import com.ateliersteve.alchemy.trait.TraitRegistry;
 import com.ateliersteve.registry.ModBlockEntities;
 import com.ateliersteve.registry.ModBlocks;
 import com.ateliersteve.registry.ModCreativeTabs;
@@ -10,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.slf4j.Logger;
 
 @Mod(AtelierSteve.MODID)
@@ -23,6 +25,17 @@ public class AtelierSteve {
         ModBlockEntities.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         ModDataComponents.register(modEventBus);
+
+        // Register common setup event
+        modEventBus.addListener(this::commonSetup);
+    }
+
+    private void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            LOGGER.info("Initializing Atelier Steve alchemy systems...");
+            TraitRegistry.init();
+            LOGGER.info("Alchemy systems initialized");
+        });
     }
 
     public static ResourceLocation id(String path) {

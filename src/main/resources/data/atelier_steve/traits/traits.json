@@ -1,0 +1,5244 @@
+{
+  "traits": [
+    {
+      "id": "low_price",
+      "name": "低价",
+      "grade": 1,
+      "description": "店头的收购价格降低10%。 但复制价格和补充价格也会降低。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "high_price",
+      "name": "高价",
+      "grade": 2,
+      "description": "店头的收购价格提高5克尔， 且初始收购价格提高10%。 但复制价格和补充价格也会随之提高。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "defense_boost",
+      "name": "防御强化",
+      "grade": 3,
+      "description": "防御力提升10。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ]
+    },
+    {
+      "id": "agility_boost",
+      "name": "敏捷强化",
+      "grade": 3,
+      "description": "敏捷提升10。",
+      "categories": [
+        "调",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "power_increase",
+      "name": "破坏力增加",
+      "grade": 4,
+      "description": "道具威力增加10%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "recovery_increase",
+      "name": "恢复力增加",
+      "grade": 4,
+      "description": "道具恢复力增加10%。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "attack_boost",
+      "name": "攻击强化",
+      "grade": 5,
+      "description": "攻击力提升10。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "mp_cost_reduction_10",
+      "name": "消耗MP-10%",
+      "grade": 5,
+      "description": "技能的消耗MP减少10%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "quality_boost",
+      "name": "品质提升",
+      "grade": 5,
+      "description": "在继承特性时选择此特性， 道具的品质提升5%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "hp_boost",
+      "name": "HP强化",
+      "grade": 6,
+      "description": "HP最大值提升20。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "mp_boost",
+      "name": "MP强化",
+      "grade": 6,
+      "description": "MP最大值提升10。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "sturdy",
+      "name": "坚固",
+      "grade": 7,
+      "description": "防御力提升20， 承受的击退效果量减少10%。",
+      "categories": [
+        "调",
+        "防"
+      ]
+    },
+    {
+      "id": "vigorous_growth",
+      "name": "茁壮成长",
+      "grade": 8,
+      "description": "赋予1层HP最大值提升与MP最大值提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "skill_power_10",
+      "name": "技能威力+10%",
+      "grade": 8,
+      "description": "技能的威力增加10%。 相对地消耗MP提升10%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "use_count_minus_1",
+      "name": "使用次数-1",
+      "grade": 8,
+      "description": "道具的使用次数减少1次。 相对地威力增加20%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "slippery_component",
+      "name": "滑溜成分",
+      "grade": 10,
+      "description": "恢复HP，并解除中毒状态。 恢复力：40",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "low_price_plus",
+      "name": "低价+",
+      "grade": 11,
+      "description": "店头的收购价格降低20%。 但复制价格和补充价格也会降低。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "cure_sleep",
+      "name": "治疗睡眠",
+      "grade": 11,
+      "description": "恢复目标的睡眠状态。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "area_bonus",
+      "name": "范围奖励",
+      "grade": 12,
+      "description": "道具的威力及恢复力 增加〔效果范围内目标数量×5〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "fast_use",
+      "name": "高速使用",
+      "grade": 12,
+      "description": "使用道具时的WT缩短10%。 相对地威力及恢复力减少10%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "use_count_plus_1",
+      "name": "使用次数+1",
+      "grade": 12,
+      "description": "道具的使用次数增加1次。 相对地威力降低10%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "bit_lucky",
+      "name": "有点幸运？",
+      "grade": 13,
+      "description": "攻击时， 造成大伤害的概率比平常高10%。",
+      "categories": [
+        "调",
+        "饰",
+        "符"
+      ]
+    },
+    {
+      "id": "count_compression",
+      "name": "次数压缩",
+      "grade": 13,
+      "description": "道具变得只能使用1次， 相对地威力及恢复力将增加 〔最大使用次数×10〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "power_increase_plus",
+      "name": "破坏力增加+",
+      "grade": 13,
+      "description": "道具威力增加15%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "pursuit_boost",
+      "name": "追击强化",
+      "grade": 13,
+      "description": "对破防中目标所造成的伤害 增加20%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "high_price_plus",
+      "name": "高价+",
+      "grade": 13,
+      "description": "店头的收购价格提高10克尔， 且初始收购价格提高20%。 但复制价格和补充价格也会随之提高。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "cure_poison",
+      "name": "治疗中毒",
+      "grade": 13,
+      "description": "恢复目标的中毒状态。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "quality_boost_plus",
+      "name": "品质提升+",
+      "grade": 13,
+      "description": "在继承特性时选择此特性， 道具的品质提升10%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "recovery_increase_plus",
+      "name": "恢复力增加+",
+      "grade": 13,
+      "description": "道具恢复力增加15%。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "single_use_boost",
+      "name": "一次性使用强化",
+      "grade": 14,
+      "description": "剩余使用次数为1次时， 道具的威力及恢复力增加10%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "few_rewards",
+      "name": "少数奖励",
+      "grade": 14,
+      "description": "道具的威力及恢复力 增加〔15÷效果范围内目标数量〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "treat_burn_injuries",
+      "name": "治疗火伤",
+      "grade": 15,
+      "description": "恢复目标的火伤状态。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "critical_hit",
+      "name": "暴击",
+      "grade": 15,
+      "description": "使用道具时，有10%的概率发生暴击。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "parameter_5",
+      "name": "参数+5%",
+      "grade": 15,
+      "description": "基础能力值提升5%。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ]
+    },
+    {
+      "id": "anti_minus_speed_enhancement",
+      "name": "防速强化",
+      "grade": 16,
+      "description": "防御力与敏捷提升10。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "defense_boost",
+            "agility_boost"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "enhance_sharpness",
+      "name": "增强锐利度",
+      "grade": 16,
+      "description": "攻击时发生10%的追加伤害。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "ride_wind",
+      "name": "乘着风",
+      "grade": 16,
+      "description": "使用技能时的WT减少10%。",
+      "categories": [
+        "调",
+        "武",
+        "饰",
+        "符"
+      ]
+    },
+    {
+      "id": "attack_speed_enhancement",
+      "name": "攻速强化",
+      "grade": 17,
+      "description": "攻击力与敏捷提升10。",
+      "categories": [
+        "调",
+        "武",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_boost",
+            "agility_boost"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "treat_frostbite",
+      "name": "治疗冻伤",
+      "grade": 17,
+      "description": "恢复目标的冻伤状态。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "power_throw",
+      "name": "力量投掷",
+      "grade": 17,
+      "description": "使用道具时的WT延长20%。 相对地威力及恢复力增加20%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "strengthen_offense_defense",
+      "name": "攻防强化",
+      "grade": 18,
+      "description": "攻击力与防御力提升10。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_boost",
+            "defense_boost"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "times_adjustment",
+      "name": "次数调整",
+      "grade": 18,
+      "description": "道具的威力及恢复力 增加〔最大使用次数×4〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "give_fire_damage",
+      "name": "赋予火伤",
+      "grade": 18,
+      "description": "以50%的概率赋予1层火伤。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "give_curse_2",
+      "name": "赋予诅咒",
+      "grade": 18,
+      "description": "以50%的概率赋予1层诅咒。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "impart_frostbite",
+      "name": "赋予冻伤",
+      "grade": 18,
+      "description": "以50%的概率赋予1层冻伤。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "impart_paralysis",
+      "name": "赋予麻痹",
+      "grade": 18,
+      "description": "以50%的概率赋予1层麻痹。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "give_poison_2",
+      "name": "赋予毒",
+      "grade": 18,
+      "description": "以50%的概率赋予1层中毒。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "give_restraint",
+      "name": "赋予束缚",
+      "grade": 18,
+      "description": "以50%的概率赋予1层束缚。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "give_sleep",
+      "name": "赋予睡眠",
+      "grade": 18,
+      "description": "以50%的概率赋予1层睡眠。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "consumes_mp15",
+      "name": "消耗MP-15%",
+      "grade": 18,
+      "description": "技能的消耗MP减少15%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "skill_power_12",
+      "name": "技能威力+12%",
+      "grade": 18,
+      "description": "技能的威力增加12%。 相对地消耗MP提升12%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "manipulate_gravity",
+      "name": "操弄重力",
+      "grade": 19,
+      "description": "WT增加50，赋予1层敏捷下降。",
+      "categories": [
+        "调",
+        "削"
+      ]
+    },
+    {
+      "id": "charming_tail",
+      "name": "魅惑的尾巴",
+      "grade": 19,
+      "description": "有50%的概率使目标吸引攻击目标。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "attack_bonus",
+      "name": "攻击加成",
+      "grade": 20,
+      "description": "攻击力提升15。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "curse_defense",
+      "name": "守备的诅咒",
+      "grade": 20,
+      "description": "赋予目标1层防御力下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "curse_speed",
+      "name": "速度的诅咒",
+      "grade": 20,
+      "description": "赋予目标1层敏捷下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "curse_power",
+      "name": "力量的诅咒",
+      "grade": 20,
+      "description": "赋予目标1层攻击力下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "defense_bonus",
+      "name": "防御加成",
+      "grade": 20,
+      "description": "防御力提升15。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ]
+    },
+    {
+      "id": "long_time",
+      "name": "悠久时光",
+      "grade": 20,
+      "description": "赋予1层全能力提升。",
+      "categories": [
+        "调",
+        "强"
+      ]
+    },
+    {
+      "id": "hp_large_increment",
+      "name": "HP大增量",
+      "grade": 20,
+      "description": "HP最大值提升40。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "mp_large_increment",
+      "name": "MP大增量",
+      "grade": 20,
+      "description": "MP最大值提升20。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "quality_boost_plus_plus",
+      "name": "品质提升++",
+      "grade": 20,
+      "description": "在继承特性时选择此特性， 道具的品质提升15%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "blessing_speed",
+      "name": "速度的祝福",
+      "grade": 20,
+      "description": "赋予目标1层敏捷提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "therapeutic_restraint",
+      "name": "治疗束缚",
+      "grade": 20,
+      "description": "恢复目标的束缚状态。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "refreshing",
+      "name": "清爽的",
+      "grade": 20,
+      "description": "WT减少50，赋予1层敏捷提升。",
+      "categories": [
+        "调",
+        "强"
+      ]
+    },
+    {
+      "id": "agility_bonus",
+      "name": "敏捷加成",
+      "grade": 20,
+      "description": "敏捷提升15。",
+      "categories": [
+        "调",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "blessing_defense",
+      "name": "守备的祝福",
+      "grade": 20,
+      "description": "赋予目标1层防御力提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "blessing_strength",
+      "name": "力量的祝福",
+      "grade": 20,
+      "description": "赋予目标1层攻击力提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "low_price_plus_plus",
+      "name": "低价++",
+      "grade": 21,
+      "description": "店头的收购价格降低30%。 但复制价格和补充价格也会降低。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "pursuit_boost_plus",
+      "name": "追击强化+",
+      "grade": 21,
+      "description": "对破防中目标所造成的伤害 增加30%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "high_price_plus_plus",
+      "name": "高价++",
+      "grade": 21,
+      "description": "店头的收购价格提高15克尔， 且初始收购价格提高30%。 但复制价格和补充价格也会随之提高。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "creepy",
+      "name": "毛骨悚然",
+      "grade": 22,
+      "description": "目标被赋予减益效果时，该减益效果提升1层。",
+      "categories": [
+        "调",
+        "削"
+      ]
+    },
+    {
+      "id": "powerful_recovery",
+      "name": "强大的恢复量",
+      "grade": 24,
+      "description": "道具恢复力增加20%。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "recovery_increase",
+            "recovery_increase_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mini_bomb",
+      "name": "迷你炸弹",
+      "grade": 24,
+      "description": "给予魔法伤害。 成为目标的敌人越多，给予的伤害增加越多。 威力：60",
+      "categories": [
+        "调",
+        "攻"
+      ]
+    },
+    {
+      "id": "powerful_destructive_power",
+      "name": "强大的破坏力",
+      "grade": 24,
+      "description": "道具威力增加20%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "power_increase",
+            "power_increase_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "refreshing_cure",
+      "name": "提神的治愈",
+      "grade": 25,
+      "description": "从无法战斗的状态下以HP恢复20%的状态复活。",
+      "categories": [
+        "调",
+        "恢"
+      ]
+    },
+    {
+      "id": "mass_product",
+      "name": "量产品",
+      "grade": 25,
+      "description": "店头的收购价格降低30%。 但复制价格和补充价格也会降低。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "low_price",
+            "low_price_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "critical_hit_plus",
+      "name": "暴击+",
+      "grade": 25,
+      "description": "使用道具时，有20%的概率发生暴击。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "single_use_boost_plus",
+      "name": "一次性使用强化+",
+      "grade": 25,
+      "description": "剩余使用次数为1次时， 道具的威力及恢复力增加20%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "high_minus_end_products",
+      "name": "高级品",
+      "grade": 25,
+      "description": "店头的收购价格提高20克尔， 且初始收购价格提高30%。 但复制价格和补充价格也会随之提高。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "high_price",
+            "high_price_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "signs_growth",
+      "name": "成长的预兆",
+      "grade": 25,
+      "description": "通过与能联想到 尚未成熟的领袖或随从的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "tenacious",
+      "name": "顽强",
+      "grade": 25,
+      "description": "赋予效果，使目标回避无法战斗的状态。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "dazzling_sun",
+      "name": "刺眼的太阳",
+      "grade": 26,
+      "description": "早上或中午时， 攻击力、防御力、敏捷提升10%。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "饰",
+        "符"
+      ]
+    },
+    {
+      "id": "count_compression_plus",
+      "name": "次数压缩+",
+      "grade": 26,
+      "description": "道具变得只能使用1次， 相对地威力及恢复力将增加 〔最大使用次数×12〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "anti_minus_speed_bonus",
+      "name": "防速加成",
+      "grade": 26,
+      "description": "防御力与敏捷提升15。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "defense_bonus",
+            "agility_bonus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "save_skills_2",
+      "name": "节省技能",
+      "grade": 26,
+      "description": "技能的威力增加8%， 且消耗MP减少8%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "skill_strengthening",
+            "consumption_mp_reduction"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pungent_taste",
+      "name": "刺激的味道",
+      "grade": 26,
+      "description": "赋予1层加速。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "parameter_8",
+      "name": "参数+8%",
+      "grade": 26,
+      "description": "基础能力值提升8%。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ]
+    },
+    {
+      "id": "fast_use_plus",
+      "name": "高速使用+",
+      "grade": 26,
+      "description": "使用道具时的WT缩短20%。 相对地威力及恢复力减少20%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "super_hardness",
+      "name": "超硬度",
+      "grade": 26,
+      "description": "赋予3层防御力提升。",
+      "categories": [
+        "调",
+        "强"
+      ]
+    },
+    {
+      "id": "use_count_minus_2",
+      "name": "使用次数-2",
+      "grade": 26,
+      "description": "道具的使用次数减少2次。 相对地威力增加40%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "excellent_results",
+      "name": "优秀成果",
+      "grade": 26,
+      "description": "在继承特性时选择此特性， 道具的品质提升15%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "quality_boost",
+            "quality_boost_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "full_ability_enhancement",
+      "name": "全能力强化",
+      "grade": 27,
+      "description": "所有能力值提升10。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "strengthen_offense_defense",
+            "attack_speed_enhancement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "show_off_your_power",
+      "name": "下马威",
+      "grade": 27,
+      "description": "攻击力、防御力、敏捷提升30%。 每经过1回合，提升量都会下降。",
+      "categories": [
+        "调",
+        "防"
+      ]
+    },
+    {
+      "id": "attack_speed_bonus",
+      "name": "攻速加成",
+      "grade": 27,
+      "description": "攻击力与敏捷提升15。",
+      "categories": [
+        "调",
+        "武",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_bonus",
+            "agility_bonus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "freezing_deliciousness",
+      "name": "使人冻结的美味",
+      "grade": 27,
+      "description": "恢复HP，赋予1层冰耐性提升。 恢复力：40",
+      "categories": [
+        "调",
+        "恢"
+      ]
+    },
+    {
+      "id": "king_mountain",
+      "name": "山中大王",
+      "grade": 27,
+      "description": "通过与能促进成长的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "increase_sharpness",
+      "name": "增加锋利度",
+      "grade": 27,
+      "description": "攻击时发生15%的追加伤害。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "attack_defense_bonus",
+      "name": "攻防加成",
+      "grade": 28,
+      "description": "攻击力与防御力提升15。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_bonus",
+            "defense_bonus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "times_adjustment_plus",
+      "name": "次数调整+",
+      "grade": 28,
+      "description": "道具的威力及恢复力 增加〔最大使用次数×6〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "power_increase_plus_plus",
+      "name": "破坏力增加++",
+      "grade": 28,
+      "description": "道具威力增加20%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "very_nice_aroma",
+      "name": "非常好闻的香气",
+      "grade": 28,
+      "description": "随机解除1个减益效果。",
+      "categories": [
+        "调",
+        "恢"
+      ]
+    },
+    {
+      "id": "follower",
+      "name": "跟班",
+      "grade": 28,
+      "description": "通过与能促进成长的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "consumes_mp20",
+      "name": "消耗MP-20%",
+      "grade": 28,
+      "description": "技能的消耗MP减少20%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "hazy_moon_halo",
+      "name": "朦胧的月晕",
+      "grade": 28,
+      "description": "傍晚或晚上时， 攻击力、防御力、敏捷提升10%。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "饰",
+        "符"
+      ]
+    },
+    {
+      "id": "perfect_circle",
+      "name": "完美的圆形",
+      "grade": 28,
+      "description": "承受的伤害减少10%。",
+      "categories": [
+        "调",
+        "防"
+      ]
+    },
+    {
+      "id": "recovery_increase_plus_plus",
+      "name": "恢复力增加++",
+      "grade": 28,
+      "description": "道具恢复力增加20%。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "use_count_plus_2",
+      "name": "使用次数+2",
+      "grade": 28,
+      "description": "道具的使用次数增加2次。 相对地威力降低20%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "area_bonus_plus",
+      "name": "范围奖励+",
+      "grade": 30,
+      "description": "道具的威力及恢复力 增加〔效果范围内目标数量×10〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "curse_wushou",
+      "name": "无守的诅咒",
+      "grade": 30,
+      "description": "赋予目标2层防御力下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "speedless_curse",
+      "name": "无速的诅咒",
+      "grade": 30,
+      "description": "赋予目标2层敏捷下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "powerless_curse",
+      "name": "无力的诅咒",
+      "grade": 30,
+      "description": "赋予目标2层攻击力下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "ups_downs_blue",
+      "name": "蓝之起伏",
+      "grade": 30,
+      "description": "通过与名称中包含 “烦恼”或“智慧”的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "consumption_mp_reduction",
+      "name": "消耗MP削减",
+      "grade": 30,
+      "description": "技能的消耗MP减少20%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "mp_cost_reduction_10",
+            "consumes_mp15"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trouble_blank_paper",
+      "name": "白纸的烦恼",
+      "grade": 30,
+      "description": "通过与名称中带有红、绿、蓝的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "pursuit_boost_plus_plus",
+      "name": "追击强化++",
+      "grade": 30,
+      "description": "对破防中目标所造成的伤害 增加40%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "few_rewards_plus",
+      "name": "少数奖励+",
+      "grade": 30,
+      "description": "道具的威力及恢复力 增加〔20÷效果范围内目标数量〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "golden_light",
+      "name": "金色光芒",
+      "grade": 30,
+      "description": "店头的收购价格提高50克尔。 且初始收购价格提高60%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符"
+      ]
+    },
+    {
+      "id": "green_undulations",
+      "name": "绿之起伏",
+      "grade": 30,
+      "description": "通过与名称中包含 “烦恼”或“智慧”的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "blessing_protection",
+      "name": "守护的祝福",
+      "grade": 30,
+      "description": "赋予目标2层防御力提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "hpmp_enhanced",
+      "name": "HPMP强化",
+      "grade": 30,
+      "description": "HP与MP的最大值提升20。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "overflowing_power",
+            "magicians_wisdom"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blessing_wind",
+      "name": "疾风的祝福",
+      "grade": 30,
+      "description": "赋予目标2层敏捷提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "magicians_wisdom",
+      "name": "魔法师的智慧",
+      "grade": 30,
+      "description": "MP最大值提升30。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "mp_boost",
+            "mp_large_increment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mass_production",
+      "name": "大量生产品",
+      "grade": 30,
+      "description": "店头的收购价格降低40%。 但复制价格和补充价格也会降低。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "low_price_plus",
+            "low_price_plus_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blessings_strength",
+      "name": "刚力的祝福",
+      "grade": 30,
+      "description": "赋予目标2层攻击力提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "power_throw_plus",
+      "name": "力量投掷+",
+      "grade": 30,
+      "description": "使用道具时的WT延长30%。 相对地威力及恢复力增加30%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "expert_completion",
+      "name": "专家的完成度",
+      "grade": 30,
+      "description": "在继承特性时选择此特性， 道具的品质提升20%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "quality_boost_plus",
+            "quality_boost_plus_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rare_items",
+      "name": "稀少的逸品",
+      "grade": 30,
+      "description": "店头的收购价格提高25克尔， 且初始收购价格提高40%。 但复制价格和补充价格也会随之提高。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "high_price_plus",
+            "high_price_plus_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rise_fall_red",
+      "name": "红之起伏",
+      "grade": 30,
+      "description": "通过与名称中包含 “烦恼”或“智慧”的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "clear_wisdom",
+      "name": "清澄的智慧",
+      "grade": 30,
+      "description": "通过与名称中带有红、绿、蓝的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "overflowing_power",
+      "name": "洋溢之力",
+      "grade": 30,
+      "description": "HP最大值提升60。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "hp_boost",
+            "hp_large_increment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cure_curse",
+      "name": "治疗诅咒",
+      "grade": 31,
+      "description": "恢复目标的诅咒状态。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "treat_paralysis",
+      "name": "治疗麻痹",
+      "grade": 31,
+      "description": "恢复目标的麻痹状态。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "wei_tuotian_s_leg_strength",
+      "name": "韦驮天的脚力",
+      "grade": 31,
+      "description": "敏捷提升20。",
+      "categories": [
+        "调",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "agility_boost",
+            "agility_bonus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iron_guard",
+      "name": "钢铁守备",
+      "grade": 31,
+      "description": "防御力提升20。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "defense_boost",
+            "defense_bonus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intense_recovery_volume",
+      "name": "强烈的恢复量",
+      "grade": 31,
+      "description": "道具恢复力增加25%。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "recovery_increase_plus",
+            "recovery_increase_plus_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "turn_misfortune_into_blessing",
+      "name": "转祸为福",
+      "grade": 32,
+      "description": "自身被赋予减益效果时， 攻击力、防御力、敏捷提升20%。 赋予敌人异常状态时，HP恢复10%。",
+      "categories": [
+        "调",
+        "饰",
+        "符"
+      ]
+    },
+    {
+      "id": "anti_minus_speed_super_enhanced",
+      "name": "防速超强化",
+      "grade": 32,
+      "description": "防御力与敏捷提升20。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "super_enhanced_defense",
+            "agility_super_enhanced"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "awakening_life",
+      "name": "觉醒的生命",
+      "grade": 32,
+      "description": "从无法战斗的状态下以HP恢复30%的状态复活， 赋予1层持续恢复HP。",
+      "categories": [
+        "调",
+        "恢"
+      ]
+    },
+    {
+      "id": "purdah_s_silk_umbrella",
+      "name": "深闺的绢伞",
+      "grade": 32,
+      "description": "每隔5个等级， 攻击力、防御力、敏捷提升1%。 被赋予参数提升的增益效果时， 参数的提升量增加25%。",
+      "categories": [
+        "调",
+        "防"
+      ]
+    },
+    {
+      "id": "very_curled_up",
+      "name": "蜷曲得非常厉害",
+      "grade": 32,
+      "description": "每经过1回合， 攻击力、防御力、敏捷提升2%（最多20%）。",
+      "categories": [
+        "调",
+        "武"
+      ]
+    },
+    {
+      "id": "strong_destructive_power",
+      "name": "强烈的破坏力",
+      "grade": 32,
+      "description": "道具威力增加25%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "power_increase_plus",
+            "power_increase_plus_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "attack_speed_super_enhanced",
+      "name": "攻速超强化",
+      "grade": 33,
+      "description": "攻击力与敏捷提升20。",
+      "categories": [
+        "调",
+        "武",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_super_strengthened",
+            "agility_super_enhanced"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "power_beasts",
+      "name": "猛兽之力",
+      "grade": 33,
+      "description": "攻击力提升20。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_boost",
+            "attack_bonus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "skill_strengthening",
+      "name": "技能强化",
+      "grade": 33,
+      "description": "技能的威力增加15%。 相对地消耗MP提升15%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "skill_power_10",
+            "skill_power_12"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "super_enhanced_offense_defense",
+      "name": "攻防超强化",
+      "grade": 34,
+      "description": "攻击力与防御力提升20。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_super_strengthened",
+            "super_enhanced_defense"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "final_blow",
+      "name": "最后的一击",
+      "grade": 34,
+      "description": "剩余使用次数为1次时， 道具的威力及恢复力增加30%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "single_use_boost",
+            "single_use_boost_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "angels_protection",
+      "name": "天使的庇护",
+      "grade": 35,
+      "description": "获得1TP。",
+      "categories": [
+        "调",
+        "恢"
+      ]
+    },
+    {
+      "id": "critical_hit_plus_plus",
+      "name": "暴击++",
+      "grade": 35,
+      "description": "使用道具时，有30%的概率发生暴击。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ]
+    },
+    {
+      "id": "demon_soul",
+      "name": "恶魔灵魂",
+      "grade": 35,
+      "description": "暴击率提升30%， 并恢复给予伤害量20%的HP。",
+      "categories": [
+        "调",
+        "武"
+      ]
+    },
+    {
+      "id": "increased_effect_on_many",
+      "name": "对多数的效果增大",
+      "grade": 35,
+      "description": "道具的威力及恢复力 增加〔效果范围内目标数量×12〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "area_bonus",
+            "area_bonus_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "physical_enhancement",
+      "name": "肉体强化",
+      "grade": 35,
+      "description": "基础能力值提升10%。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "parameter_5",
+            "parameter_8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wisdom_great_magician",
+      "name": "大魔法师的智慧",
+      "grade": 35,
+      "description": "MP最大值提升50。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "mp_large_increment",
+            "mp_super_enhanced"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hp_super_enhanced",
+      "name": "HP超强化",
+      "grade": 35,
+      "description": "HP最大值提升60。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "consume_mp_compression",
+      "name": "消耗MP压缩",
+      "grade": 35,
+      "description": "技能的消耗MP减少30%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "consumes_mp15",
+            "consumes_mp20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mp_super_enhanced",
+      "name": "MP超强化",
+      "grade": 35,
+      "description": "MP最大值提升30。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "break_rules",
+      "name": "打破常规",
+      "grade": 35,
+      "description": "赋予灵气弱化， 给予无视防御的魔法伤害。 威力：30",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "overflowing_power_2",
+      "name": "满溢之力",
+      "grade": 35,
+      "description": "HP最大值提升100。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "hp_large_increment",
+            "hp_super_enhanced"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "steaming_hot",
+      "name": "热腾腾",
+      "grade": 35,
+      "description": "给予目标火属性的固定魔法伤害， 并赋予1层火耐性下降。 威力：100",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "cost_compression_skills",
+      "name": "成本压缩技能",
+      "grade": 35,
+      "description": "技能的威力增加10%， 且消耗MP减少10%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "skill_bonus",
+            "consume_mp_compression"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reduce",
+      "name": "缩减",
+      "grade": 35,
+      "description": "道具的使用次数减少3次。 相对地威力增加60%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "use_count_minus_1",
+            "use_count_minus_2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "increased_effect_on_monomers",
+      "name": "对单体的效果增大",
+      "grade": 36,
+      "description": "道具的威力及恢复力 增加〔25÷效果范围内目标数量〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "few_rewards",
+            "few_rewards_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "proliferate",
+      "name": "增殖",
+      "grade": 36,
+      "description": "道具的使用次数增加3次。 相对地威力降低30%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "use_count_plus_1",
+            "use_count_plus_2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "limited_price",
+      "name": "限定价格",
+      "grade": 36,
+      "description": "店头的收购价格提高30克尔， 且初始收购价格提高50%。 但复制价格和补充价格也会随之提高。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "high_minus_end_products",
+            "rare_items"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "harvest_life",
+      "name": "收割生命",
+      "grade": 36,
+      "description": "目标HP在15%以下时， 立刻使其陷入无法战斗的状态。 对部分强敌、头目无效。",
+      "categories": [
+        "调",
+        "攻"
+      ]
+    },
+    {
+      "id": "continuous_pursuit",
+      "name": "连打的追击",
+      "grade": 37,
+      "description": "攻击时发生20%的追加伤害， 且技能威力提升10%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "enhance_sharpness",
+            "increase_sharpness"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mandatory_one_minus_time_use",
+      "name": "强制一次性使用",
+      "grade": 37,
+      "description": "道具变得只能使用1次， 相对地威力及恢复力将增加 〔最大使用次数×15〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "count_compression",
+            "count_compression_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "give_tight_binding",
+      "name": "赋予紧缚",
+      "grade": 37,
+      "description": "以100%的概率赋予1层束缚。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "give_inflammation",
+      "name": "赋予炎疮",
+      "grade": 37,
+      "description": "以100%的概率赋予1层火伤。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "give_ice_sores",
+      "name": "赋予冰疮",
+      "grade": 37,
+      "description": "以100%的概率赋予1层冻伤。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "give_curse",
+      "name": "赋予怨咒",
+      "grade": 37,
+      "description": "以100%的概率赋予1层诅咒。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "impart_dull_numbness",
+      "name": "赋予钝麻",
+      "grade": 37,
+      "description": "以100%的概率赋予1层麻痹。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "impart_drowsiness",
+      "name": "赋予昏睡",
+      "grade": 37,
+      "description": "以100%的概率赋予1层睡眠。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "give_poison",
+      "name": "赋予剧毒",
+      "grade": 37,
+      "description": "以100%的概率赋予1层中毒。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ]
+    },
+    {
+      "id": "a_treasure_trove_nutrients",
+      "name": "营养的宝库",
+      "grade": 37,
+      "description": "恢复HP，赋予1层TP获得量提升。 HP越少，恢复量增加越多。 恢复力：30",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ]
+    },
+    {
+      "id": "a_blow_without_mercy",
+      "name": "无怜悯的一击",
+      "grade": 37,
+      "description": "对破防中目标造成的伤害 增加40%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "pursuit_boost",
+            "pursuit_boost_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "super_enhanced_times",
+      "name": "次数超强化",
+      "grade": 37,
+      "description": "道具的威力及恢复力 增加〔最大使用次数×10〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "times_adjustment",
+            "times_adjustment_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "full_ability_bonus",
+      "name": "全能力加成",
+      "grade": 38,
+      "description": "所有能力值提升15。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_defense_bonus",
+            "attack_speed_bonus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blue_confusion",
+      "name": "蓝之迷惘",
+      "grade": 38,
+      "description": "以50%的概率赋予1个随机异常状态。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "ups_downs_blue",
+            "trouble_blank_paper"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "super_enhanced_defense",
+      "name": "防御力超强化",
+      "grade": 38,
+      "description": "防御力提升20。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ]
+    },
+    {
+      "id": "pyroxene_defense",
+      "name": "辉石守备",
+      "grade": 38,
+      "description": "防御力提升30。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "defense_bonus",
+            "super_enhanced_defense"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_vitality",
+      "name": "龙的生命力",
+      "grade": 38,
+      "description": "击破敌人时，HP恢复10%。 最大MP值提升50。",
+      "categories": [
+        "调",
+        "武"
+      ]
+    },
+    {
+      "id": "green_confusion",
+      "name": "绿之迷惘",
+      "grade": 38,
+      "description": "赋予1层火或冰或雷或风耐性下降。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "green_undulations",
+            "trouble_blank_paper"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ambitious",
+      "name": "心怀大志",
+      "grade": 38,
+      "description": "通过与能联想到 开始成长的领袖或随从的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "partner",
+      "name": "搭档",
+      "grade": 38,
+      "description": "退到后方时，恢复交换队友的HP。 恢复力：50",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "follower",
+            "signs_growth"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "red_confusion",
+      "name": "红之迷惘",
+      "grade": 38,
+      "description": "赋予1层攻击力或防御力或敏捷下降。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "rise_fall_red",
+            "trouble_blank_paper"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "skill_bonus",
+      "name": "技能加成",
+      "grade": 38,
+      "description": "技能的威力增加20%。 相对地消耗MP提升20%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "skill_power_12",
+            "skill_power_15"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "skill_power_15",
+      "name": "技能威力+15%",
+      "grade": 38,
+      "description": "技能的威力增加15%。 相对地消耗MP提升15%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "agility_super_enhanced",
+      "name": "敏捷超强化",
+      "grade": 38,
+      "description": "敏捷提升20。",
+      "categories": [
+        "调",
+        "饰",
+        "符",
+        "探"
+      ]
+    },
+    {
+      "id": "amazing_foot_power",
+      "name": "神速的脚力",
+      "grade": 38,
+      "description": "敏捷提升30。",
+      "categories": [
+        "调",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "agility_bonus",
+            "agility_super_enhanced"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reliable_captain",
+      "name": "可靠的队长",
+      "grade": 38,
+      "description": "攻击力、防御力、敏捷提升15。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "king_mountain",
+            "signs_growth"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "violent_destructive_power",
+      "name": "猛烈的破坏力",
+      "grade": 39,
+      "description": "道具威力增加30%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "powerful_destructive_power",
+            "strong_destructive_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "enhance_attack_performance",
+      "name": "增强攻击性能",
+      "grade": 39,
+      "description": "攻击时发生20%的追加伤害。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "internal_storm",
+      "name": "内藏风暴",
+      "grade": 39,
+      "description": "暴击率提升10%，每经过1回合， 敏捷提升3%（最多30%）。",
+      "categories": [
+        "调",
+        "武"
+      ]
+    },
+    {
+      "id": "super_quality",
+      "name": "超级质量",
+      "grade": 39,
+      "description": "在继承特性时选择此特性， 道具的品质提升30%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "excellent_results",
+            "expert_completion"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "violent_recovery_volume",
+      "name": "猛烈的恢复量",
+      "grade": 39,
+      "description": "道具恢复力增加30%。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "powerful_recovery",
+            "intense_recovery_volume"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "attack_super_strengthened",
+      "name": "攻击超强化",
+      "grade": 40,
+      "description": "攻击力提升20。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ]
+    },
+    {
+      "id": "blue_skill",
+      "name": "蓝之妙技",
+      "grade": 40,
+      "description": "赋予1个随机增益效果。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "ups_downs_blue",
+            "clear_wisdom"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "critical_hit_finished_product",
+      "name": "暴击成品",
+      "grade": 40,
+      "description": "使用道具时，有30%的概率发生暴击。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "critical_hit",
+            "critical_hit_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "light_blue_groove",
+      "name": "浅蓝律动",
+      "grade": 40,
+      "description": "通过与名称中包含 “病”或“和谐”的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "green_undulations",
+            "ups_downs_blue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "green_skill",
+      "name": "绿之妙技",
+      "grade": 40,
+      "description": "赋予1层火或冰或雷或风耐性提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "green_undulations",
+            "clear_wisdom"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hpmp_large_increment",
+      "name": "HPMP大增量",
+      "grade": 40,
+      "description": "HP与MP的最大值提升30。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "overflowing_power_2",
+            "wisdom_great_magician"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "parameter_10",
+      "name": "参数+10%",
+      "grade": 40,
+      "description": "基础能力值提升10%。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ]
+    },
+    {
+      "id": "power_destruction",
+      "name": "破坏之力",
+      "grade": 40,
+      "description": "攻击力提升30。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "attack_bonus",
+            "attack_super_strengthened"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "purple_rhythm",
+      "name": "紫之律动",
+      "grade": 40,
+      "description": "通过与名称中包含 “病”或“和谐”的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "ups_downs_blue",
+            "rise_fall_red"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "red_skill",
+      "name": "红之妙技",
+      "grade": 40,
+      "description": "赋予1层攻击力或防御力或敏捷提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "rise_fall_red",
+            "clear_wisdom"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sonic_throw",
+      "name": "音速投掷",
+      "grade": 40,
+      "description": "使用道具时的WT缩短30%。 相对地威力及恢复力减少30%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "fast_use",
+            "fast_use_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "super_physical_enhancement",
+      "name": "肉体超强化",
+      "grade": 40,
+      "description": "基础能力值提升15%。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "parameter_8",
+            "parameter_10"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "yellow_rhythm",
+      "name": "黄之律动",
+      "grade": 40,
+      "description": "通过与名称中包含 “病”或“和谐”的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "rise_fall_red",
+            "green_undulations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pray_harmony",
+      "name": "为谐和祈祷",
+      "grade": 41,
+      "description": "参数下降的概率减少30%，恢复减益效果时， 赋予1层攻击力提升、防御力提升、敏捷提升。",
+      "categories": [
+        "调",
+        "防"
+      ]
+    },
+    {
+      "id": "light_blue_sadness",
+      "name": "浅蓝忧愁",
+      "grade": 42,
+      "description": "赋予1层随机副属性耐性下降， 并以50%的概率赋予3个随机异常状态。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "light_blue_groove",
+            "transparent_disease"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "affordable",
+      "name": "经济实惠",
+      "grade": 42,
+      "description": "店头的收购价格降低50%。 但复制价格和补充价格也会降低。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "mass_product",
+            "mass_production"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mixing_reality_reality",
+      "name": "虚实的搅拌",
+      "grade": 42,
+      "description": "赋予1层睡眠与敏捷下降。",
+      "categories": [
+        "调",
+        "削"
+      ]
+    },
+    {
+      "id": "fifth_element",
+      "name": "第五元素",
+      "grade": 42,
+      "description": "没有副属性的攻击给予的伤害增加10%， 承受的伤害减少10%。",
+      "categories": [
+        "调",
+        "饰",
+        "符"
+      ]
+    },
+    {
+      "id": "life_force",
+      "name": "生命之力",
+      "grade": 42,
+      "description": "HP最大值提升150。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "overflowing_power",
+            "overflowing_power_2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "purple_sorrow",
+      "name": "紫之忧愁",
+      "grade": 42,
+      "description": "赋予1层随机参数下降， 并以50%的概率赋予3个随机异常状态。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "purple_rhythm",
+            "transparent_disease"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sages_wisdom",
+      "name": "贤者的智慧",
+      "grade": 42,
+      "description": "MP最大值提升75。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "magicians_wisdom",
+            "wisdom_great_magician"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "single_target_reward",
+      "name": "单体奖励",
+      "grade": 42,
+      "description": "道具的威力及恢复力 增加〔30÷效果范围内目标数量〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "few_rewards_plus",
+            "increased_effect_on_monomers"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "huang_zhis_sorrow",
+      "name": "黄之忧愁",
+      "grade": 42,
+      "description": "分别赋予1层随机参数下降与 随机副属性耐性下降。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "yellow_rhythm",
+            "transparent_disease"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_scale_guard",
+      "name": "龙鳞守备",
+      "grade": 43,
+      "description": "防御力提升40。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "iron_guard",
+            "pyroxene_defense"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "change_freely",
+      "name": "变幻自在",
+      "grade": 43,
+      "description": "恢复消耗MP量10%的HP， 并恢复所受伤害量10%的MP。",
+      "categories": [
+        "调",
+        "饰",
+        "符"
+      ]
+    },
+    {
+      "id": "group_rewards",
+      "name": "团体奖励",
+      "grade": 43,
+      "description": "道具的威力及恢复力 增加〔效果范围内目标数量×15〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "area_bonus_plus",
+            "increased_effect_on_many"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a_merciless_blow",
+      "name": "毫不留情的一击",
+      "grade": 43,
+      "description": "对破防中目标造成的伤害 增加50%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "pursuit_boost_plus",
+            "pursuit_boost_plus_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "speed_light",
+      "name": "光速的脚力",
+      "grade": 43,
+      "description": "敏捷提升40。",
+      "categories": [
+        "调",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "wei_tuotian_s_leg_strength",
+            "amazing_foot_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "power_throw_2",
+      "name": "强力投掷",
+      "grade": 44,
+      "description": "使用道具时的WT延长50%。 相对地威力及恢复力增加45%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "power_throw",
+            "power_throw_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mingjun",
+      "name": "名君",
+      "grade": 45,
+      "description": "攻击力、防御力、敏捷提升30。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "reliable_captain",
+            "ambitious"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "smell_destruction",
+      "name": "破坏的气息",
+      "grade": 45,
+      "description": "攻击时，若目标散发灵气， 追加使灵气量表减少1。",
+      "categories": [
+        "调",
+        "武"
+      ]
+    },
+    {
+      "id": "light_blue_exquisite",
+      "name": "浅蓝精致",
+      "grade": 45,
+      "description": "赋予1层随机副属性耐性提升， 并赋予2个随机机增益效果。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "light_blue_groove",
+            "as_harmonious_as_air"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "physical_super_evolution",
+      "name": "肉体超进化",
+      "grade": 45,
+      "description": "基础能力值提升20%。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "physical_enhancement",
+            "super_physical_enhancement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "half_crit",
+      "name": "一半暴击",
+      "grade": 45,
+      "description": "使用道具时，有50%的概率发生暴击。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "critical_hit_plus",
+            "critical_hit_plus_plus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mp_consumption_halved",
+      "name": "消耗MP减半",
+      "grade": 45,
+      "description": "技能的消耗MP减少50%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "consumption_mp_reduction",
+            "consume_mp_compression"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hpmp_super_enhanced",
+      "name": "HPMP超强化",
+      "grade": 45,
+      "description": "HP与MP的最大值提升50。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "life_force",
+            "sages_wisdom"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "use_small_self_fulfill_greater_self",
+      "name": "以小我成全大我",
+      "grade": 45,
+      "description": "通过与能联想到 值得信赖的领袖或随从的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "purple_exquisite",
+      "name": "紫之精致",
+      "grade": 45,
+      "description": "赋予1层随机参数提升， 并赋予2个随机增益效果。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "purple_rhythm",
+            "as_harmonious_as_air"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "allies",
+      "name": "盟友",
+      "grade": 45,
+      "description": "退到后方时，恢复交换队友的HP与MP。 恢复力：50",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "partner",
+            "ambitious"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "power_military_god",
+      "name": "军神之力",
+      "grade": 45,
+      "description": "攻击力提升40。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "power_beasts",
+            "power_destruction"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "yellow_exquisite",
+      "name": "黄之精致",
+      "grade": 45,
+      "description": "分别赋予1层随机参数提升与副属性耐性提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "yellow_rhythm",
+            "as_harmonious_as_air"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "use_big_self_fulfill_small_self",
+      "name": "以大我成全小我",
+      "grade": 48,
+      "description": "通过与能联想到 值得信赖的领袖或随从的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "transparent_disease",
+      "name": "透明的病",
+      "grade": 48,
+      "description": "通过与名称中带有黄、浅蓝、紫的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "save_skills",
+      "name": "储存技能",
+      "grade": 48,
+      "description": "技能的威力增加15%， 且消耗MP减少15%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "super_enhanced_skills",
+            "mp_consumption_halved"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "super_enhanced_skills",
+      "name": "技能超强化",
+      "grade": 48,
+      "description": "技能的威力增加30%。 相对地消耗MP提升30%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "skill_strengthening",
+            "skill_bonus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "all_abilities_super_enhanced",
+      "name": "全能力超强化",
+      "grade": 49,
+      "description": "所有能力值提升20。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "super_enhanced_offense_defense",
+            "attack_speed_super_enhanced"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a_cruel_blow",
+      "name": "冷酷无赦的一击",
+      "grade": 49,
+      "description": "对破防中目标造成的伤害 增加60%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "a_blow_without_mercy",
+            "a_merciless_blow"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "awakening_endurance",
+      "name": "耐久力的觉醒",
+      "grade": 50,
+      "description": "HP与MP的最大值提升80。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "hpmp_super_enhanced",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "awakening_power",
+      "name": "力量的觉醒",
+      "grade": 50,
+      "description": "攻击力提升60。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "power_military_god",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "awakening_defense",
+      "name": "守备的觉醒",
+      "grade": 50,
+      "description": "防御力提升60。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "dragon_scale_guard",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "awakening_speed",
+      "name": "速度的觉醒",
+      "grade": 50,
+      "description": "敏捷提升60。",
+      "categories": [
+        "调",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "speed_light",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "awakening_spiritual_power",
+      "name": "精神力的觉醒",
+      "grade": 50,
+      "description": "MP最大值提升100。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "sages_wisdom",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "awakening_vitality",
+      "name": "生命力的觉醒",
+      "grade": 50,
+      "description": "HP最大值提升200。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "life_force",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "priceless",
+      "name": "无价",
+      "grade": 50,
+      "description": "店头的收购价格降低70%。 但复制价格和补充价格也会降低。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "affordable",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cumulative_bonus",
+      "name": "累计加成",
+      "grade": 50,
+      "description": "道具的威力及恢复力 增加〔最大使用次数×15〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "super_enhanced_times",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a_sure_hit",
+      "name": "必中暴击",
+      "grade": 50,
+      "description": "使用道具时，必定会发生暴击。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "critical_hit_finished_product",
+            "half_crit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dim_weakness",
+      "name": "昏暗的衰弱",
+      "grade": 50,
+      "description": "通过与名称中带有纯白的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "trouble_blank_paper",
+            "transparent_disease"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faded_bright_red",
+      "name": "褪色的鲜红",
+      "grade": 50,
+      "description": "HP在25%以下时，暴击率、 伤害减轻率、回避率、命中率提升25%。 受到会陷入无法战斗的伤害时， 有10%的概率使HP剩余1。",
+      "categories": [
+        "调",
+        "防"
+      ]
+    },
+    {
+      "id": "spiritual_evolution",
+      "name": "灵体进化",
+      "grade": 50,
+      "description": "基础能力值提升30%。",
+      "categories": [
+        "调",
+        "防",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "physical_super_evolution",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "as_harmonious_as_air",
+      "name": "如空气般和谐",
+      "grade": 50,
+      "description": "通过与名称中带有黄、浅蓝、紫的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "single_complex_strengthening_at_same_time",
+      "name": "单复同时强化",
+      "grade": 50,
+      "description": "道具的威力及恢复力增加 〔20÷效果范围内目标数量＋ 效果范围内目标数量×10〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "single_target_reward",
+            "group_rewards"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "an_end",
+      "name": "一次终结",
+      "grade": 50,
+      "description": "道具变得只能使用1次， 相对地威力及恢复力将增加 〔最大使用次数×20〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "mandatory_one_minus_time_use",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gods_throw",
+      "name": "神之投掷",
+      "grade": 50,
+      "description": "使用道具时的WT延长200%。 相对地威力及恢复力增加100%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "power_throw_2",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "final_blow_2",
+      "name": "最后的强击",
+      "grade": 50,
+      "description": "剩余使用次数为1次时， 道具的威力及恢复力增加50%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "final_blow",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lightning_throw",
+      "name": "闪电投掷",
+      "grade": 50,
+      "description": "使用道具时的WT缩短80%。 相对地威力及恢复力减少80%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "sonic_throw",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "consume_mp_shrink",
+      "name": "消耗MP缩小",
+      "grade": 50,
+      "description": "技能的消耗MP减少75%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "mp_consumption_halved",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unique",
+      "name": "独一无二",
+      "grade": 50,
+      "description": "店头的收购价格提高50克尔， 且初始收购价格提高80%。 但复制价格和补充价格也会随之提高。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "limited_price",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "super_skills",
+      "name": "超绝技能",
+      "grade": 50,
+      "description": "技能的威力增加50%。 相对地消耗MP提升50%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "super_enhanced_skills",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pure_white_resonance",
+      "name": "纯白共振",
+      "grade": 50,
+      "description": "通过与名称中包含 “衰弱”或“繁荣”的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "yellow_rhythm",
+            "ups_downs_blue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a_quick_messy_pursuit",
+      "name": "快刀乱麻的追击",
+      "grade": 50,
+      "description": "攻击时发生30%的追加伤害， 且技能威力提升15%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "increase_sharpness",
+            "enhance_attack_performance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_destructive_power",
+      "name": "终极的破坏力",
+      "grade": 50,
+      "description": "道具威力增加50%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "violent_destructive_power",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_delicacy",
+      "name": "究极的逸品",
+      "grade": 50,
+      "description": "在继承特性时选择此特性， 道具的品质提升50%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "super_quality",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_recovery",
+      "name": "终极的恢复量",
+      "grade": 50,
+      "description": "道具恢复力增加50%。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "violent_recovery_volume",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arousal_factor",
+      "name": "觉醒因子",
+      "grade": 55,
+      "description": "借由与能力值相关的特定特性合成， 可使其升级成更强大的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "undefeated_divine_punishment",
+      "name": "无守的神罚",
+      "grade": 55,
+      "description": "赋予目标3层防御力下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "curse_wushou",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "speedless_divine_punishment",
+      "name": "无速的神罚",
+      "grade": 55,
+      "description": "赋予目标3层敏捷下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "speedless_curse",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "powerless_divine_punishment",
+      "name": "无力的神罚",
+      "grade": 55,
+      "description": "赋予目标3层攻击力下降。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "powerless_curse",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "strengthening_convergence_diffusion",
+      "name": "收束扩散强化",
+      "grade": 55,
+      "description": "道具的威力及恢复力增加 〔30÷效果范围内目标数量＋ 效果范围内目标数量×15〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "single_complex_strengthening_at_same_time",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seal_demon_king",
+      "name": "魔王之印",
+      "grade": 55,
+      "description": "借由与特定特性合成， 可使其升级成更强大的特性。 并且会生成“恶魔”的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "dragon_gods_asylum",
+      "name": "龙神的庇护",
+      "grade": 55,
+      "description": "借由与特定特性合成， 可使其升级成更强大的特性。 并且会生成“龙神”的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "skills_skilled",
+      "name": "熟练者的技能",
+      "grade": 55,
+      "description": "技能的威力增加25%， 且消耗MP减少25%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "cost_compression_skills",
+            "save_skills"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slightly_prosperous",
+      "name": "略微繁荣",
+      "grade": 55,
+      "description": "通过与名称中带有纯白的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "clear_wisdom",
+            "as_harmonious_as_air"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_tight_bondage",
+      "name": "终极紧缚",
+      "grade": 55,
+      "description": "以100%的概率赋予2层束缚。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "give_tight_binding",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_sore",
+      "name": "终极炎疮",
+      "grade": 55,
+      "description": "以100%的概率赋予2层火伤。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "give_inflammation",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_ice_sores",
+      "name": "终极冰疮",
+      "grade": 55,
+      "description": "以100%的概率赋予2层冻伤。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "give_ice_sores",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_curse",
+      "name": "终极怨咒",
+      "grade": 55,
+      "description": "以100%的概率赋予2层诅咒。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "give_curse",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_dull_numbness",
+      "name": "终极钝麻",
+      "grade": 55,
+      "description": "以100%的概率赋予2层麻痹。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "impart_dull_numbness",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_lethargy",
+      "name": "终极昏睡",
+      "grade": 55,
+      "description": "以100%的概率赋予2层睡眠。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "impart_drowsiness",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ultimate_poison",
+      "name": "终极剧毒",
+      "grade": 55,
+      "description": "以100%的概率赋予2层中毒。 异常状态赋予概率会随耐性产生变化。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "give_poison",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sound_body",
+      "name": "健全的身体",
+      "grade": 55,
+      "description": "通过与能联想到 独当一面的领袖或随从的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "blessings_from_god_strength",
+      "name": "刚力神的祝福",
+      "grade": 55,
+      "description": "赋予目标3层攻击力提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "blessings_strength",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wei_tuotian_s_blessings",
+      "name": "韦驮天的祝福",
+      "grade": 55,
+      "description": "赋予目标3层敏捷提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "blessing_wind",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "group_outburst",
+      "name": "团体爆发",
+      "grade": 55,
+      "description": "道具的威力及恢复力 增加〔效果范围内目标数量×20〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "group_rewards",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pursuit_that_cuts_through_rocks_bit_by_bit",
+      "name": "点滴穿石的追击",
+      "grade": 55,
+      "description": "攻击时发生40%的追加伤害， 且技能威力提升20%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "a_quick_messy_pursuit",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "straightforward_heart",
+      "name": "率直的心",
+      "grade": 55,
+      "description": "通过与能联想到 独当一面的领袖或随从的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "tangible_skills",
+      "name": "切实的技能",
+      "grade": 55,
+      "description": "通过与能联想到 独当一面的领袖或随从的特性合成， 变化为能发挥效果的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "patron_saints_blessing",
+      "name": "守护神的祝福",
+      "grade": 55,
+      "description": "赋予目标3层防御力提升。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "blessing_protection",
+            "essence_divine_realm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "single_storm",
+      "name": "单体风暴",
+      "grade": 55,
+      "description": "道具的威力及恢复力 增加〔60÷效果范围内目标数量〕%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "single_target_reward",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breaking_defense_breaking_out",
+      "name": "破防爆发",
+      "grade": 55,
+      "description": "对破防中目标造成的伤害 增加80%。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "a_cruel_blow",
+            "ultimate_power"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "essence_divine_realm",
+      "name": "神域的精髓",
+      "grade": 55,
+      "description": "通过与WT、强化、弱化 相关的特定特性合成， 可使其升级成更强大的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "ultimate_power",
+      "name": "究极之力",
+      "grade": 55,
+      "description": "借由与品质、价格、威力、恢复力 相关的特定特性合成， 可使其升级成更强大的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "pure_white_erosion",
+      "name": "纯白侵蚀",
+      "grade": 56,
+      "description": "分别赋予1层全能力下降与随机副属性耐性下降， 并以50%的概率赋予5个随机异常状态。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "pure_white_resonance",
+            "dim_weakness"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pure_white_glory",
+      "name": "纯白荣华",
+      "grade": 56,
+      "description": "分别赋予1层全能力提升与随机耐性提升， 并赋予3个随机增益效果。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "pure_white_resonance",
+            "slightly_prosperous"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wang_zuozhicai",
+      "name": "王佐之才",
+      "grade": 59,
+      "description": "退到后方时，赋予换人的队友1层全能力提升。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "allies",
+            "use_small_self_fulfill_greater_self"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rare_wise_king",
+      "name": "稀世贤王",
+      "grade": 59,
+      "description": "自身在前锋队伍内时，所有前锋队伍成员的 攻击力、防御力、敏捷提升20。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "mingjun",
+            "use_small_self_fulfill_greater_self"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unparalleled_deputy",
+      "name": "无双副手",
+      "grade": 59,
+      "description": "移动至前卫时，赋予自身1层攻击力提升、 防御力提升、敏捷提升。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "allies",
+            "use_big_self_fulfill_small_self"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "overlord_hundred_demons",
+      "name": "百魔霸王",
+      "grade": 59,
+      "description": "攻击力、防御力、敏捷提升50。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "mingjun",
+            "use_big_self_fulfill_small_self"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "almighty_power",
+      "name": "全能之力",
+      "grade": 60,
+      "description": "所有能力值提升40。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "饰",
+        "符",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "all_abilities_super_enhanced",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demonic_flash",
+      "name": "恶魔闪焰",
+      "grade": 60,
+      "description": "道具威力增加100%。 但会消耗HP最大值20%的HP。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "violent_destructive_power",
+            "seal_demon_king"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demon_cure",
+      "name": "恶魔治癒",
+      "grade": 60,
+      "description": "道具恢复力增加100%。 但会消耗MP最大值20%的MP。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "violent_recovery_volume",
+            "seal_demon_king"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demon_sonic",
+      "name": "恶魔音速",
+      "grade": 60,
+      "description": "使用道具时的WT缩短75%。 相对地道具威力减少50%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "sonic_throw",
+            "seal_demon_king"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demon_throw",
+      "name": "恶魔投掷",
+      "grade": 60,
+      "description": "道具威力增加80%。 但使用道具时的WT增加150%。",
+      "categories": [
+        "调",
+        "攻",
+        "恢",
+        "削",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "power_throw_2",
+            "seal_demon_king"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_god_cure",
+      "name": "龙神治愈",
+      "grade": 60,
+      "description": "道具恢复力增加30%， 并根据赋予的特性强度进一步增加。",
+      "categories": [
+        "调",
+        "恢",
+        "强"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "violent_recovery_volume",
+            "dragon_gods_asylum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_gods_fang",
+      "name": "龙神之牙",
+      "grade": 60,
+      "description": "攻击力提升50， 且技能威力增加20%。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "power_military_god",
+            "dragon_gods_asylum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_gods_feet",
+      "name": "龙神之脚",
+      "grade": 60,
+      "description": "敏捷提升50， 回避率提升10%。",
+      "categories": [
+        "调",
+        "饰",
+        "符"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "speed_light",
+            "dragon_gods_asylum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_god_roars",
+      "name": "龙神咆哮",
+      "grade": 60,
+      "description": "道具威力增加30%， 并根据赋予的特性强度进一步增加。",
+      "categories": [
+        "调",
+        "攻",
+        "削"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "violent_destructive_power",
+            "dragon_gods_asylum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scales_dragon_god",
+      "name": "龙神之鳞",
+      "grade": 60,
+      "description": "防御力提升50， 异常状态的发生概率减轻30%。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "dragon_scale_guard",
+            "dragon_gods_asylum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_god_soul",
+      "name": "龙神之魂",
+      "grade": 60,
+      "description": "MP最大值提升100， 行动时会恢复MP15。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "sages_wisdom",
+            "dragon_gods_asylum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_gods_order",
+      "name": "龙神之命",
+      "grade": 60,
+      "description": "HP最大值提升175， 行动时会恢复HP30。",
+      "categories": [
+        "调",
+        "防",
+        "饰",
+        "符"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "life_force",
+            "dragon_gods_asylum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dragon_gods_reverse_scale",
+      "name": "龙神的逆鳞",
+      "grade": 60,
+      "description": "所有能力值提升30， 攻击时，造成大伤害的概率比平常高25%。",
+      "categories": [
+        "调",
+        "武",
+        "防",
+        "饰",
+        "符"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "all_abilities_super_enhanced",
+            "dragon_gods_asylum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "super_skill",
+      "name": "超级技能",
+      "grade": 60,
+      "description": "技能的威力增加35%， 且消耗MP减少35%。",
+      "categories": [
+        "调",
+        "武",
+        "探"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "skills_skilled",
+            "arousal_factor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wang_zuozhis_talent_body",
+      "name": "王佐之才·体",
+      "grade": 65,
+      "description": "退到后方时，恢复交换的队友100HP， 且防御时会获得1TP。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "wang_zuozhicai",
+            "sound_body"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wang_zuozhis_talent",
+      "name": "王佐之才·心",
+      "grade": 65,
+      "description": "退到后方时，恢复交换的队友50HP与MP， 且TP与DG的获得量增加20%。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "wang_zuozhicai",
+            "straightforward_heart"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wang_zuozhis_talents",
+      "name": "王佐之才·技",
+      "grade": 65,
+      "description": "退到后方时，使换人的队友恢复100MP， 并赋予1层暴击率提升与命中率提升。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "wang_zuozhicai",
+            "tangible_skills"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "half_dead",
+      "name": "半死不活",
+      "grade": 65,
+      "description": "使用道具时，有50%的概率 使强敌与头目以外的目标陷入无法战斗的状态。",
+      "categories": [
+        "调",
+        "攻"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "half_crit",
+            "kill_skills"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rare_sage_king_body",
+      "name": "稀世贤王·体",
+      "grade": 65,
+      "description": "自身在前锋队伍内时， 前锋队伍的防御力提升30， 异常状态耐性提升10%。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "rare_wise_king",
+            "sound_body"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "heart_a_rare_wise_king",
+      "name": "稀世贤王·心",
+      "grade": 65,
+      "description": "自身在前锋队伍内时，所有前锋队伍成员的 敏捷提升30，WT减少10%。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "rare_wise_king",
+            "straightforward_heart"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rare_sage_skills",
+      "name": "稀世贤王·技",
+      "grade": 65,
+      "description": "自身在前锋队伍内时， 所有前锋队伍成员的攻击力提升30， 道具与技能造成的伤害增加10%。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "rare_wise_king",
+            "tangible_skills"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unparalleled_deputy_body",
+      "name": "无双副手·体",
+      "grade": 65,
+      "description": "移动至前卫时，赋予自身1层防御力提升， 并赋予100%引诱目标。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "unparalleled_deputy",
+            "sound_body"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unparalleled_deputy_palm",
+      "name": "无双副手·心",
+      "grade": 65,
+      "description": "移动至前卫时， 赋予自身1层敏捷提升与加速。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "unparalleled_deputy",
+            "straightforward_heart"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unparalleled_off_minus_hand_skills",
+      "name": "无双副手·技",
+      "grade": 65,
+      "description": "移动至前卫时，赋予自身1层攻击力提升、 技能伤害强化、道具伤害强化。",
+      "categories": [
+        "调",
+        "防"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "unparalleled_deputy",
+            "tangible_skills"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hundred_demon_overlord_body",
+      "name": "百魔霸王·体",
+      "grade": 65,
+      "description": "防御力提升50， 每次获得回合时恢复HP与MP。 恢复力：30",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "overlord_hundred_demons",
+            "sound_body"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "heart_overlord_hundred_demons",
+      "name": "百魔霸王·心",
+      "grade": 65,
+      "description": "敏捷提升50，自身的获得TP量增加30%。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "overlord_hundred_demons",
+            "straightforward_heart"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hundred_demon_overlord_skills",
+      "name": "百魔霸王·技",
+      "grade": 65,
+      "description": "攻击力提升50。 攻击时，若目标散发灵气， 追加使灵气量表减少3。",
+      "categories": [
+        "调",
+        "武"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "overlord_hundred_demons",
+            "tangible_skills"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kill_skills",
+      "name": "必杀技能",
+      "grade": 65,
+      "description": "借由与暴击相关的特定特性合成， 可使其升级成更强大的特性。",
+      "categories": [
+        "调"
+      ]
+    },
+    {
+      "id": "kill_with_one_hit",
+      "name": "一击必杀",
+      "grade": 70,
+      "description": "使用道具时，必定使强敌与头目以外的目标 陷入无法战斗的状态。",
+      "categories": [
+        "调",
+        "攻"
+      ],
+      "combinations": [
+        {
+          "ingredients": [
+            "a_sure_hit",
+            "kill_skills"
+          ]
+        }
+      ]
+    }
+  ]
+}

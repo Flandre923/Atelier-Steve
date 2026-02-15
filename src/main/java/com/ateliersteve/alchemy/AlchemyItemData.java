@@ -2,7 +2,10 @@ package com.ateliersteve.alchemy;
 
 import com.ateliersteve.alchemy.element.ElementComponent;
 import com.ateliersteve.alchemy.element.ElementShapePresets;
+import com.ateliersteve.alchemy.trait.TraitCombinationEngine;
+import com.ateliersteve.alchemy.trait.TraitDefinition;
 import com.ateliersteve.alchemy.trait.TraitInstance;
+import com.ateliersteve.alchemy.trait.TraitRegistry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -32,11 +35,24 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
     );
 
     /**
-     * Creates random alchemy data by picking 1-3 element components from the predefined presets.
+     * Creates random alchemy data.
+     * Currently:
+     * - Randomly picks 1-3 traits from the registered trait pool.
+     * - Randomly picks 1-3 element components from the predefined presets.
      */
     public static AlchemyItemData createRandom(RandomSource random) {
         List<TraitInstance> traits = new ArrayList<>();
-        traits.add(TraitInstance.createHpBoostSmall());
+
+        List<TraitDefinition> availableTraits = new ArrayList<>(TraitRegistry.getAll());
+        if (!availableTraits.isEmpty()) {
+            Collections.shuffle(availableTraits, new java.util.Random(random.nextLong()));
+            int traitCount = 1 + random.nextInt(3); // 1 to 3
+            traitCount = Math.min(traitCount, availableTraits.size());
+            for (int i = 0; i < traitCount; i++) {
+                traits.add(new TraitInstance(availableTraits.get(i).getId()));
+            }
+            traits = new ArrayList<>(TraitCombinationEngine.resolveTraitCombinations(traits));
+        }
 
         List<ElementShapePresets.Preset> presets = new ArrayList<>(ElementShapePresets.ALL_PRESETS);
         Collections.shuffle(presets, new java.util.Random(random.nextLong()));

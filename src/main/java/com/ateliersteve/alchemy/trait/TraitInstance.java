@@ -17,11 +17,6 @@ import java.util.Objects;
 public record TraitInstance(ResourceLocation traitId) {
     private static final Map<ResourceLocation, AlchemyTrait> TRAIT_REGISTRY = new HashMap<>();
 
-    static {
-        // Register built-in traits
-        registerTrait(HpBoostTrait.INSTANCE);
-    }
-
     public static void registerTrait(AlchemyTrait trait) {
         TRAIT_REGISTRY.put(trait.getId(), trait);
     }
@@ -38,13 +33,6 @@ public record TraitInstance(ResourceLocation traitId) {
             ResourceLocation.STREAM_CODEC, TraitInstance::traitId,
             TraitInstance::new
     );
-
-    /**
-     * Creates a default HP boost small trait instance.
-     */
-    public static TraitInstance createHpBoostSmall() {
-        return new TraitInstance(HpBoostTrait.ID);
-    }
 
     /**
      * Get the actual trait implementation.
