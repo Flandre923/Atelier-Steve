@@ -1,0 +1,81 @@
+{
+  "target": {
+    "item": "minecraft:wheat"
+  },
+  "traits": {
+    "min": 0,
+    "max": 3
+  },
+  "elements": {
+    "min": 1,
+    "max": 2,
+    "presets": [
+      {
+        "element": "wind",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 0, 0, 1, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "thunder",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 0, 0, 1, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "thunder",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 1, 0, 0, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "fire",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 0, 0, 1, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "wind",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 0, 0, 1, 0, 0, 1, 0, 0]
+        }
+      },
+      {
+        "element": "wind",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [0, 1, 0, 0, 2, 0, 0, 0, 1]
+        }
+      },
+      {
+        "element": "fire",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [1, 0, 0, 0, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "water",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 0, 0, 0, 1, 0, 0, 0, 0]
+        }
+      }
+    ]
+  },
+  "cole": 1,
+  "priority": 0
+}

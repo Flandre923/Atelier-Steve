@@ -61,57 +61,7 @@ public class ElementShapePresets {
             new Preset(AlchemyElement.ICE, ICE_L_SHAPE)
     );
 
-    // Wheat-specific 3x3 presets used by Gathering Basket rolls.
-    // ★ = LINK, ■ = NORMAL, empty = EMPTY
-    public static final ElementShape WHEAT_SHAPE_1 = ElementShape.of(3, 3,
-            LINK,   EMPTY,  EMPTY,
-            NORMAL, EMPTY,  EMPTY,
-            EMPTY,  EMPTY,  EMPTY
-    );
-    public static final ElementShape WHEAT_SHAPE_2 = ElementShape.of(3, 3,
-            LINK,   EMPTY,  EMPTY,
-            NORMAL, EMPTY,  EMPTY,
-            EMPTY,  EMPTY,  EMPTY
-    );
-    public static final ElementShape WHEAT_SHAPE_3 = ElementShape.of(3, 3,
-            LINK,   NORMAL, EMPTY,
-            EMPTY,  EMPTY,  EMPTY,
-            EMPTY,  EMPTY,  EMPTY
-    );
-    public static final ElementShape WHEAT_SHAPE_4 = ElementShape.of(3, 3,
-            LINK,   EMPTY,  EMPTY,
-            NORMAL, EMPTY,  EMPTY,
-            EMPTY,  EMPTY,  EMPTY
-    );
-    public static final ElementShape WHEAT_SHAPE_5 = ElementShape.of(3, 3,
-            LINK,   EMPTY,  EMPTY,
-            NORMAL, EMPTY,  EMPTY,
-            NORMAL, EMPTY,  EMPTY
-    );
-    public static final ElementShape WHEAT_SHAPE_6 = ElementShape.of(3, 3,
-            EMPTY,  NORMAL, EMPTY,
-            EMPTY,  LINK,   EMPTY,
-            EMPTY,  EMPTY,  NORMAL
-    );
-    public static final ElementShape WHEAT_SHAPE_7 = ElementShape.of(3, 3,
-            NORMAL, EMPTY,  EMPTY,
-            EMPTY,  EMPTY,  EMPTY,
-            EMPTY,  EMPTY,  EMPTY
-    );
-    public static final ElementShape WHEAT_SHAPE_8 = ElementShape.of(3, 3,
-            LINK,   EMPTY,  EMPTY,
-            EMPTY,  NORMAL, EMPTY,
-            EMPTY,  EMPTY,  EMPTY
-    );
-
-    public static final List<Preset> WHEAT_PRESETS = List.of(
-            new Preset(AlchemyElement.WIND, WHEAT_SHAPE_1),
-            new Preset(AlchemyElement.THUNDER, WHEAT_SHAPE_2),
-            new Preset(AlchemyElement.THUNDER, WHEAT_SHAPE_3),
-            new Preset(AlchemyElement.FIRE, WHEAT_SHAPE_4),
-            new Preset(AlchemyElement.WIND, WHEAT_SHAPE_5),
-            new Preset(AlchemyElement.WIND, WHEAT_SHAPE_6),
-            new Preset(AlchemyElement.FIRE, WHEAT_SHAPE_7),
-            new Preset(AlchemyElement.WATER, WHEAT_SHAPE_8)
-    );
+    public static final List<ElementComponent> ALL_COMPONENTS = ALL_PRESETS.stream()
+            .map(ElementComponent::fromPreset)
+            .toList();
 }

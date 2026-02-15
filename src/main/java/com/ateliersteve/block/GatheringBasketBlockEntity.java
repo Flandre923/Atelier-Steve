@@ -1,6 +1,7 @@
 package com.ateliersteve.block;
 
 import com.ateliersteve.alchemy.AlchemyItemData;
+import com.ateliersteve.alchemy.ingredient.AlchemyIngredientRegistry;
 import com.ateliersteve.registry.ModBlockEntities;
 import com.ateliersteve.registry.ModDataComponents;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
@@ -18,7 +19,6 @@ import com.lowdragmc.lowdraglib2.syncdata.storage.FieldManagedStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,9 +64,7 @@ public class GatheringBasketBlockEntity extends BlockEntity implements ISyncPers
             if (!stack.isEmpty() && !stack.has(ModDataComponents.ALCHEMY_DATA.get())) {
                 var level = GatheringBasketBlockEntity.this.getLevel();
                 var random = level != null ? level.getRandom() : net.minecraft.util.RandomSource.create();
-                AlchemyItemData generated = stack.is(Items.WHEAT)
-                        ? AlchemyItemData.createRandomForWheat(random)
-                        : AlchemyItemData.createRandom(random);
+                AlchemyItemData generated = AlchemyIngredientRegistry.generateData(stack, random);
                 stack.set(ModDataComponents.ALCHEMY_DATA.get(), generated);
             }
         }

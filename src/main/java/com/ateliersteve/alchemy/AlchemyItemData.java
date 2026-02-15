@@ -43,21 +43,24 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
      * - Randomly picks 1-3 element components from the predefined presets.
      */
     public static AlchemyItemData createRandom(RandomSource random) {
-        List<TraitInstance> traits = generateRandomTraits(random, 1, 3);
-        List<ElementComponent> elements = generateRandomElements(random, ElementShapePresets.ALL_PRESETS, 1, 3);
-        return new AlchemyItemData(traits, elements, 0);
+        return createRandom(random, 1, 3, ElementShapePresets.ALL_COMPONENTS, 1, 3, 0);
     }
 
     /**
-     * Creates random alchemy data for gathered wheat.
-     * - Traits: 0 to 3
-     * - Elements: 1 to 2 (from wheat-specific presets)
-     * - Cole: fixed to 1
+     * Creates random alchemy data using explicit ranges and preset pool.
      */
-    public static AlchemyItemData createRandomForWheat(RandomSource random) {
-        List<TraitInstance> traits = generateRandomTraits(random, 0, 3);
-        List<ElementComponent> elements = generateRandomElements(random, ElementShapePresets.WHEAT_PRESETS, 1, 2);
-        return new AlchemyItemData(traits, elements, 1);
+    public static AlchemyItemData createRandom(
+            RandomSource random,
+            int traitMin,
+            int traitMax,
+            List<ElementComponent> elementPresetPool,
+            int elementMin,
+            int elementMax,
+            int cole
+    ) {
+        List<TraitInstance> traits = generateRandomTraits(random, traitMin, traitMax);
+        List<ElementComponent> elements = generateRandomElementsFromComponents(random, elementPresetPool, elementMin, elementMax);
+        return new AlchemyItemData(traits, elements, cole);
     }
 
     /**
@@ -89,28 +92,24 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
         return new ArrayList<>(TraitCombinationEngine.resolveTraitCombinations(picked));
     }
 
-    private static List<ElementComponent> generateRandomElements(
+    private static List<ElementComponent> generateRandomElementsFromComponents(
             RandomSource random,
-            List<ElementShapePresets.Preset> presetPool,
+            List<ElementComponent> presetPool,
             int min,
             int max
     ) {
-        if (presetPool.isEmpty() || max <= 0) {
+        if (presetPool == null || presetPool.isEmpty() || max <= 0) {
             return List.of();
         }
 
-        List<ElementShapePresets.Preset> presets = new ArrayList<>(presetPool);
+        List<ElementComponent> presets = new ArrayList<>(presetPool);
         Collections.shuffle(presets, new java.util.Random(random.nextLong()));
 
         int upperBound = Math.min(max, presets.size());
         int lowerBound = Math.min(min, upperBound);
         int count = lowerBound + random.nextInt(upperBound - lowerBound + 1);
 
-        List<ElementComponent> elements = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            elements.add(ElementComponent.fromPreset(presets.get(i)));
-        }
-        return elements;
+        return new ArrayList<>(presets.subList(0, count));
     }
 
     @Override
