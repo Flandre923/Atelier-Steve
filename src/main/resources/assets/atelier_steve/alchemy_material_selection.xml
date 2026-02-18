@@ -150,50 +150,167 @@
             horizontal-align: center;
         }
 
-        .result_header {
-            flex-direction: row;
-            align-items: center;
+        .preview_card {
+            flex-direction: column;
             gap-all: 6;
-            background: rect(#cfcfcf, 4, 1, #5a5a5a);
-            padding-all: 4;
+            flex-grow: 1;
+            width: 100%;
         }
 
-        .result_slot {
-            width: 26;
-            height: 26;
+        .top_section {
+            flex-direction: row;
+            align-items: flex-start;
+            gap-all: 8;
         }
 
-        .result_name {
+        .item_icon_container {
+            width: 52;
+            height: 52;
+            align-items: center;
+            justify-content: center;
+            background: rect(#f0f0f0, 20, 2, #b0b0b0);
+        }
+
+        .preview_item_slot {
+            width: 32;
+            height: 32;
+        }
+
+        .info_panel {
+            flex-direction: column;
+            gap-all: 4;
             flex-grow: 1;
         }
 
-        .section_title {
-            background: rect(#d7d7d7, 4, 1, #8d8d8d);
-            padding-horizontal: 4;
+        .info_row {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            background: rect(#2b2b2b, 4);
+            padding-horizontal: 6;
             padding-vertical: 2;
+            width: 100%;
         }
 
-        .materials_list {
+        .info_label {
+            color: #b5b5b5;
+            font-size: 10;
+        }
+
+        .info_value {
+            color: #ffffff;
+            font-size: 12;
+        }
+
+        .info_label_text {
+            flex-grow: 1;
+        }
+
+        .info_value_text {
+            horizontal-align: right;
+        }
+
+        .quality_section {
             flex-direction: column;
+            background: rect(#ffffff, 4, 1, #b0b0b0);
+            padding-all: 4;
             gap-all: 4;
         }
 
-        .material_row {
+        .quality_header {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .quality_label_text {
+            flex-grow: 1;
+        }
+
+        .quality_value_text {
+            horizontal-align: right;
+        }
+
+        .quality_bar {
+            flex-direction: row;
+            align-items: center;
+            gap-all: 2;
+            padding-all: 2;
+            background: rect(#e0e0e0, 3);
+        }
+
+        .quality_segment {
+            width: 12;
+            height: 6;
+            background: rect(#d6d6d6, 1);
+        }
+
+        .quality_segment_fill {
+            height: 6;
+        }
+
+        .attributes_scroller {
+            flex-grow: 1;
+            width: 100%;
+            min-height: 80;
+            background: rect(#e2e2e2, 3, 1, #5a5a5a);
+            padding-all: 4;
+        }
+
+        .attributes_list {
+            flex-direction: column;
+            gap-all: 6;
+            width: 100%;
+            min-height: 12;
+        }
+
+        .attr_item {
+            flex-direction: row;
+            align-items: center;
+            gap-all: 6;
             padding-vertical: 2;
+            height: 16;
         }
 
-        .material_info {
+        .attr_icon {
+            width: 14;
+            height: 14;
+            background: rect(#d6d6d6, 7);
+        }
+
+        .attr_content {
+            flex-direction: column;
+            gap-all: 2;
             flex-grow: 1;
         }
 
-        .material_name {
-            flex-grow: 1;
+        .attr_name {
             color: #2b2b2b;
+            font-size: 11;
         }
 
-        .material_qty {
-            flex-shrink: 0;
-            min-width: 28;
+        .attr_bar {
+            flex-direction: row;
+            align-items: flex-end;
+            gap-all: 2;
+            height: 12;
+        }
+
+        .bar_segment {
+            width: 4;
+            height: 6;
+            background: rect(#d6d6d6, 1);
+            align-self: flex-end;
+        }
+
+        .bar_segment_key {
+            width: 6;
+            height: 10;
+            align-self: flex-end;
+        }
+
+        .effects_empty {
             color: #2b2b2b;
         }
 
@@ -233,12 +350,35 @@
             <label id="basket_hint" class="hint_text"/>
         </element>
         <element id="material_select_right" class="panel right_panel">
-            <element id="result_header" class="result_header">
-                <item-slot id="result_slot" class="result_slot"/>
-                <label id="result_name" class="result_name"/>
+            <element id="preview_card" class="preview_card">
+                <element id="top_section" class="top_section">
+                    <element id="item_icon_container" class="item_icon_container">
+                        <item-slot id="preview_item_slot" class="preview_item_slot"/>
+                    </element>
+                    <element id="info_panel" class="info_panel">
+                        <element class="info_row">
+                            <label id="level_label" class="info_label info_label_text"/>
+                            <label id="level_value" class="info_value info_value_text"/>
+                        </element>
+                        <element class="info_row">
+                            <label id="usage_label" class="info_label info_label_text"/>
+                            <label id="usage_value" class="info_value info_value_text"/>
+                        </element>
+                        <element class="info_row">
+                            <label id="craft_label" class="info_label info_label_text"/>
+                            <label id="craft_value" class="info_value info_value_text"/>
+                        </element>
+                    </element>
+                </element>
+                <element id="quality_section" class="quality_section">
+                    <element class="quality_header">
+                        <label id="quality_label" class="quality_label_text"/>
+                        <label id="quality_value" class="quality_value_text"/>
+                    </element>
+                    <element id="quality_bar" class="quality_bar"/>
+                </element>
+                <element id="attributes_scroller" class="attributes_scroller"/>
             </element>
-            <label id="materials_header" class="section_title"/>
-            <element id="materials_list" class="materials_list"/>
         </element>
     </root>
 </ldlib2-ui>
