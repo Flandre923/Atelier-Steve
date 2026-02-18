@@ -143,6 +143,8 @@
             color: #ffffff;
             font-size: 8;
             z-index: 2;
+            text-align: center;
+            vertical-align: center;
         }
 
         .hint_text {

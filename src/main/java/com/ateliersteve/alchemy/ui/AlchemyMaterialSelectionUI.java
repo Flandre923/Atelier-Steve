@@ -645,7 +645,8 @@ public final class AlchemyMaterialSelectionUI {
                     continue;
                 }
                 for (var component : data.elements()) {
-                    values.merge(component.element().getSerializedName(), component.getNormalCount(), Integer::sum);
+                    int amount = component.getNormalCount() + component.getLinkCount();
+                    values.merge(component.element().getSerializedName(), amount, Integer::sum);
                 }
             }
         }
