@@ -21,6 +21,7 @@ public class ModCreativeTabs {
                     .icon(() -> ModItems.GATHERING_BASKET.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.GATHERING_BASKET.get());
+                        output.accept(ModItems.ALCHEMY_CAULDRON.get());
                         output.accept(ModItems.NEUTRALIZER_RED.get().getDefaultInstance());
                     })
                     .build()

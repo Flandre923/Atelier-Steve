@@ -17,6 +17,11 @@ public class ModItems {
             ModBlocks.GATHERING_BASKET
     );
 
+    public static final DeferredItem<BlockItem> ALCHEMY_CAULDRON = ITEMS.registerSimpleBlockItem(
+            "alchemy_cauldron",
+            ModBlocks.ALCHEMY_CAULDRON
+    );
+
     public static final DeferredItem<Item> NEUTRALIZER_RED = ITEMS.register(
             "neutralizer_red",
             () -> new AlchemyItem(

@@ -1,6 +1,7 @@
 package com.ateliersteve.registry;
 
 import com.ateliersteve.AtelierSteve;
+import com.ateliersteve.block.AlchemyCauldronBlockEntity;
 import com.ateliersteve.block.GatheringBasketBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -16,6 +17,12 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("gathering_basket", () -> BlockEntityType.Builder.of(
                     GatheringBasketBlockEntity::new,
                     ModBlocks.GATHERING_BASKET.get()
+            ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AlchemyCauldronBlockEntity>> ALCHEMY_CAULDRON =
+            BLOCK_ENTITIES.register("alchemy_cauldron", () -> BlockEntityType.Builder.of(
+                    AlchemyCauldronBlockEntity::new,
+                    ModBlocks.ALCHEMY_CAULDRON.get()
             ).build(null));
 
     public static void register(IEventBus eventBus) {

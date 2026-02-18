@@ -1,0 +1,25 @@
+package com.ateliersteve.block;
+
+import com.ateliersteve.alchemy.ui.AlchemyMaterialSelectionUI;
+import com.ateliersteve.alchemy.ui.AlchemyRecipePreviewUI;
+import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
+import com.ateliersteve.registry.ModBlockEntities;
+import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+public class AlchemyCauldronBlockEntity extends BlockEntity {
+    public AlchemyCauldronBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.ALCHEMY_CAULDRON.get(), pos, state);
+    }
+
+    public ModularUI createUI(Player player) {
+        AlchemyRecipeDefinition pending = AlchemyMaterialSelectionUI.consumePendingRecipe(player);
+        if (pending != null) {
+            return AlchemyMaterialSelectionUI.createUI(player, getBlockPos(), pending);
+        }
+        return AlchemyRecipePreviewUI.createUI(player, getBlockPos());
+    }
+}

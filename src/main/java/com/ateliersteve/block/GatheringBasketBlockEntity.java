@@ -79,6 +79,10 @@ public class GatheringBasketBlockEntity extends BlockEntity implements ISyncPers
         super(ModBlockEntities.GATHERING_BASKET.get(), pos, state);
     }
 
+    public ItemStackHandler getInventory() {
+        return inventory;
+    }
+
     @Override
     public FieldManagedStorage getSyncStorage() {
         return syncStorage;

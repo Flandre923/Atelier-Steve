@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ldlib2-ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Low-Drag-MC/LDLib2/refs/heads/1.21/ldlib2-ui.xsd">
+    <stylesheet location="ldlib2:lss/mc.lss"/>
+    <style>
+        #alchemy_recipe_root {
+            width: 360;
+            height: 240;
+            flex-direction: row;
+            padding-all: 8;
+            gap-all: 8;
+            background: rect(rgba(0, 0, 0, 140), 6);
+        }
+
+        .panel {
+            background: rect(#c6c6c6, 4, 1, #555555);
+            padding-all: 6;
+        }
+
+        .sidebar {
+            width: 150;
+            flex-direction: column;
+            gap-all: 6;
+        }
+
+        .main_display {
+            flex-direction: column;
+            gap-all: 6;
+            flex-grow: 1;
+        }
+
+        .top_title_bar {
+            height: 24;
+            align-items: center;
+            justify-content: center;
+            background: rect(#8e8e8e, 3);
+        }
+
+        .item_list {
+            flex-grow: 1;
+            width: 100%;
+            min-height: 120;
+            background: rect(rgba(0, 0, 0, 40), 3);
+            padding-all: 4;
+        }
+
+        .list_item {
+            width: 100%;
+            padding-all: 4;
+            gap-all: 4;
+        }
+
+        .list_item.active {
+            background: rect(#9a9a9a, 3, 1, #5a5a5a);
+        }
+
+
+        .detail_card {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            background: rect(#cfcfcf, 4, 1, #5a5a5a);
+            padding-all: 8;
+            gap-all: 6;
+        }
+
+        .big_icon {
+            align-items: center;
+            justify-content: center;
+            background: rect(#ffffff, 20, 2, #b0b0b0);
+        }
+
+        .quantity_control {
+            flex-direction: column;
+            align-items: flex-start;
+            gap-all: 4;
+        }
+
+        .qty_label {
+            padding-horizontal: 4;
+        }
+
+        .level_text {
+            padding-horizontal: 4;
+        }
+
+        .sub_tag {
+            align-self: flex-start;
+        }
+
+        .sub_tag_label {
+            background: rect(#7a7a7a, 8, 1, #5a5a5a);
+            padding-horizontal: 4;
+            padding-vertical: 2;
+            horizontal-align: left;
+            vertical-align: center;
+        }
+
+        .materials_box {
+            flex-direction: column;
+            gap-all: 4;
+            flex-grow: 1;
+            background: rect(#e2e2e2, 4, 1, #5a5a5a);
+            padding-all: 6;
+        }
+
+        .materials_header {
+            background: rect(rgba(0, 0, 0, 0), 0);
+        }
+
+        .materials_list {
+            flex-direction: column;
+            gap-all: 4;
+        }
+
+        .material_row {
+            padding-vertical: 2;
+        }
+
+        .material_info {
+            flex-grow: 1;
+        }
+
+        .material_name {
+            flex-grow: 1;
+            color: #2b2b2b;
+        }
+
+        .material_qty {
+            flex-shrink: 0;
+            min-width: 28;
+            color: #2b2b2b;
+        }
+
+        .row_space_between {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap-all: 4;
+            width: 100%;
+        }
+
+        .row_align_center {
+            flex-direction: row;
+            align-items: center;
+            gap-all: 4;
+        }
+
+        .center {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flex_grow {
+            flex-grow: 1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .item_icon_small {
+            width: 18;
+            height: 18;
+        }
+
+        .material_icon {
+            width: 18;
+            height: 18;
+        }
+
+        .big_icon_slot {
+            width: 36;
+            height: 36;
+        }
+    </style>
+    <root id="alchemy_recipe_root">
+        <element id="sidebar" class="panel sidebar">
+            <scroller-view id="item_list" class="item_list"/>
+        </element>
+        <element id="main_display" class="panel main_display">
+            <element id="title_bar" class="top_title_bar">
+                <label id="title_label"/>
+            </element>
+            <element id="detail_card" class="detail_card">
+                <element id="big_icon" class="big_icon">
+                    <item-slot id="big_icon_slot" class="big_icon_slot"/>
+                </element>
+                <element id="quantity_control" class="quantity_control">
+                    <label id="level_text" class="level_text"/>
+                    <label id="qty_label" class="qty_label"/>
+                    <element id="sub_tag" class="sub_tag">
+                        <label id="sub_tag_label" class="sub_tag_label"/>
+                    </element>
+                </element>
+            </element>
+            <element id="materials_box" class="materials_box">
+                <label id="materials_header" class="materials_header"/>
+                <element id="materials_list" class="materials_list"/>
+            </element>
+        </element>
+    </root>
+</ldlib2-ui>
