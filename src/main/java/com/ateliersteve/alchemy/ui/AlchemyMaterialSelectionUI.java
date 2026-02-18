@@ -69,6 +69,14 @@ public final class AlchemyMaterialSelectionUI {
             AtelierSteve.id("category_gunpowder"), AtelierSteve.id("textures/gui/ingredients/category_gunpowder.png"),
             AtelierSteve.id("category_water"), AtelierSteve.id("textures/gui/ingredients/category_water.png")
     );
+    private static final Map<String, ResourceLocation> ELEMENT_ICONS = Map.of(
+            "fire", AtelierSteve.id("textures/gui/elements/fire.png"),
+            "water", AtelierSteve.id("textures/gui/elements/light.png"),
+            "ice", AtelierSteve.id("textures/gui/elements/ice.png"),
+            "wind", AtelierSteve.id("textures/gui/elements/wind.png"),
+            "thunder", AtelierSteve.id("textures/gui/elements/thunder.png"),
+            "light", AtelierSteve.id("textures/gui/elements/light.png")
+    );
 
     private AlchemyMaterialSelectionUI() {
     }
@@ -510,6 +518,13 @@ public final class AlchemyMaterialSelectionUI {
         return TAG_CATEGORY_ICONS.get(tagId);
     }
 
+    private static ResourceLocation resolveElementIcon(String element) {
+        if (element == null) {
+            return null;
+        }
+        return ELEMENT_ICONS.get(element);
+    }
+
     private static void buildQualityBar(UIElement bar, int quality) {
         bar.clearAllChildren();
         int clamped = Math.max(0, Math.min(quality, QUALITY_MAX));
@@ -582,8 +597,13 @@ public final class AlchemyMaterialSelectionUI {
                     .addClass("attr_item")
                     .layout(layout -> layout.widthPercent(100));
             var icon = new UIElement()
-                    .addClass("attr_icon")
-                    .lss("background", "rect(" + color + ", 7)");
+                    .addClass("attr_icon");
+            ResourceLocation iconTexture = resolveElementIcon(group.type());
+            if (iconTexture != null) {
+                icon.lss("background", "sprite(" + iconTexture + ")");
+            } else {
+                icon.lss("background", "rect(" + color + ", 7)");
+            }
             var content = new UIElement().addClass("attr_content");
             var name = new Label()
                     .setText(step == null ? Component.literal("\u65e0") : Component.literal(step.value()))

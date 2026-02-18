@@ -5,7 +5,7 @@ import net.minecraft.util.StringRepresentable;
 
 public enum AlchemyElement implements StringRepresentable {
     FIRE("fire", 0xFF5500),
-    WATER("water", 0x0055FF),
+    LIGHT("light", 0x0055FF),
     ICE("ice", 0x00FFFF),
     THUNDER("thunder", 0xFFFF00),
     WIND("wind", 0x00FF00);
@@ -36,6 +36,9 @@ public enum AlchemyElement implements StringRepresentable {
     }
 
     public static AlchemyElement fromName(String name) {
+        if ("water".equals(name)) {
+            return LIGHT;
+        }
         for (AlchemyElement element : values()) {
             if (element.name.equals(name)) {
                 return element;
