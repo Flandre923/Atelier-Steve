@@ -5,6 +5,7 @@
     "minecraft:charcoal",
     "minecraft:blaze_rod",
     "minecraft:dried_kelp_block",
-    "minecraft:lava_bucket"
+    "minecraft:lava_bucket",
+    "atelier_steve:neutralizer_red"
   ]
 }

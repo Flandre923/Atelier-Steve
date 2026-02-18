@@ -1,8 +1,10 @@
 {
   "itemGroup.atelier_steve": "史蒂夫的炼金工房",
   "block.atelier_steve.gathering_basket": "采集篮",
+  "item.atelier_steve.neutralizer_red": "中和剂·红",
   "tooltip.atelier_steve.alchemy_data": "炼金数据",
   "tooltip.atelier_steve.cole": "克尔: %s",
+  "tooltip.atelier_steve.quality": "品质: %s",
   "tooltip.atelier_steve.traits": "特性:",
   "tooltip.atelier_steve.elements": "成分:",
   "element.atelier_steve.fire": "火",

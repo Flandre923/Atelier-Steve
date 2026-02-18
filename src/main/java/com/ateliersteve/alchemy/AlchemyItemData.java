@@ -22,17 +22,19 @@ import java.util.Objects;
  * Data component that stores alchemy data for an item.
  * Contains traits and element components.
  */
-public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent> elements, int cole) {
+public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent> elements, int cole, int quality) {
     public static final Codec<AlchemyItemData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             TraitInstance.CODEC.listOf().fieldOf("traits").forGetter(AlchemyItemData::traits),
             ElementComponent.CODEC.listOf().fieldOf("elements").forGetter(AlchemyItemData::elements),
-            Codec.INT.optionalFieldOf("cole", 0).forGetter(AlchemyItemData::cole)
+            Codec.INT.optionalFieldOf("cole", 0).forGetter(AlchemyItemData::cole),
+            Codec.INT.optionalFieldOf("quality", 0).forGetter(AlchemyItemData::quality)
     ).apply(instance, AlchemyItemData::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, AlchemyItemData> STREAM_CODEC = StreamCodec.composite(
             TraitInstance.STREAM_CODEC.apply(ByteBufCodecs.list()), AlchemyItemData::traits,
             ElementComponent.STREAM_CODEC.apply(ByteBufCodecs.list()), AlchemyItemData::elements,
             ByteBufCodecs.INT, AlchemyItemData::cole,
+            ByteBufCodecs.INT, AlchemyItemData::quality,
             AlchemyItemData::new
     );
 
@@ -43,7 +45,7 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
      * - Randomly picks 1-3 element components from the predefined presets.
      */
     public static AlchemyItemData createRandom(RandomSource random) {
-        return createRandom(random, 1, 3, ElementShapePresets.ALL_COMPONENTS, 1, 3, 0);
+        return createRandom(random, 1, 3, ElementShapePresets.ALL_COMPONENTS, 1, 3, 0, 0);
     }
 
     /**
@@ -56,22 +58,23 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
             List<ElementComponent> elementPresetPool,
             int elementMin,
             int elementMax,
-            int cole
+            int cole,
+            int quality
     ) {
         List<TraitInstance> traits = generateRandomTraits(random, traitMin, traitMax);
         List<ElementComponent> elements = generateRandomElementsFromComponents(random, elementPresetPool, elementMin, elementMax);
-        return new AlchemyItemData(traits, elements, cole);
+        return new AlchemyItemData(traits, elements, cole, quality);
     }
 
     /**
      * Creates empty alchemy data.
      */
     public static AlchemyItemData empty() {
-        return new AlchemyItemData(List.of(), List.of(), 0);
+        return new AlchemyItemData(List.of(), List.of(), 0, 0);
     }
 
     public boolean isEmpty() {
-        return traits.isEmpty() && elements.isEmpty();
+        return traits.isEmpty() && elements.isEmpty() && cole == 0 && quality == 0;
     }
 
     private static List<TraitInstance> generateRandomTraits(RandomSource random, int min, int max) {
@@ -117,11 +120,14 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AlchemyItemData that = (AlchemyItemData) o;
-        return cole == that.cole && Objects.equals(traits, that.traits) && Objects.equals(elements, that.elements);
+        return cole == that.cole
+                && quality == that.quality
+                && Objects.equals(traits, that.traits)
+                && Objects.equals(elements, that.elements);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(traits, elements, cole);
+        return Objects.hash(traits, elements, cole, quality);
     }
 }

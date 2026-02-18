@@ -42,6 +42,11 @@ public class AlchemyTooltipHandler {
                     .withStyle(ChatFormatting.YELLOW));
         }
 
+        if (data.quality() > 0) {
+            tooltip.add(Component.translatable("tooltip.atelier_steve.quality", data.quality())
+                    .withStyle(ChatFormatting.YELLOW));
+        }
+
         // Add traits
         if (!data.traits().isEmpty()) {
             tooltip.add(Component.translatable("tooltip.atelier_steve.traits")

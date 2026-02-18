@@ -20,6 +20,7 @@ public record AlchemyIngredientDefinition(
         int elementMin,
         int elementMax,
         int cole,
+        int quality,
         List<ElementComponent> elementPresets,
         boolean useDefaultElementPresets,
         int priority

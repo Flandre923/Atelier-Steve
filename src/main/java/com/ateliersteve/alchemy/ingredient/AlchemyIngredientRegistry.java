@@ -11,6 +11,12 @@ import java.util.List;
 public class AlchemyIngredientRegistry {
     private static final List<AlchemyIngredientDefinition> DEFINITIONS = new ArrayList<>();
 
+    public interface QualityModifier {
+        int adjustQuality(ItemStack stack, AlchemyIngredientDefinition definition, int baseQuality);
+    }
+
+    public static final QualityModifier NONE = (stack, definition, baseQuality) -> baseQuality;
+
     public static void clear() {
         DEFINITIONS.clear();
     }
@@ -39,10 +45,18 @@ public class AlchemyIngredientRegistry {
     }
 
     public static AlchemyItemData generateData(ItemStack stack, RandomSource random) {
+        return generateData(stack, random, NONE);
+    }
+
+    public static AlchemyItemData generateData(ItemStack stack, RandomSource random, QualityModifier qualityModifier) {
         AlchemyIngredientDefinition definition = findMatching(stack);
         if (definition == null) {
             return AlchemyItemData.createRandom(random);
         }
+        int baseQuality = definition.quality();
+        int adjustedQuality = qualityModifier == null
+                ? baseQuality
+                : qualityModifier.adjustQuality(stack, definition, baseQuality);
         return AlchemyItemData.createRandom(
                 random,
                 definition.traitMin(),
@@ -50,7 +64,8 @@ public class AlchemyIngredientRegistry {
                 definition.getElementPresets(),
                 definition.elementMin(),
                 definition.elementMax(),
-                definition.cole()
+                definition.cole(),
+                adjustedQuality
         );
     }
 }

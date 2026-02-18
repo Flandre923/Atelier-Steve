@@ -104,6 +104,7 @@ public class AlchemyIngredientDataLoader {
         }
 
         int cole = readInt(root, "cole", 0);
+        int quality = readInt(root, "quality", 0);
         int priority = readInt(root, "priority", 0);
 
         return new AlchemyIngredientDefinition(
@@ -115,6 +116,7 @@ public class AlchemyIngredientDataLoader {
                 elementMin,
                 elementMax,
                 cole,
+                quality,
                 elementPresets,
                 useDefaultElementPresets,
                 priority
