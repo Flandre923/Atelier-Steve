@@ -1,0 +1,113 @@
+{
+  "result": "atelier_steve:neutralizer_red",
+  "grid_size": {
+    "width": 3,
+    "height": 3
+  },
+  "cells": [
+    {"x": 0, "y": 0, "type": "star", "color": "orange"},
+    {"x": 0, "y": 1, "type": "block", "color": "orange"},
+    {"x": 1, "y": 1, "type": "block", "color": "orange"},
+    {"x": 1, "y": 0, "type": "empty", "color": "dark_grey"},
+    {"x": 2, "y": 0, "type": "empty", "color": "dark_grey"},
+    {"x": 2, "y": 1, "type": "empty", "color": "dark_grey"},
+    {"x": 0, "y": 2, "type": "empty", "color": "dark_grey"},
+    {"x": 1, "y": 2, "type": "empty", "color": "dark_grey"},
+    {"x": 2, "y": 2, "type": "empty", "color": "dark_grey"}
+  ],
+  "unlock_condition": {
+    "item": "minecraft:poppy",
+    "count": 1
+  },
+  "ingredients": [
+    {"type": "specific", "name": "minecraft:poppy", "count": 1},
+    {"type": "tag", "tag": "atelier_steve:category_gunpowder", "count": 2},
+    {"type": "tag", "tag": "atelier_steve:category_water", "count": 1}
+  ],
+  "effects": [
+    {
+      "type": "fire",
+      "category": "fire_level",
+      "steps": [
+        {"threshold": 5, "value": "Fire Level Up +1"},
+        {"threshold": 12, "value": "Fire Level Up +2"},
+        {"threshold": 16, "value": "Fire Level Up +3"}
+      ]
+    },
+    {
+      "type": "thunder",
+      "category": "grant_tag",
+      "steps": [
+        {"threshold": 10, "value": "Grant Tag Fuel"}
+      ]
+    },
+    {
+      "type": "fire",
+      "category": "heat_storage",
+      "steps": [
+        {
+          "threshold": 5,
+          "value": "Heat Storage",
+          "bonus_elements": [
+            {
+              "element": "fire",
+              "shape": {
+                "width": 2,
+                "height": 2,
+                "cells": [2, 0, 1, 0]
+              }
+            }
+          ]
+        },
+        {
+          "threshold": 11,
+          "value": "Heat Storage Material",
+          "bonus_elements": [
+            {
+              "element": "fire",
+              "shape": {
+                "width": 2,
+                "height": 2,
+                "cells": [2, 1, 1, 0]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fire",
+      "category": "neutralize_power",
+      "steps": [
+        {
+          "threshold": 8,
+          "value": "Neutralize Power Red",
+          "bonus_elements": [
+            {
+              "element": "fire",
+              "shape": {
+                "width": 1,
+                "height": 2,
+                "cells": [2, 1]
+              }
+            }
+          ]
+        },
+        {
+          "threshold": 17,
+          "value": "Rouge Power",
+          "bonus_elements": [
+            {
+              "element": "fire",
+              "shape": {
+                "width": 1,
+                "height": 2,
+                "cells": [2, 2]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

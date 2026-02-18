@@ -2,6 +2,7 @@ package com.ateliersteve.event;
 
 import com.ateliersteve.AtelierSteve;
 import com.ateliersteve.alchemy.ingredient.AlchemyIngredientReloadListener;
+import com.ateliersteve.alchemy.recipe.AlchemyRecipeReloadListener;
 import com.ateliersteve.alchemy.trait.TraitReloadListener;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -17,7 +18,9 @@ public class ResourceReloadHandler {
     public static void onAddReloadListener(AddReloadListenerEvent event) {
         event.addListener(new TraitReloadListener());
         event.addListener(new AlchemyIngredientReloadListener());
+        event.addListener(new AlchemyRecipeReloadListener());
         AtelierSteve.LOGGER.info("Registered trait reload listener");
         AtelierSteve.LOGGER.info("Registered alchemy ingredient reload listener");
+        AtelierSteve.LOGGER.info("Registered alchemy recipe reload listener");
     }
 }
