@@ -335,6 +335,9 @@ public final class AlchemyMaterialSelectionUI {
             BiConsumer<Integer, ItemStack> onStackClick
     ) {
         var cell = new UIElement().addClass("grid_slot_cell");
+        if (selected) {
+            cell.addClass("selected");
+        }
         var slotElement = new ItemSlot().bind(handler, slot).addClass("grid_slot_item");
         var check = new Label().setText(Component.literal("\u2713")).addClass("grid_slot_check");
         if (!selected) {
