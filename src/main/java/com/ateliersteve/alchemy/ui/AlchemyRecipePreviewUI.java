@@ -117,7 +117,8 @@ public final class AlchemyRecipePreviewUI {
                             serverPlayer.closeContainer();
                             serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
                         }
-                    }
+                    },
+                    () -> AlchemyMaterialSelectionUI.requestOpenClient(player, recipe)
             ));
         }
     }
@@ -228,7 +229,8 @@ public final class AlchemyRecipePreviewUI {
             int slot,
             Component name,
             boolean active,
-            Runnable onServerClick
+            Runnable onServerClick,
+            Runnable onClientClick
     ) {
         var row = new UIElement()
                 .addClass("list_item")
@@ -256,6 +258,10 @@ public final class AlchemyRecipePreviewUI {
 
         if (onServerClick != null) {
             row.addServerEventListener(UIEvents.CLICK, e -> onServerClick.run());
+        }
+
+        if (onClientClick != null) {
+            row.addEventListener(UIEvents.CLICK, e -> onClientClick.run());
         }
 
         return row;

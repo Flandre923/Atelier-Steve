@@ -5,6 +5,7 @@ import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeIngredient;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeRegistry;
 import com.ateliersteve.block.GatheringBasketBlockEntity;
+import com.lowdragmc.lowdraglib2.gui.factory.BlockUIMenuType;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
@@ -25,20 +26,24 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 public final class AlchemyMaterialSelectionUI {
     private static final int SEARCH_RADIUS = 6;
     private static final int GRID_COLUMNS = 4;
     private static final int VISIBLE_ROWS = 5;
-    private static final Map<UUID, ResourceLocation> PENDING_RECIPES = new ConcurrentHashMap<>();
+    private static final Map<UUID, ResourceLocation> PENDING_RECIPES_SERVER = new ConcurrentHashMap<>();
+    private static final Map<UUID, ResourceLocation> PENDING_RECIPES_CLIENT = new ConcurrentHashMap<>();
     private static final Map<ResourceLocation, ResourceLocation> TAG_CATEGORY_ICONS = Map.of(
             AtelierSteve.id("category_gunpowder"), AtelierSteve.id("textures/gui/ingredients/category_gunpowder.png"),
             AtelierSteve.id("category_water"), AtelierSteve.id("textures/gui/ingredients/category_water.png")
@@ -51,21 +56,24 @@ public final class AlchemyMaterialSelectionUI {
         if (player == null || recipe == null) {
             return;
         }
-        PENDING_RECIPES.put(player.getUUID(), recipe.id());
+        PENDING_RECIPES_SERVER.put(player.getUUID(), recipe.id());
     }
 
     public static void requestOpenClient(Player player, AlchemyRecipeDefinition recipe) {
         if (player == null || recipe == null) {
             return;
         }
-        PENDING_RECIPES.put(player.getUUID(), recipe.id());
+        PENDING_RECIPES_CLIENT.put(player.getUUID(), recipe.id());
     }
 
     public static AlchemyRecipeDefinition consumePendingRecipe(Player player) {
         if (player == null) {
             return null;
         }
-        ResourceLocation id = PENDING_RECIPES.remove(player.getUUID());
+        Map<UUID, ResourceLocation> pending = player.level().isClientSide
+                ? PENDING_RECIPES_CLIENT
+                : PENDING_RECIPES_SERVER;
+        ResourceLocation id = pending.remove(player.getUUID());
         if (id == null) {
             return null;
         }
@@ -79,17 +87,35 @@ public final class AlchemyMaterialSelectionUI {
         }
 
         var ui = UI.of(xml);
+        var root = ui.select("#alchemy_material_select_root").findFirst().orElseThrow();
         var recipeTitle = (Label) ui.select("#recipe_title").findFirst().orElseThrow();
         var ingredientFilter = (Label) ui.select("#ingredient_filter").findFirst().orElseThrow();
         var ingredientTabs = ui.select("#ingredient_tabs").findFirst().orElseThrow();
-        var prevButton = ui.select("#ingredient_prev").findFirst().orElseThrow();
-        var nextButton = ui.select("#ingredient_next").findFirst().orElseThrow();
         var gridScroller = (ScrollerView) ui.select("#ingredient_grid").findFirst().orElseThrow();
         var hintLabel = (Label) ui.select("#basket_hint").findFirst().orElseThrow();
         var resultSlot = (ItemSlot) ui.select("#result_slot").findFirst().orElseThrow();
         var resultName = (Label) ui.select("#result_name").findFirst().orElseThrow();
         var materialsHeader = (Label) ui.select("#materials_header").findFirst().orElseThrow();
         var materialsList = ui.select("#materials_list").findFirst().orElseThrow();
+
+        var gridContent = new UIElement().addClass("grid_content");
+        gridScroller.addScrollViewChild(gridContent);
+
+        root.setFocusable(true);
+        root.focus();
+        root.addEventListener(UIEvents.MOUSE_DOWN, e -> root.focus());
+        root.addServerEventListener(UIEvents.MOUSE_DOWN, e -> {
+            if (e.button == 1 && player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.closeContainer();
+                serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
+            }
+        });
+        root.addServerEventListener(UIEvents.KEY_DOWN, e -> {
+            if (e.keyCode == GLFW.GLFW_KEY_ESCAPE && player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.closeContainer();
+                serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
+            }
+        });
 
         ItemStack resultStack = resolveResultStack(recipe);
         recipeTitle.setText(resultStack.isEmpty()
@@ -122,19 +148,27 @@ public final class AlchemyMaterialSelectionUI {
 
         List<GatheringBasketBlockEntity> baskets = findNearbyBaskets(player, cauldronPos, SEARCH_RADIUS);
         List<ItemStack> basketStacks = collectBasketStacks(baskets);
-        if (baskets.isEmpty()) {
-            hintLabel.setText(Component.literal("附近没有采集篮"));
-        } else if (basketStacks.isEmpty()) {
-            hintLabel.setText(Component.empty());
-        } else {
-            hintLabel.setText(Component.empty());
-        }
 
         List<AlchemyRecipeIngredient> ingredients = recipe == null ? List.of() : recipe.ingredients();
         List<List<ItemStack>> perIngredient = new ArrayList<>();
         for (AlchemyRecipeIngredient ingredient : ingredients) {
             perIngredient.add(filterStacksForIngredient(basketStacks, ingredient));
         }
+
+        boolean hasBasket = !baskets.isEmpty();
+        boolean hasItems = !basketStacks.isEmpty();
+        boolean hasMatches = perIngredient.stream().anyMatch(matches -> !matches.isEmpty());
+        if (!hasBasket) {
+            hintLabel.setText(Component.literal("附近没有采集篮"));
+        } else if (!hasItems) {
+            hintLabel.setText(Component.literal("采集篮是空的"));
+        } else if (!hasMatches) {
+            hintLabel.setText(Component.literal("采集篮内没有匹配材料"));
+        } else {
+            hintLabel.setText(Component.empty());
+        }
+
+        Map<Integer, LinkedHashSet<Integer>> selectedSlots = new HashMap<>();
 
         AtomicInteger selectedIndex = new AtomicInteger(0);
         Runnable[] refreshRef = new Runnable[1];
@@ -143,30 +177,42 @@ public final class AlchemyMaterialSelectionUI {
             if (ingredients.isEmpty()) {
                 ingredientFilter.setText(Component.literal("No ingredients"));
                 ingredientTabs.clearAllChildren();
-                populateGrid(gridScroller, List.of());
+                populateGrid(gridContent, List.of(), null, null);
                 return;
             }
             if (index < 0 || index >= ingredients.size()) {
                 selectedIndex.set(0);
                 index = 0;
             }
+            int indexFinal = index;
             ingredientFilter.setText(buildIngredientFilterText(ingredients.get(index), perIngredient.get(index)));
-            refreshIngredientTabs(ingredientTabs, ingredients, index, selectedIndex, refreshRef[0]);
-            populateGrid(gridScroller, perIngredient.get(index));
+            refreshIngredientTabs(ingredientTabs, ingredients, index, selectedIndex, selectedSlots, refreshRef[0]);
+            LinkedHashSet<Integer> selectedSet = selectedSlots.get(indexFinal);
+            populateGrid(gridContent, perIngredient.get(indexFinal), selectedSet, (slot, stack) -> {
+                if (stack.isEmpty()) {
+                    return;
+                }
+                LinkedHashSet<Integer> current = selectedSlots.get(indexFinal);
+                if (current != null && current.contains(slot)) {
+                    current.remove(slot);
+                    if (current.isEmpty()) {
+                        selectedSlots.remove(indexFinal);
+                    }
+                } else {
+                    int max = ingredients.get(indexFinal).count();
+                    if (current == null) {
+                        current = new LinkedHashSet<>();
+                        selectedSlots.put(indexFinal, current);
+                    }
+                    if (current.size() >= max) {
+                        Integer first = current.iterator().next();
+                        current.remove(first);
+                    }
+                    current.add(slot);
+                }
+                refreshRef[0].run();
+            });
         };
-
-        prevButton.addEventListener(UIEvents.CLICK, e -> {
-            if (selectedIndex.get() > 0) {
-                selectedIndex.decrementAndGet();
-                refreshRef[0].run();
-            }
-        });
-        nextButton.addEventListener(UIEvents.CLICK, e -> {
-            if (selectedIndex.get() < ingredients.size() - 1) {
-                selectedIndex.incrementAndGet();
-                refreshRef[0].run();
-            }
-        });
 
         refreshRef[0].run();
 
@@ -178,6 +224,7 @@ public final class AlchemyMaterialSelectionUI {
             List<AlchemyRecipeIngredient> ingredients,
             int selectedIndex,
             AtomicInteger selected,
+            Map<Integer, LinkedHashSet<Integer>> selectedSlots,
             Runnable refresh
     ) {
         container.clearAllChildren();
@@ -189,7 +236,8 @@ public final class AlchemyMaterialSelectionUI {
             }
             tab.addChildren(
                     buildIngredientIcon(ingredient),
-                    new Label().setText(Component.literal("x" + ingredient.count())).addClass("ingredient_count")
+                    new Label().setText(buildIngredientCountText(selectedSlots.get(i), ingredient.count()))
+                            .addClass("ingredient_count")
             );
             int index = i;
             tab.addEventListener(UIEvents.CLICK, e -> {
@@ -200,8 +248,13 @@ public final class AlchemyMaterialSelectionUI {
         }
     }
 
-    private static void populateGrid(ScrollerView scroller, List<ItemStack> stacks) {
-        scroller.clearAllChildren();
+    private static void populateGrid(
+            UIElement gridContent,
+            List<ItemStack> stacks,
+            LinkedHashSet<Integer> selectedSlots,
+            BiConsumer<Integer, ItemStack> onStackClick
+    ) {
+        gridContent.clearAllChildren();
         int slotCount = Math.max(stacks.size(), GRID_COLUMNS * VISIBLE_ROWS);
         List<ItemStack> gridStacks = new ArrayList<>(slotCount);
         for (int i = 0; i < slotCount; i++) {
@@ -219,11 +272,39 @@ public final class AlchemyMaterialSelectionUI {
             for (int col = 0; col < GRID_COLUMNS; col++) {
                 int slot = row * GRID_COLUMNS + col;
                 if (slot < slotCount) {
-                    rowContainer.addChild(new ItemSlot().bind(handler, slot).addClass("grid_slot"));
+                    ItemStack stack = gridStacks.get(slot);
+                    boolean isSelected = !stack.isEmpty() && selectedSlots != null && selectedSlots.contains(slot);
+                    BiConsumer<Integer, ItemStack> clickHandler = stack.isEmpty() ? null : onStackClick;
+                    rowContainer.addChild(buildGridSlot(handler, slot, stack, isSelected, clickHandler));
                 }
             }
-            scroller.addScrollViewChild(rowContainer);
+            gridContent.addChild(rowContainer);
         }
+    }
+
+    private static UIElement buildGridSlot(
+            ItemStackHandler handler,
+            int slot,
+            ItemStack stack,
+            boolean selected,
+            BiConsumer<Integer, ItemStack> onStackClick
+    ) {
+        var cell = new UIElement().addClass("grid_slot_cell");
+        var slotElement = new ItemSlot().bind(handler, slot).addClass("grid_slot_item");
+        var check = new Label().setText(Component.literal("\u2713")).addClass("grid_slot_check");
+        if (!selected) {
+            check.addClass("hidden");
+        }
+        cell.addChildren(slotElement, check);
+        if (onStackClick != null && !stack.isEmpty()) {
+            cell.addEventListener(UIEvents.CLICK, e -> onStackClick.accept(slot, stack));
+        }
+        return cell;
+    }
+
+    private static Component buildIngredientCountText(LinkedHashSet<Integer> selectedSlots, int total) {
+        int selectedCount = selectedSlots == null ? 0 : selectedSlots.size();
+        return Component.literal(selectedCount + "/" + total);
     }
 
     private static UIElement buildIngredientIcon(AlchemyRecipeIngredient ingredient) {
@@ -304,16 +385,16 @@ public final class AlchemyMaterialSelectionUI {
         if (stacks == null || stacks.isEmpty() || ingredient == null) {
             return List.of();
         }
-        Map<Item, ItemStack> unique = new LinkedHashMap<>();
+        List<ItemStack> matches = new ArrayList<>();
         for (ItemStack stack : stacks) {
             if (stack.isEmpty()) {
                 continue;
             }
             if (matchesIngredient(stack, ingredient)) {
-                unique.putIfAbsent(stack.getItem(), stack.copy());
+                matches.add(stack.copy());
             }
         }
-        return new ArrayList<>(unique.values());
+        return matches;
     }
 
     private static boolean matchesIngredient(ItemStack stack, AlchemyRecipeIngredient ingredient) {
