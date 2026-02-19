@@ -144,7 +144,7 @@ public final class AlchemyCombineUI {
 
         populateSelectedList(selectedList, selectedStacks, selectedHint);
 
-        buildStatsBar(statsBar, selectedStacks);
+        buildStatsBar(statsBar, List.of());
         buildCombineGrid(grid);
 
         combineHint.setText(Component.literal("\u70bc\u91d1\u8c03\u548c"));
@@ -236,7 +236,7 @@ public final class AlchemyCombineUI {
     private static void buildStatsBar(UIElement statsBar, List<ItemStack> stacks) {
         statsBar.clearAllChildren();
         Map<String, Integer> values = computeElementValues(stacks);
-        List<String> order = List.of("fire", "wind", "water", "light");
+        List<String> order = List.of("fire", "ice", "thunder", "wind", "light");
         for (String element : order) {
             var item = new UIElement().addClass("stat_item");
             var icon = new UIElement().addClass("stat_icon");
