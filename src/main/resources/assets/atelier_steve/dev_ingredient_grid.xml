@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ldlib2-ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Low-Drag-MC/LDLib2/refs/heads/1.21/ldlib2-ui.xsd">
+    <stylesheet location="ldlib2:lss/mc.lss"/>
+    <style>
+        #dev_grid_root {
+            width: 360;
+            height: 220;
+            padding-all: 8;
+            gap-all: 8;
+            background: rect(rgba(0, 0, 0, 140), 6);
+        }
+
+        .panel {
+            flex-direction: column;
+            background: rect(#c6c6c6, 4, 1, #555555);
+            padding-all: 8;
+            gap-all: 8;
+            height: 100%;
+            width: 100%;
+        }
+
+        .panel_header {
+            height: 22;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: rect(#8e8e8e, 3);
+        }
+
+        .panel_header_label {
+            width: 100%;
+            horizontal-align: center;
+        }
+
+        .grid_body {
+            flex-grow: 1;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .ingredient_grid {
+            flex-direction: column;
+            gap-all: 2;
+            background: rect(#392D23, 1);
+            padding-all: 2;
+        }
+
+        .ingredient_row {
+            flex-direction: row;
+            gap-all: 2;
+        }
+
+        .ingredient_cell {
+            width: 18;
+            height: 18;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ingredient_cell_empty {
+            background: rect(#635552, 1);
+        }
+
+        .ingredient_cell_normal {
+            background: rect(#d44b4b, 1);
+        }
+
+        .ingredient_cell_link {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ingredient_star {
+            width: 18;
+            height: 18;
+            background: sprite(atelier_steve:textures/gui/dev/star.png);
+        }
+    </style>
+    <root id="dev_grid_root">
+        <element class="panel">
+            <element class="panel_header">
+                <label id="dev_title" class="panel_header_label"/>
+            </element>
+            <element id="grid_holder" class="grid_body"/>
+        </element>
+    </root>
+</ldlib2-ui>
