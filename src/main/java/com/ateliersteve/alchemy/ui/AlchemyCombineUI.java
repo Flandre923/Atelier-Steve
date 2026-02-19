@@ -148,7 +148,7 @@ public final class AlchemyCombineUI {
         buildCombineGrid(grid);
 
         combineHint.setText(Component.literal("\u70bc\u91d1\u8c03\u548c"));
-        int successRate = computeSuccessRate(selectedStacks);
+        int successRate = computeSuccessRate(List.of());
         successLabel.setText(Component.literal("\u5927\u6210\u529f\u6982\u7387"));
         successValue.setText(Component.literal(successRate + "%"));
         successFill.layout(layout -> layout.widthPercent(successRate));
@@ -178,8 +178,7 @@ public final class AlchemyCombineUI {
         qualityValue.setText(quality <= 0 ? Component.literal("-") : Component.literal(String.valueOf(quality)));
         AlchemyEffectPanel.buildQualityBar(qualityBar, quality);
 
-        Map<String, Integer> elementValues = computeElementValues(selectedStacks);
-        AlchemyEffectPanel.buildEffectAttributes(recipe, elementValues, attributesScroller);
+        AlchemyEffectPanel.buildEffectAttributes(recipe, Map.of(), attributesScroller);
 
         return ModularUI.of(ui, player);
     }
@@ -257,18 +256,20 @@ public final class AlchemyCombineUI {
 
     private static void buildCombineGrid(UIElement grid) {
         grid.clearAllChildren();
+        var content = new UIElement().addClass("combine_grid_content");
         for (int row = 0; row < 5; row++) {
-            var rowElement = new UIElement().addClass("grid_row");
+            var rowElement = new UIElement().addClass("combine_grid_row");
             for (int col = 0; col < 5; col++) {
-                rowElement.addChild(new UIElement().addClass("grid_cell"));
+                rowElement.addChild(new UIElement().addClass("combine_grid_cell"));
             }
-            grid.addChild(rowElement);
+            content.addChild(rowElement);
         }
+        grid.addChild(content);
     }
 
     private static int computeSuccessRate(List<ItemStack> stacks) {
         int total = computeElementValues(stacks).values().stream().mapToInt(Integer::intValue).sum();
-        return Math.min(99, 10 + total);
+        return Math.min(99, total);
     }
 
     private static Map<String, Integer> computeElementValues(List<ItemStack> stacks) {
