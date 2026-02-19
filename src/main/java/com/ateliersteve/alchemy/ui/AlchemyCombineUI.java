@@ -14,7 +14,6 @@ import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ItemSlot;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
 import com.lowdragmc.lowdraglib2.utils.XmlUtils;
 import net.minecraft.core.BlockPos;
@@ -60,10 +59,15 @@ public final class AlchemyCombineUI {
         if (player == null) {
             return null;
         }
-        Map<UUID, PendingCombine> pending = player.level().isClientSide
-                ? PENDING_COMBINE_CLIENT
-                : PENDING_COMBINE_SERVER;
-        return pending.remove(player.getUUID());
+        UUID playerId = player.getUUID();
+        boolean isClient = player.level().isClientSide;
+        Map<UUID, PendingCombine> primary = isClient ? PENDING_COMBINE_CLIENT : PENDING_COMBINE_SERVER;
+        PendingCombine pending = primary.remove(playerId);
+        if (pending != null) {
+            return pending;
+        }
+        Map<UUID, PendingCombine> fallback = isClient ? PENDING_COMBINE_SERVER : PENDING_COMBINE_CLIENT;
+        return fallback.remove(playerId);
     }
 
     public static ModularUI createUI(Player player, BlockPos cauldronPos, PendingCombine pending) {
@@ -78,7 +82,7 @@ public final class AlchemyCombineUI {
         var ui = UI.of(xml);
         var root = ui.select("#alchemy_combine_root").findFirst().orElseThrow();
         var combineTitle = (Label) ui.select("#combine_title").findFirst().orElseThrow();
-        var selectedList = (ScrollerView) ui.select("#selected_list").findFirst().orElseThrow();
+        var selectedList = ui.select("#selected_list_content").findFirst().orElseThrow();
         var selectedHint = (Label) ui.select("#selected_hint").findFirst().orElseThrow();
         var statsBar = ui.select("#stats_bar").findFirst().orElseThrow();
         var grid = ui.select("#combine_grid").findFirst().orElseThrow();
@@ -177,8 +181,8 @@ public final class AlchemyCombineUI {
         return ModularUI.of(ui, player);
     }
 
-    private static void populateSelectedList(ScrollerView scroller, List<ItemStack> stacks, Label hint) {
-        scroller.clearAllChildren();
+    private static void populateSelectedList(UIElement container, List<ItemStack> stacks, Label hint) {
+        container.clearAllChildren();
         if (stacks == null || stacks.isEmpty()) {
             hint.setText(Component.literal("\u5df2\u9009\u6750\u6599\u4e3a\u7a7a"));
             return;
@@ -199,7 +203,7 @@ public final class AlchemyCombineUI {
                     .addClass("selected_count");
             info.addChildren(icon, name);
             row.addChildren(info, count);
-            scroller.addScrollViewChild(row);
+            container.addChild(row);
         }
     }
 
@@ -250,13 +254,20 @@ public final class AlchemyCombineUI {
             if (stack.isEmpty()) {
                 continue;
             }
+            int stackCount = stack.getCount();
+            if (stackCount <= 0) {
+                continue;
+            }
             AlchemyItemData data = stack.get(ModDataComponents.ALCHEMY_DATA.get());
             if (data == null) {
                 continue;
             }
             for (var component : data.elements()) {
                 int amount = component.getNormalCount() + component.getLinkCount();
-                values.merge(component.element().getSerializedName(), amount, Integer::sum);
+                if (amount <= 0) {
+                    continue;
+                }
+                values.merge(component.element().getSerializedName(), amount * stackCount, Integer::sum);
             }
         }
         return values;

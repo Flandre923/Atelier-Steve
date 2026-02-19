@@ -41,22 +41,32 @@
             height: 22;
             align-items: center;
             justify-content: center;
+            width: 100%;
             background: rect(#8e8e8e, 3);
+        }
+
+        .panel_header_label {
+            width: 100%;
+            horizontal-align: center;
         }
 
         .stats_bar {
             flex-direction: row;
             align-items: center;
-            justify-content: space-around;
+            justify-content: space-between;
             background: rect(rgba(0, 0, 0, 40), 6);
             padding-horizontal: 6;
             padding-vertical: 2;
+            gap-all: 6;
+            width: 100%;
         }
 
         .stat_item {
             flex-direction: row;
             align-items: center;
             gap-all: 4;
+            flex-grow: 1;
+            justify-content: center;
         }
 
         .stat_icon {
@@ -89,10 +99,21 @@
         }
 
         .success_bar {
+            flex-direction: column;
+            gap-all: 2;
+            width: 100%;
+        }
+
+        .success_header {
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
             gap-all: 4;
+            width: 100%;
+        }
+
+        .success_label {
+            flex-grow: 1;
         }
 
         .success_track {
@@ -118,6 +139,12 @@
             min-height: 120;
             background: rect(rgba(0, 0, 0, 40), 3);
             padding-all: 4;
+        }
+
+        .selected_list_content {
+            flex-direction: column;
+            gap-all: 2;
+            width: 100%;
         }
 
         .selected_row {
@@ -147,6 +174,7 @@
         .hint_text {
             color: #5a2a2a;
             horizontal-align: center;
+            width: 100%;
         }
 
         .preview_card {
@@ -255,12 +283,14 @@
             min-height: 80;
             background: rect(#e2e2e2, 3, 1, #5a5a5a);
             padding-all: 4;
+            align-items: center;
+            justify-content: center;
         }
 
         .attributes_list {
             flex-direction: column;
             gap-all: 6;
-            width: 100%;
+            align-items: center;
             min-height: 12;
         }
 
@@ -321,9 +351,11 @@
     <root id="alchemy_combine_root">
         <element id="combine_left" class="panel left_panel">
             <element class="panel_header">
-                <label id="combine_title"/>
+                <label id="combine_title" class="panel_header_label"/>
             </element>
-            <scroller-view id="selected_list" class="selected_list"/>
+            <scroller-view id="selected_list" class="selected_list">
+                <element id="selected_list_content" class="selected_list_content"/>
+            </scroller-view>
             <label id="selected_hint" class="hint_text"/>
         </element>
         <element id="combine_center" class="panel center_panel">
@@ -331,11 +363,13 @@
             <element id="combine_grid" class="combine_grid"/>
             <label id="combine_hint" class="hint_text"/>
             <element id="success_bar" class="success_bar">
-                <label id="success_label"/>
+                <element class="success_header">
+                    <label id="success_label" class="success_label"/>
+                    <label id="success_value" class="success_value"/>
+                </element>
                 <element id="success_track" class="success_track">
                     <element id="success_fill" class="success_fill"/>
                 </element>
-                <label id="success_value" class="success_value"/>
             </element>
         </element>
         <element id="combine_right" class="panel right_panel">
