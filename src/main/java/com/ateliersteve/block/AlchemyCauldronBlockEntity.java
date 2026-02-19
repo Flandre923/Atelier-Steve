@@ -1,5 +1,6 @@
 package com.ateliersteve.block;
 
+import com.ateliersteve.alchemy.ui.AlchemyCombineUI;
 import com.ateliersteve.alchemy.ui.AlchemyMaterialSelectionUI;
 import com.ateliersteve.alchemy.ui.AlchemyRecipePreviewUI;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
@@ -16,6 +17,10 @@ public class AlchemyCauldronBlockEntity extends BlockEntity {
     }
 
     public ModularUI createUI(Player player) {
+        AlchemyCombineUI.PendingCombine pendingCombine = AlchemyCombineUI.consumePendingCombine(player);
+        if (pendingCombine != null) {
+            return AlchemyCombineUI.createUI(player, getBlockPos(), pendingCombine);
+        }
         AlchemyRecipeDefinition pending = AlchemyMaterialSelectionUI.consumePendingRecipe(player);
         if (pending != null) {
             return AlchemyMaterialSelectionUI.createUI(player, getBlockPos(), pending);

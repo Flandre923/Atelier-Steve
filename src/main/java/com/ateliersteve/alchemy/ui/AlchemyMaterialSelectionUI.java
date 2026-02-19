@@ -2,11 +2,12 @@ package com.ateliersteve.alchemy.ui;
 
 import com.ateliersteve.AtelierSteve;
 import com.ateliersteve.alchemy.AlchemyItemData;
-import com.ateliersteve.alchemy.element.AlchemyElement;
 import com.ateliersteve.alchemy.item.AlchemyItem;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeIngredient;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeRegistry;
+import com.ateliersteve.alchemy.ui.AlchemyCombineUI;
+import com.ateliersteve.alchemy.ui.AlchemyEffectPanel;
 import com.ateliersteve.block.GatheringBasketBlockEntity;
 import com.ateliersteve.registry.ModDataComponents;
 import com.lowdragmc.lowdraglib2.gui.factory.BlockUIMenuType;
@@ -17,6 +18,8 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.ItemSlot;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
+import com.lowdragmc.lowdraglib2.gui.sync.rpc.RPCEvent;
+import com.lowdragmc.lowdraglib2.gui.sync.rpc.RPCEventBuilder;
 import com.lowdragmc.lowdraglib2.utils.XmlUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -30,7 +33,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import org.appliedenergistics.yoga.YogaAlign;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -38,28 +40,12 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 public final class AlchemyMaterialSelectionUI {
-    private static final int QUALITY_MAX = 999;
-    private static final int QUALITY_SEGMENT_WIDTH = 12;
-    private static final List<Integer> QUALITY_COLORS = List.of(
-            0x6fa3ff,
-            0xffe66d,
-            0xff9f43,
-            0xff6b6b,
-            0xa855f7,
-            0x1dd1a1,
-            0x54a0ff,
-            0x5f27cd,
-            0x222f3e,
-            0x000000
-    );
     private static final int SEARCH_RADIUS = 6;
     private static final int GRID_COLUMNS = 4;
     private static final int VISIBLE_ROWS = 5;
@@ -68,14 +54,6 @@ public final class AlchemyMaterialSelectionUI {
     private static final Map<ResourceLocation, ResourceLocation> TAG_CATEGORY_ICONS = Map.of(
             AtelierSteve.id("category_gunpowder"), AtelierSteve.id("textures/gui/ingredients/category_gunpowder.png"),
             AtelierSteve.id("category_water"), AtelierSteve.id("textures/gui/ingredients/category_water.png")
-    );
-    private static final Map<String, ResourceLocation> ELEMENT_ICONS = Map.of(
-            "fire", AtelierSteve.id("textures/gui/elements/fire.png"),
-            "water", AtelierSteve.id("textures/gui/elements/light.png"),
-            "ice", AtelierSteve.id("textures/gui/elements/ice.png"),
-            "wind", AtelierSteve.id("textures/gui/elements/wind.png"),
-            "thunder", AtelierSteve.id("textures/gui/elements/thunder.png"),
-            "light", AtelierSteve.id("textures/gui/elements/light.png")
     );
 
     private AlchemyMaterialSelectionUI() {
@@ -133,6 +111,8 @@ public final class AlchemyMaterialSelectionUI {
         var qualityValue = (Label) ui.select("#quality_value").findFirst().orElseThrow();
         var qualityBar = ui.select("#quality_bar").findFirst().orElseThrow();
         var attributesScroller = ui.select("#attributes_scroller").findFirst().orElseThrow();
+        var combineButton = ui.select("#combine_button").findFirst().orElseThrow();
+        var combineButtonLabel = (Label) ui.select("#combine_button_label").findFirst().orElseThrow();
 
         var gridContent = new UIElement().addClass("grid_content");
         gridScroller.addScrollViewChild(gridContent);
@@ -181,9 +161,9 @@ public final class AlchemyMaterialSelectionUI {
         AlchemyItemData alchemyData = resultStack.get(ModDataComponents.ALCHEMY_DATA.get());
         int quality = alchemyData == null ? 0 : alchemyData.quality();
         qualityValue.setText(quality <= 0 ? Component.literal("-") : Component.literal(String.valueOf(quality)));
-        buildQualityBar(qualityBar, quality);
+        AlchemyEffectPanel.buildQualityBar(qualityBar, quality);
 
-        buildEffectAttributes(recipe, Map.of(), attributesScroller);
+        AlchemyEffectPanel.buildEffectAttributes(recipe, Map.of(), attributesScroller);
 
         List<GatheringBasketBlockEntity> baskets = findNearbyBaskets(player, cauldronPos, SEARCH_RADIUS);
         List<ItemStack> basketStacks = collectBasketStacks(baskets);
@@ -210,8 +190,68 @@ public final class AlchemyMaterialSelectionUI {
         Map<Integer, LinkedHashSet<Integer>> selectedSlots = new HashMap<>();
         Runnable updateEffects = () -> {
             Map<String, Integer> values = computeSelectedElementValues(perIngredient, selectedSlots);
-            buildEffectAttributes(recipe, values, attributesScroller);
+            AlchemyEffectPanel.buildEffectAttributes(recipe, values, attributesScroller);
         };
+
+        combineButtonLabel.setText(Component.literal("\u8fdb\u5165\u8c03\u548c"));
+        RPCEvent combineRpc = RPCEventBuilder.simple(ResourceLocation.class, BlockPos.class, Integer[].class,
+                (recipeId, pos, pairs) -> {
+                    if (!(player instanceof ServerPlayer serverPlayer)) {
+                        return;
+                    }
+                    AlchemyRecipeDefinition targetRecipe = AlchemyRecipeRegistry.findById(recipeId);
+                    if (targetRecipe == null) {
+                        return;
+                    }
+                    List<ItemStack> selected = new ArrayList<>();
+                    if (pairs != null) {
+                        for (int i = 0; i + 1 < pairs.length; i += 2) {
+                            Integer ingredientIndex = pairs[i];
+                            Integer slotIndex = pairs[i + 1];
+                            if (ingredientIndex == null || slotIndex == null) {
+                                continue;
+                            }
+                            if (ingredientIndex < 0 || ingredientIndex >= perIngredient.size()) {
+                                continue;
+                            }
+                            List<ItemStack> stacks = perIngredient.get(ingredientIndex);
+                            if (slotIndex < 0 || slotIndex >= stacks.size()) {
+                                continue;
+                            }
+                            ItemStack stack = stacks.get(slotIndex);
+                            if (!stack.isEmpty()) {
+                                selected.add(stack.copy());
+                            }
+                        }
+                    }
+                    if (selected.isEmpty()) {
+                        return;
+                    }
+                    AlchemyCombineUI.requestOpen(serverPlayer, targetRecipe, selected);
+                    serverPlayer.closeContainer();
+                    serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, pos));
+                });
+        combineButton.addRPCEvent(combineRpc);
+        Runnable updateCombineButton = () -> {
+            if (isSelectionComplete(ingredients, selectedSlots)) {
+                combineButton.removeClass("disabled");
+            } else {
+                combineButton.addClass("disabled");
+            }
+        };
+
+        combineButton.addEventListener(UIEvents.CLICK, e -> {
+            if (!isSelectionComplete(ingredients, selectedSlots)) {
+                return;
+            }
+            List<ItemStack> selectedStacks = collectSelectedStacks(perIngredient, selectedSlots);
+            if (selectedStacks.isEmpty()) {
+                return;
+            }
+            AlchemyCombineUI.requestOpenClient(player, recipe, selectedStacks);
+            Integer[] payload = buildSelectionPairs(selectedSlots);
+            combineButton.sendEvent(combineRpc, recipe.id(), cauldronPos, payload);
+        });
 
         AtomicInteger selectedIndex = new AtomicInteger(0);
         Runnable[] refreshRef = new Runnable[1];
@@ -220,8 +260,9 @@ public final class AlchemyMaterialSelectionUI {
             if (ingredients.isEmpty()) {
                 ingredientFilter.setText(Component.literal("No ingredients"));
                 ingredientTabs.clearAllChildren();
-                populateGrid(gridContent, List.of(), null, null);
+            populateGrid(gridContent, List.of(), null, null);
                 updateEffects.run();
+                updateCombineButton.run();
                 return;
             }
             if (index < 0 || index >= ingredients.size()) {
@@ -236,27 +277,11 @@ public final class AlchemyMaterialSelectionUI {
                 if (stack.isEmpty()) {
                     return;
                 }
-                LinkedHashSet<Integer> current = selectedSlots.get(indexFinal);
-                if (current != null && current.contains(slot)) {
-                    current.remove(slot);
-                    if (current.isEmpty()) {
-                        selectedSlots.remove(indexFinal);
-                    }
-                } else {
-                    int max = ingredients.get(indexFinal).count();
-                    if (current == null) {
-                        current = new LinkedHashSet<>();
-                        selectedSlots.put(indexFinal, current);
-                    }
-                    if (current.size() >= max) {
-                        Integer first = current.iterator().next();
-                        current.remove(first);
-                    }
-                    current.add(slot);
-                }
+                toggleSelectedSlot(ingredients.get(indexFinal), selectedSlots, indexFinal, slot);
                 refreshRef[0].run();
             });
             updateEffects.run();
+            updateCombineButton.run();
         };
 
         refreshRef[0].run();
@@ -279,16 +304,19 @@ public final class AlchemyMaterialSelectionUI {
             if (i == selectedIndex) {
                 tab.addClass("active");
             }
-            tab.addChildren(
-                    buildIngredientIcon(ingredient),
-                    new Label().setText(buildIngredientCountText(selectedSlots.get(i), ingredient.count()))
-                            .addClass("ingredient_count")
-            );
+            UIElement icon = buildIngredientIcon(ingredient);
+            Label countLabel = new Label();
+            countLabel.setText(buildIngredientCountText(selectedSlots.get(i), ingredient.count()));
+            countLabel.addClass("ingredient_count");
+            tab.addChildren(icon, countLabel);
             int index = i;
-            tab.addEventListener(UIEvents.CLICK, e -> {
+            Runnable selectTabClient = () -> {
                 selected.set(index);
                 refresh.run();
-            });
+            };
+            tab.addEventListener(UIEvents.CLICK, e -> selectTabClient.run());
+            icon.addEventListener(UIEvents.CLICK, e -> selectTabClient.run());
+            countLabel.addEventListener(UIEvents.CLICK, e -> selectTabClient.run());
             container.addChild(tab);
         }
     }
@@ -345,9 +373,38 @@ public final class AlchemyMaterialSelectionUI {
         }
         cell.addChildren(slotElement, check);
         if (onStackClick != null && !stack.isEmpty()) {
-            cell.addEventListener(UIEvents.CLICK, e -> onStackClick.accept(slot, stack));
+            slotElement.addEventListener(UIEvents.CLICK, e -> onStackClick.accept(slot, stack));
         }
         return cell;
+    }
+
+    private static void toggleSelectedSlot(
+            AlchemyRecipeIngredient ingredient,
+            Map<Integer, LinkedHashSet<Integer>> selectedSlots,
+            int index,
+            int slot
+    ) {
+        if (ingredient == null || selectedSlots == null) {
+            return;
+        }
+        LinkedHashSet<Integer> current = selectedSlots.get(index);
+        if (current != null && current.contains(slot)) {
+            current.remove(slot);
+            if (current.isEmpty()) {
+                selectedSlots.remove(index);
+            }
+        } else {
+            int max = ingredient.count();
+            if (current == null) {
+                current = new LinkedHashSet<>();
+                selectedSlots.put(index, current);
+            }
+            if (current.size() >= max) {
+                Integer first = current.iterator().next();
+                current.remove(first);
+            }
+            current.add(slot);
+        }
     }
 
     private static Component buildIngredientCountText(LinkedHashSet<Integer> selectedSlots, int total) {
@@ -521,124 +578,69 @@ public final class AlchemyMaterialSelectionUI {
         return TAG_CATEGORY_ICONS.get(tagId);
     }
 
-    private static ResourceLocation resolveElementIcon(String element) {
-        if (element == null) {
-            return null;
-        }
-        return ELEMENT_ICONS.get(element);
-    }
-
-    private static void buildQualityBar(UIElement bar, int quality) {
-        bar.clearAllChildren();
-        int clamped = Math.max(0, Math.min(quality, QUALITY_MAX));
-        for (int i = 0; i < QUALITY_COLORS.size(); i++) {
-            int segmentStart = i * 100;
-            int segmentEnd = (i + 1) * 100;
-            int fillWidth = 0;
-            if (clamped >= segmentEnd) {
-                fillWidth = QUALITY_SEGMENT_WIDTH;
-            } else if (clamped > segmentStart) {
-                float ratio = (clamped - segmentStart) / 100f;
-                fillWidth = Math.max(1, Math.round(ratio * QUALITY_SEGMENT_WIDTH));
-            }
-
-            var segment = new UIElement().addClass("quality_segment");
-            if (fillWidth > 0) {
-                int fillWidthFinal = fillWidth;
-                var fill = new UIElement()
-                        .addClass("quality_segment_fill")
-                        .layout(layout -> layout.width(fillWidthFinal));
-                fill.lss("background", "rect(" + toHexColor(QUALITY_COLORS.get(i)) + ", 1)");
-                segment.addChild(fill);
-            }
-            bar.addChild(segment);
-        }
-    }
-
-    private static void buildEffectAttributes(
-            AlchemyRecipeDefinition recipe,
-            Map<String, Integer> elementValues,
-            UIElement attributesScroller
+    private static boolean isSelectionComplete(
+            List<AlchemyRecipeIngredient> ingredients,
+            Map<Integer, LinkedHashSet<Integer>> selectedSlots
     ) {
-        attributesScroller.clearAllChildren();
-        var attributesList = new UIElement()
-                .addClass("attributes_list")
-                .layout(layout -> layout.widthPercent(100));
-        attributesScroller.addChild(attributesList);
-
-        if (recipe == null || recipe.effects().isEmpty()) {
-            attributesList.addChild(new Label()
-                    .setText(Component.literal("\u65e0"))
-                    .addClass("effects_empty"));
-            return;
+        if (ingredients == null || ingredients.isEmpty()) {
+            return false;
         }
-
-        boolean added = false;
-        for (AlchemyRecipeDefinition.EffectGroup group : recipe.effects()) {
-            int max = 0;
-            Set<Integer> positions = new TreeSet<>();
-            for (AlchemyRecipeDefinition.EffectStep step : group.steps()) {
-                int threshold = step.threshold();
-                if (threshold <= 0) {
-                    continue;
-                }
-                positions.add(threshold);
-                if (threshold > max) {
-                    max = threshold;
-                }
+        for (int i = 0; i < ingredients.size(); i++) {
+            int needed = ingredients.get(i).count();
+            int selected = selectedSlots.getOrDefault(i, new LinkedHashSet<>()).size();
+            if (selected < needed) {
+                return false;
             }
-            if (max <= 0) {
+        }
+        return true;
+    }
+
+    private static List<ItemStack> collectSelectedStacks(
+            List<List<ItemStack>> perIngredient,
+            Map<Integer, LinkedHashSet<Integer>> selectedSlots
+    ) {
+        List<ItemStack> selected = new ArrayList<>();
+        if (perIngredient == null || selectedSlots == null) {
+            return selected;
+        }
+        for (var entry : selectedSlots.entrySet()) {
+            int index = entry.getKey();
+            if (index < 0 || index >= perIngredient.size()) {
                 continue;
             }
-
-            int value = Math.min(elementValues.getOrDefault(group.type(), 0), max);
-            AlchemyElement element = AlchemyElement.fromName(group.type());
-            String color = toHexColor(element.getColor());
-            AlchemyRecipeDefinition.EffectStep step = group.selectStep(value);
-
-            var row = new UIElement()
-                    .addClass("attr_item")
-                    .layout(layout -> layout.widthPercent(100));
-            var icon = new UIElement()
-                    .addClass("attr_icon");
-            ResourceLocation iconTexture = resolveElementIcon(group.type());
-            if (iconTexture != null) {
-                icon.lss("background", "sprite(" + iconTexture + ")");
-            } else {
-                icon.lss("background", "rect(" + color + ", 7)");
-            }
-            var content = new UIElement().addClass("attr_content");
-            var name = new Label()
-                    .setText(step == null ? Component.literal("\u65e0") : Component.literal(step.value()))
-                    .addClass("attr_name");
-            var bar = new UIElement()
-                    .addClass("attr_bar")
-                    .layout(layout -> layout.setAlignItems(YogaAlign.FLEX_END));
-
-            for (int n = 1; n <= max; n++) {
-                var segment = new UIElement()
-                        .addClass("bar_segment")
-                        .layout(layout -> layout.setAlignSelf(YogaAlign.FLEX_END));
-                if (positions.contains(n)) {
-                    segment.addClass("bar_segment_key");
+            List<ItemStack> stacks = perIngredient.get(index);
+            for (Integer slot : entry.getValue()) {
+                if (slot == null || slot < 0 || slot >= stacks.size()) {
+                    continue;
                 }
-                if (n <= value) {
-                    segment.lss("background", "rect(" + color + ", 1)");
+                ItemStack stack = stacks.get(slot);
+                if (!stack.isEmpty()) {
+                    selected.add(stack.copy());
                 }
-                bar.addChild(segment);
             }
-
-            content.addChildren(name, bar);
-            row.addChildren(icon, content);
-            attributesList.addChild(row);
-            added = true;
         }
+        return selected;
+    }
 
-        if (!added) {
-            attributesList.addChild(new Label()
-                    .setText(Component.literal("\u65e0"))
-                    .addClass("effects_empty"));
+    private static Integer[] buildSelectionPairs(Map<Integer, LinkedHashSet<Integer>> selectedSlots) {
+        if (selectedSlots == null || selectedSlots.isEmpty()) {
+            return new Integer[0];
         }
+        List<Integer> pairs = new ArrayList<>();
+        for (var entry : selectedSlots.entrySet()) {
+            Integer ingredientIndex = entry.getKey();
+            if (ingredientIndex == null) {
+                continue;
+            }
+            for (Integer slotIndex : entry.getValue()) {
+                if (slotIndex == null) {
+                    continue;
+                }
+                pairs.add(ingredientIndex);
+                pairs.add(slotIndex);
+            }
+        }
+        return pairs.toArray(Integer[]::new);
     }
 
     private static Map<String, Integer> computeSelectedElementValues(
@@ -676,7 +678,4 @@ public final class AlchemyMaterialSelectionUI {
         return values;
     }
 
-    private static String toHexColor(int color) {
-        return String.format("#%06X", color & 0xFFFFFF);
-    }
 }
