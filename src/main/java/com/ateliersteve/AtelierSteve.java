@@ -1,6 +1,7 @@
 package com.ateliersteve;
 
 import com.ateliersteve.alchemy.trait.TraitRegistry;
+import com.ateliersteve.dev.DevUiBootstrap;
 import com.ateliersteve.registry.ModBlockEntities;
 import com.ateliersteve.registry.ModBlocks;
 import com.ateliersteve.registry.ModCreativeTabs;
@@ -12,6 +13,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import org.slf4j.Logger;
 
 @Mod(AtelierSteve.MODID)
@@ -25,6 +27,10 @@ public class AtelierSteve {
         ModBlockEntities.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         ModDataComponents.register(modEventBus);
+
+        if (!FMLEnvironment.production) {
+            DevUiBootstrap.register();
+        }
 
         // Register common setup event
         modEventBus.addListener(this::commonSetup);
