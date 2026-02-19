@@ -2,11 +2,14 @@ package com.ateliersteve.alchemy.ui;
 
 import com.ateliersteve.AtelierSteve;
 import com.ateliersteve.alchemy.AlchemyItemData;
+import com.ateliersteve.alchemy.element.CellType;
+import com.ateliersteve.alchemy.element.ElementComponent;
 import com.ateliersteve.alchemy.element.AlchemyElement;
 import com.ateliersteve.alchemy.item.AlchemyItem;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeIngredient;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeRegistry;
+import com.ateliersteve.ui.IngredientGridElement;
 import com.ateliersteve.registry.ModDataComponents;
 import com.lowdragmc.lowdraglib2.gui.factory.BlockUIMenuType;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
@@ -193,18 +196,41 @@ public final class AlchemyCombineUI {
         for (int i = 0; i < stacks.size(); i++) {
             ItemStack stack = stacks.get(i);
             var row = new UIElement().addClass("selected_row");
-            var info = new UIElement().addClass("row_align_center");
             var icon = new ItemSlot().bind(handler, i).addClass("selected_icon");
-            var name = new Label()
-                    .setText(stack.isEmpty() ? Component.literal("-") : stack.getHoverName())
-                    .addClass("selected_name");
-            var count = new Label()
-                    .setText(Component.literal("x " + stack.getCount()))
-                    .addClass("selected_count");
-            info.addChildren(icon, name);
-            row.addChildren(info, count);
+            var components = new UIElement().addClass("selected_components");
+
+            AlchemyItemData data = stack.get(ModDataComponents.ALCHEMY_DATA.get());
+            if (data == null || data.elements().isEmpty()) {
+                components.addChild(new IngredientGridElement().setGridSize(3, 3).addClass("selected_component_grid"));
+            } else {
+                for (ElementComponent elementComponent : data.elements()) {
+                    components.addChild(buildElementGrid(elementComponent));
+                }
+            }
+
+            row.addChildren(icon, components);
             container.addChild(row);
         }
+    }
+
+    private static IngredientGridElement buildElementGrid(ElementComponent component) {
+        var shape = component.shape();
+        IngredientGridElement grid = new IngredientGridElement();
+        grid.setGridSize(3, 3)
+                .setElementColor(0xFF000000 | (component.element().getColor() & 0xFFFFFF));
+        grid.addClass("selected_component_grid");
+        for (int y = 0; y < Math.min(shape.getHeight(), 3); y++) {
+            for (int x = 0; x < Math.min(shape.getWidth(), 3); x++) {
+                CellType cellType = shape.getCellAt(x, y);
+                IngredientGridElement.CellType displayType = switch (cellType) {
+                    case NORMAL -> IngredientGridElement.CellType.NORMAL;
+                    case LINK -> IngredientGridElement.CellType.LINK;
+                    case EMPTY -> IngredientGridElement.CellType.EMPTY;
+                };
+                grid.setCell(x + 1, y + 1, displayType);
+            }
+        }
+        return grid;
     }
 
     private static void buildStatsBar(UIElement statsBar, List<ItemStack> stacks) {
