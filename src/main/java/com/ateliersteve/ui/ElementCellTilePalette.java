@@ -1,8 +1,12 @@
 package com.ateliersteve.ui;
 
 import com.ateliersteve.AtelierSteve;
+import com.ateliersteve.alchemy.element.AlchemyElement;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class ElementCellTilePalette {
     private static final int DEFAULT_ICON_INSET = 4;
@@ -42,6 +46,15 @@ public final class ElementCellTilePalette {
 
     private ElementCellTilePalette() {
     }
+
+    private static final Map<String, ElementCellTileSpec> SPECS_BY_ID = List.of(
+            unfilledSamples(),
+            thunderFilledSamples(),
+            reservedFilledSamples(),
+            stateSamples()
+    ).stream()
+            .flatMap(List::stream)
+            .collect(Collectors.toUnmodifiableMap(ElementCellTileSpec::id, Function.identity()));
 
     public static List<ElementCellTileSpec> unfilledSamples() {
         return List.of(
@@ -166,5 +179,43 @@ public final class ElementCellTilePalette {
                         DEFAULT_ICON_INSET
                 )
         );
+    }
+
+    public static ElementCellTileSpec empty() {
+        return byId("empty");
+    }
+
+    public static ElementCellTileSpec disabled() {
+        return byId("disabled");
+    }
+
+    public static ElementCellTileSpec unfilled(AlchemyElement element) {
+        if (element == null) {
+            return empty();
+        }
+        return switch (element) {
+            case FIRE -> byId("flame");
+            case ICE -> byId("snow");
+            case LIGHT -> byId("star");
+            case THUNDER -> byId("thunder");
+            case WIND -> byId("wind");
+        };
+    }
+
+    public static ElementCellTileSpec filled(AlchemyElement element, boolean link) {
+        if (element == null) {
+            return empty();
+        }
+        return switch (element) {
+            case FIRE -> byId(link ? "filled_fire_link" : "filled_fire");
+            case ICE -> byId(link ? "filled_ice_link" : "filled_ice");
+            case LIGHT -> byId(link ? "filled_light_link" : "filled_light");
+            case THUNDER -> byId(link ? "filled_thunder_link" : "filled_thunder");
+            case WIND -> byId(link ? "filled_wind_link" : "filled_wind");
+        };
+    }
+
+    private static ElementCellTileSpec byId(String id) {
+        return SPECS_BY_ID.get(id);
     }
 }
