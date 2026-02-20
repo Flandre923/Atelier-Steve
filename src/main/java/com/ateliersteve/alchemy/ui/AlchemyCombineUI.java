@@ -235,6 +235,21 @@ public final class AlchemyCombineUI {
                 serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
             }
         });
+        root.addEventListener(UIEvents.KEY_DOWN, e -> {
+            if (!sessionTimeline.current().isPreviewing()) {
+                return;
+            }
+            boolean changed = false;
+            if (e.keyCode == GLFW.GLFW_KEY_R) {
+                changed = sessionTimeline.apply(AlchemyCombineSessionSnapshot::rotateSelected);
+            } else if (e.keyCode == GLFW.GLFW_KEY_F) {
+                changed = sessionTimeline.apply(AlchemyCombineSessionSnapshot::flipSelected);
+            }
+            if (changed) {
+                onSessionStateChanged(player, sessionTimeline.current());
+                rerender(renderGridRef, refreshSelectedListRef);
+            }
+        });
         ItemStack resultStack = resolveResultStack(recipe);
         combineTitle.setText(resultStack.isEmpty()
                 ? Component.literal(recipe == null ? "No Recipe" : recipe.result().toString())
@@ -652,9 +667,9 @@ public final class AlchemyCombineUI {
             }
             applyPlaced(snapshot.placedMaterials(), gridSize);
             if (snapshot.isPreviewing() && snapshot.selectedComponentId() != null && snapshot.selectedMaterialId() != null) {
-                var selected = snapshot.getIngredientComponent(snapshot.selectedMaterialId(), snapshot.selectedComponentId());
+                var selected = snapshot.selectedPreviewComponent();
                 if (selected != null && snapshot.previewX() >= 0 && snapshot.previewY() >= 0) {
-                    applyPreview(selected.component(), snapshot.previewX(), snapshot.previewY(), snapshot.isPreviewPlacementValid(gridSize), gridSize);
+                    applyPreview(selected, snapshot.previewX(), snapshot.previewY(), snapshot.isPreviewPlacementValid(gridSize), gridSize);
                 }
             }
         }

@@ -20,6 +20,8 @@ final class AlchemyCombineSessionSnapshot {
     private final LinkedHashMap<String, Integer> usedComponentCounts;
     private final List<PlacedMaterial> placedMaterials;
     private final String selectedComponentId;
+    private final int selectedRotation;
+    private final boolean selectedFlipped;
     private final int previewX;
     private final int previewY;
 
@@ -31,6 +33,8 @@ final class AlchemyCombineSessionSnapshot {
             LinkedHashMap<String, Integer> usedComponentCounts,
             List<PlacedMaterial> placedMaterials,
             String selectedComponentId,
+            int selectedRotation,
+            boolean selectedFlipped,
             int previewX,
             int previewY
     ) {
@@ -41,6 +45,8 @@ final class AlchemyCombineSessionSnapshot {
         this.usedComponentCounts = usedComponentCounts;
         this.placedMaterials = placedMaterials;
         this.selectedComponentId = selectedComponentId;
+        this.selectedRotation = normalizeRotation(selectedRotation);
+        this.selectedFlipped = selectedFlipped;
         this.previewX = previewX;
         this.previewY = previewY;
     }
@@ -79,6 +85,8 @@ final class AlchemyCombineSessionSnapshot {
                 new LinkedHashMap<>(),
                 List.of(),
                 null,
+                0,
+                false,
                 -1,
                 -1
         );
@@ -117,6 +125,14 @@ final class AlchemyCombineSessionSnapshot {
 
     String selectedMaterialId() {
         return selectedComponentId == null ? null : componentToMaterialId.get(selectedComponentId);
+    }
+
+    int selectedRotation() {
+        return selectedRotation;
+    }
+
+    boolean selectedFlipped() {
+        return selectedFlipped;
     }
 
     int previewX() {
@@ -170,7 +186,7 @@ final class AlchemyCombineSessionSnapshot {
         if (componentId.equals(selectedComponentId) && previewX < 0 && previewY < 0) {
             return this;
         }
-        return with(componentId, -1, -1, usedComponentCounts, placedMaterials);
+        return with(componentId, 0, false, -1, -1, usedComponentCounts, placedMaterials);
     }
 
     AlchemyCombineSessionSnapshot hover(int x, int y) {
@@ -180,14 +196,42 @@ final class AlchemyCombineSessionSnapshot {
         if (previewX == x && previewY == y) {
             return this;
         }
-        return with(selectedComponentId, x, y, usedComponentCounts, placedMaterials);
+        return with(selectedComponentId, selectedRotation, selectedFlipped, x, y, usedComponentCounts, placedMaterials);
     }
 
     AlchemyCombineSessionSnapshot cancelSelection() {
         if (selectedComponentId == null && previewX < 0 && previewY < 0) {
             return this;
         }
-        return with(null, -1, -1, usedComponentCounts, placedMaterials);
+        return with(null, 0, false, -1, -1, usedComponentCounts, placedMaterials);
+    }
+
+    AlchemyCombineSessionSnapshot rotateSelected() {
+        if (selectedComponentId == null) {
+            return this;
+        }
+        int nextRotation = selectedFlipped
+                ? normalizeRotation(selectedRotation - 1)
+                : normalizeRotation(selectedRotation + 1);
+        return with(selectedComponentId, nextRotation, selectedFlipped, previewX, previewY, usedComponentCounts, placedMaterials);
+    }
+
+    AlchemyCombineSessionSnapshot flipSelected() {
+        if (selectedComponentId == null) {
+            return this;
+        }
+        return with(selectedComponentId, selectedRotation, !selectedFlipped, previewX, previewY, usedComponentCounts, placedMaterials);
+    }
+
+    AlchemyCombineSessionSnapshot setSelectedTransform(int rotation, boolean flipped) {
+        if (selectedComponentId == null) {
+            return this;
+        }
+        int normalized = normalizeRotation(rotation);
+        if (selectedRotation == normalized && selectedFlipped == flipped) {
+            return this;
+        }
+        return with(selectedComponentId, normalized, flipped, previewX, previewY, usedComponentCounts, placedMaterials);
     }
 
     AlchemyCombineSessionSnapshot placeSelectedAt(int x, int y, int gridSize) {
@@ -202,7 +246,8 @@ final class AlchemyCombineSessionSnapshot {
         if (ref == null || ref.component().cells().isEmpty() || isComponentExhausted(selectedComponentId)) {
             return this;
         }
-        if (!isPlacementValid(x, y, ref.component().cells(), placedMaterials, gridSize)) {
+        MaterialComponentEntry transformed = transformComponent(ref.component(), selectedRotation, selectedFlipped);
+        if (!isPlacementValid(x, y, transformed.cells(), placedMaterials, gridSize)) {
             return this;
         }
 
@@ -216,16 +261,18 @@ final class AlchemyCombineSessionSnapshot {
                 placedId,
                 materialId,
                 selectedComponentId,
+                selectedRotation,
+                selectedFlipped,
                 ref.material().sourceIndex(),
                 ref.material().stack().copy(),
-                ref.component().cells(),
+                transformed.cells(),
                 x,
                 y
         ));
 
         LinkedHashMap<String, Integer> nextUsed = new LinkedHashMap<>(usedComponentCounts);
         nextUsed.merge(selectedComponentId, 1, Integer::sum);
-        return with(null, -1, -1, nextUsed, List.copyOf(nextPlaced));
+        return with(null, 0, false, -1, -1, nextUsed, List.copyOf(nextPlaced));
     }
 
     AlchemyCombineSessionSnapshot removePlacedAt(int x, int y) {
@@ -248,7 +295,7 @@ final class AlchemyCombineSessionSnapshot {
             nextUsed.put(target.componentId(), remaining);
         }
 
-        return with(selectedComponentId, previewX, previewY, nextUsed, List.copyOf(nextPlaced));
+        return with(selectedComponentId, selectedRotation, selectedFlipped, previewX, previewY, nextUsed, List.copyOf(nextPlaced));
     }
 
     AlchemyCombineSessionSnapshot removeLastPlaced() {
@@ -268,7 +315,7 @@ final class AlchemyCombineSessionSnapshot {
             nextUsed.put(target.componentId(), remaining);
         }
 
-        return with(selectedComponentId, previewX, previewY, nextUsed, List.copyOf(nextPlaced));
+        return with(selectedComponentId, selectedRotation, selectedFlipped, previewX, previewY, nextUsed, List.copyOf(nextPlaced));
     }
 
     boolean isPreviewing() {
@@ -287,20 +334,40 @@ final class AlchemyCombineSessionSnapshot {
         if (ref == null) {
             return false;
         }
-        return isPlacementValid(previewX, previewY, ref.component().cells(), placedMaterials, gridSize);
+        MaterialComponentEntry transformed = transformComponent(ref.component(), selectedRotation, selectedFlipped);
+        return isPlacementValid(previewX, previewY, transformed.cells(), placedMaterials, gridSize);
+    }
+
+    MaterialComponentEntry selectedPreviewComponent() {
+        if (selectedComponentId == null) {
+            return null;
+        }
+        String materialId = componentToMaterialId.get(selectedComponentId);
+        if (materialId == null) {
+            return null;
+        }
+        MaterialComponentRef ref = getIngredientComponent(materialId, selectedComponentId);
+        if (ref == null) {
+            return null;
+        }
+        return transformComponent(ref.component(), selectedRotation, selectedFlipped);
     }
 
     Integer[] toSyncPayload() {
         List<Integer> payload = new ArrayList<>();
-        payload.add(1);
+        payload.add(2);
         payload.add(componentIndexOf(selectedComponentId));
         payload.add(previewX);
         payload.add(previewY);
+        payload.add(selectedRotation);
+        payload.add(selectedFlipped ? 1 : 0);
         payload.add(placedMaterials.size());
         for (PlacedMaterial placed : placedMaterials) {
             payload.add(componentIndexOf(placed.componentId()));
             payload.add(placed.originX());
             payload.add(placed.originY());
+            payload.add(placed.rotation());
+            payload.add(placed.flipped() ? 1 : 0);
         }
         return payload.toArray(Integer[]::new);
     }
@@ -313,7 +380,8 @@ final class AlchemyCombineSessionSnapshot {
         if (base == null || payload == null || payload.length < 5) {
             return base;
         }
-        if (payload[0] == null || payload[0] != 1) {
+        int version = payload[0] == null ? 1 : payload[0];
+        if (version != 1 && version != 2) {
             return base;
         }
 
@@ -321,13 +389,17 @@ final class AlchemyCombineSessionSnapshot {
         int selectedComponentIndex = safe(payload, 1, -1);
         int previewX = safe(payload, 2, -1);
         int previewY = safe(payload, 3, -1);
-        int count = Math.max(0, safe(payload, 4, 0));
+        int selectedRotation = version >= 2 ? normalizeRotation(safe(payload, 4, 0)) : 0;
+        boolean selectedFlipped = version >= 2 && safe(payload, 5, 0) != 0;
+        int count = Math.max(0, safe(payload, version >= 2 ? 6 : 4, 0));
 
-        int cursor = 5;
+        int cursor = version >= 2 ? 7 : 5;
         for (int i = 0; i < count; i++) {
             String componentId = state.componentIdAt(safe(payload, cursor++, -1));
             int originX = safe(payload, cursor++, -1);
             int originY = safe(payload, cursor++, -1);
+            int rotation = version >= 2 ? normalizeRotation(safe(payload, cursor++, 0)) : 0;
+            boolean flipped = version >= 2 && safe(payload, cursor++, 0) != 0;
             if (componentId == null) {
                 continue;
             }
@@ -335,17 +407,73 @@ final class AlchemyCombineSessionSnapshot {
             if (materialId == null) {
                 continue;
             }
-            state = state.selectComponent(materialId, componentId).placeSelectedAt(originX, originY, gridSize);
+            state = state.selectComponent(materialId, componentId)
+                    .setSelectedTransform(rotation, flipped)
+                    .placeSelectedAt(originX, originY, gridSize);
         }
 
         String selectedComponentId = state.componentIdAt(selectedComponentIndex);
         if (selectedComponentId != null) {
             String materialId = state.componentToMaterialId.get(selectedComponentId);
             if (materialId != null) {
-                state = state.selectComponent(materialId, selectedComponentId).hover(previewX, previewY);
+                state = state.selectComponent(materialId, selectedComponentId)
+                        .setSelectedTransform(selectedRotation, selectedFlipped)
+                        .hover(previewX, previewY);
             }
         }
         return state;
+    }
+
+    private static int normalizeRotation(int rotation) {
+        int normalized = rotation % 4;
+        return normalized < 0 ? normalized + 4 : normalized;
+    }
+
+    private static MaterialComponentEntry transformComponent(MaterialComponentEntry component, int rotation, boolean flipped) {
+        if (component == null) {
+            return null;
+        }
+        int normalizedRotation = normalizeRotation(rotation);
+        if (normalizedRotation == 0 && !flipped) {
+            return component;
+        }
+
+        int rotatedWidth = (normalizedRotation % 2 == 0) ? component.width() : component.height();
+        int rotatedHeight = (normalizedRotation % 2 == 0) ? component.height() : component.width();
+        List<IngredientCell> transformedCells = new ArrayList<>(component.cells().size());
+        for (IngredientCell cell : component.cells()) {
+            int rx;
+            int ry;
+            switch (normalizedRotation) {
+                case 1 -> {
+                    rx = component.height() - 1 - cell.offsetY();
+                    ry = cell.offsetX();
+                }
+                case 2 -> {
+                    rx = component.width() - 1 - cell.offsetX();
+                    ry = component.height() - 1 - cell.offsetY();
+                }
+                case 3 -> {
+                    rx = cell.offsetY();
+                    ry = component.width() - 1 - cell.offsetX();
+                }
+                default -> {
+                    rx = cell.offsetX();
+                    ry = cell.offsetY();
+                }
+            }
+
+            int tx = flipped ? (rotatedWidth - 1 - rx) : rx;
+            transformedCells.add(new IngredientCell(tx, ry, cell.element(), cell.cellType()));
+        }
+
+        return new MaterialComponentEntry(
+                component.componentId(),
+                component.element(),
+                rotatedWidth,
+                rotatedHeight,
+                List.copyOf(transformedCells)
+        );
     }
 
     private int remainingCountForComponent(String componentId, int materialStackCount) {
@@ -430,6 +558,8 @@ final class AlchemyCombineSessionSnapshot {
 
     private AlchemyCombineSessionSnapshot with(
             String nextSelectedComponentId,
+            int nextSelectedRotation,
+            boolean nextSelectedFlipped,
             int nextPreviewX,
             int nextPreviewY,
             LinkedHashMap<String, Integer> nextUsedComponentCounts,
@@ -443,6 +573,8 @@ final class AlchemyCombineSessionSnapshot {
                 nextUsedComponentCounts,
                 nextPlacedMaterials,
                 nextSelectedComponentId,
+                nextSelectedRotation,
+                nextSelectedFlipped,
                 nextPreviewX,
                 nextPreviewY
         );
@@ -483,14 +615,20 @@ final class AlchemyCombineSessionSnapshot {
                         }
                     }
                     components.put(componentId,
-                            new MaterialComponentEntry(componentId, component.element(), List.copyOf(componentCells)));
+                            new MaterialComponentEntry(
+                                    componentId,
+                                    component.element(),
+                                    component.shape().getWidth(),
+                                    component.shape().getHeight(),
+                                    List.copyOf(componentCells)
+                            ));
                 }
             }
             return new MaterialEntry(materialId, sourceIndex, stack, components, List.copyOf(allCells));
         }
     }
 
-    record MaterialComponentEntry(String componentId, AlchemyElement element, List<IngredientCell> cells) {
+    record MaterialComponentEntry(String componentId, AlchemyElement element, int width, int height, List<IngredientCell> cells) {
     }
 
     record MaterialComponentRef(MaterialEntry material, MaterialComponentEntry component) {
@@ -500,6 +638,8 @@ final class AlchemyCombineSessionSnapshot {
             String placedId,
             String materialId,
             String componentId,
+            int rotation,
+            boolean flipped,
             int sourceIndex,
             ItemStack stack,
             List<IngredientCell> cells,
