@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -133,6 +134,7 @@ public final class AlchemyCombineUI {
         boolean[] suppressBack = new boolean[]{false};
         Runnable[] refreshSelectedListRef = new Runnable[1];
         Runnable[] renderGridRef = new Runnable[1];
+        Runnable[] refreshComputedRef = new Runnable[1];
 
         if (player.level().isClientSide) {
             COMBINE_SESSION_CLIENT.put(player.getUUID(), sessionTimeline.current());
@@ -269,7 +271,6 @@ public final class AlchemyCombineUI {
                 }
         );
 
-        buildStatsBar(statsBar, List.of());
         CombineGridView gridView = buildCombineGrid(grid, new CellHandler() {
             @Override
             public void onHover(int x, int y) {
@@ -312,6 +313,9 @@ public final class AlchemyCombineUI {
             combineBoard[0].rebuild(current, GRID_SIZE);
             renderCombineGrid(gridView, combineBoard[0]);
             syncBoardState.run();
+            if (refreshComputedRef[0] != null) {
+                refreshComputedRef[0].run();
+            }
         };
 
         refreshSelectedListRef[0].run();
@@ -319,10 +323,6 @@ public final class AlchemyCombineUI {
 
 
         combineHint.setText(Component.translatable("ui.atelier_steve.alchemy_combine.title"));
-        int successRate = computeSuccessRate(List.of());
-        successLabel.setText(Component.translatable("ui.atelier_steve.alchemy_combine.success_rate"));
-        successValue.setText(Component.literal(successRate + "%"));
-        successFill.layout(layout -> layout.widthPercent(successRate));
 
         levelLabel.setText(Component.literal("LV"));
         usageLabel.setText(Component.translatable("ui.atelier_steve.alchemy_recipe.usage_count"));
@@ -348,7 +348,16 @@ public final class AlchemyCombineUI {
         qualityValue.setText(quality <= 0 ? Component.literal("-") : Component.literal(String.valueOf(quality)));
         AlchemyEffectPanel.buildQualityBar(qualityBar, quality);
 
-        AlchemyEffectPanel.buildEffectAttributes(recipe, Map.of(), attributesScroller);
+        refreshComputedRef[0] = () -> {
+            Map<String, Integer> values = computeCombinedElementValues(sessionTimeline.current(), recipe);
+            buildStatsBar(statsBar, values);
+            int successRate = computeSuccessRate(values);
+            successLabel.setText(Component.translatable("ui.atelier_steve.alchemy_combine.success_rate"));
+            successValue.setText(Component.literal(successRate + "%"));
+            successFill.layout(layout -> layout.widthPercent(successRate));
+            AlchemyEffectPanel.buildEffectAttributes(recipe, values, attributesScroller);
+        };
+        refreshComputedRef[0].run();
 
         return ModularUI.of(ui, player);
     }
@@ -442,9 +451,8 @@ public final class AlchemyCombineUI {
         return grid;
     }
 
-    private static void buildStatsBar(UIElement statsBar, List<ItemStack> stacks) {
+    private static void buildStatsBar(UIElement statsBar, Map<String, Integer> values) {
         statsBar.clearAllChildren();
-        Map<String, Integer> values = computeElementValues(stacks);
         List<String> order = List.of("fire", "ice", "thunder", "wind", "light");
         for (String element : order) {
             var item = new UIElement().addClass("stat_item");
@@ -502,37 +510,79 @@ public final class AlchemyCombineUI {
         }
     }
 
-    private static int computeSuccessRate(List<ItemStack> stacks) {
-        int total = computeElementValues(stacks).values().stream().mapToInt(Integer::intValue).sum();
+    private static int computeSuccessRate(Map<String, Integer> values) {
+        int total = values.values().stream().mapToInt(Integer::intValue).sum();
         return Math.min(99, total);
     }
 
-    private static Map<String, Integer> computeElementValues(List<ItemStack> stacks) {
+    private static Map<String, Integer> computeCombinedElementValues(
+            AlchemyCombineSessionSnapshot snapshot,
+            AlchemyRecipeDefinition recipe
+    ) {
+        Map<String, Integer> insertedValues = computeInsertedElementValues(snapshot);
+        if (recipe == null || insertedValues.isEmpty()) {
+            return insertedValues;
+        }
+
+        Map<String, Integer> values = new HashMap<>(insertedValues);
+        int maxIterations = Math.max(1, recipe.effects().size() + 1);
+        for (int i = 0; i < maxIterations; i++) {
+            List<AlchemyRecipeDefinition.ResolvedEffect> resolvedEffects = recipe.resolveEffects(values);
+            Map<String, Integer> next = new HashMap<>(insertedValues);
+            applyEnhancedElementBonuses(next, insertedValues, resolvedEffects);
+            if (next.equals(values)) {
+                break;
+            }
+            values = next;
+        }
+        return values;
+    }
+
+    private static Map<String, Integer> computeInsertedElementValues(AlchemyCombineSessionSnapshot snapshot) {
         Map<String, Integer> values = new HashMap<>();
-        if (stacks == null) {
+        if (snapshot == null || snapshot.placedMaterials().isEmpty()) {
             return values;
         }
-        for (ItemStack stack : stacks) {
-            if (stack.isEmpty()) {
-                continue;
-            }
-            int stackCount = stack.getCount();
-            if (stackCount <= 0) {
-                continue;
-            }
-            AlchemyItemData data = stack.get(ModDataComponents.ALCHEMY_DATA.get());
-            if (data == null) {
-                continue;
-            }
-            for (var component : data.elements()) {
-                int amount = component.getNormalCount() + component.getLinkCount();
-                if (amount <= 0) {
-                    continue;
-                }
-                values.merge(component.element().getSerializedName(), amount * stackCount, Integer::sum);
+        for (AlchemyCombineSessionSnapshot.PlacedMaterial placed : snapshot.placedMaterials()) {
+            for (AlchemyCombineSessionSnapshot.IngredientCell cell : placed.cells()) {
+                values.merge(cell.element().getSerializedName(), 1, Integer::sum);
             }
         }
         return values;
+    }
+
+    private static void applyEnhancedElementBonuses(
+            Map<String, Integer> targetValues,
+            Map<String, Integer> insertedValues,
+            List<AlchemyRecipeDefinition.ResolvedEffect> resolvedEffects
+    ) {
+        if (targetValues == null || insertedValues == null || insertedValues.isEmpty() || resolvedEffects == null || resolvedEffects.isEmpty()) {
+            return;
+        }
+
+        Set<String> insertedElements = insertedValues.entrySet().stream()
+                .filter(entry -> entry.getValue() != null && entry.getValue() > 0)
+                .map(Map.Entry::getKey)
+                .collect(java.util.stream.Collectors.toSet());
+        if (insertedElements.isEmpty()) {
+            return;
+        }
+
+        for (AlchemyRecipeDefinition.ResolvedEffect resolvedEffect : resolvedEffects) {
+            for (ElementComponent bonus : resolvedEffect.bonusElements()) {
+                int enhancedCount = bonus.getNormalCount() + bonus.getLinkCount();
+                if (enhancedCount <= 0) {
+                    continue;
+                }
+                String enhancedElement = bonus.element().getSerializedName();
+                for (String insertedElement : insertedElements) {
+                    targetValues.merge(insertedElement, enhancedCount, Integer::sum);
+                }
+                if (insertedElements.contains(enhancedElement)) {
+                    targetValues.merge(enhancedElement, enhancedCount, Integer::sum);
+                }
+            }
+        }
     }
 
     private static void setItemElementStack(UIElement element, ItemStack stack) {
