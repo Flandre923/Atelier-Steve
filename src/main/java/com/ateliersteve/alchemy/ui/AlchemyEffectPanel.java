@@ -87,7 +87,7 @@ public final class AlchemyEffectPanel {
 
         if (recipe == null || recipe.effects().isEmpty()) {
             attributesList.addChild(new Label()
-                    .setText(Component.literal("\u65e0"))
+                    .setText(Component.translatable("ui.atelier_steve.alchemy_recipe.effects_empty"))
                     .addClass("effects_empty"));
             return;
         }
@@ -128,7 +128,9 @@ public final class AlchemyEffectPanel {
             }
             var content = new UIElement().addClass("attr_content");
             var name = new Label()
-                    .setText(step == null ? Component.literal("\u65e0") : Component.literal(step.value()))
+                    .setText(step == null
+                            ? Component.translatable("ui.atelier_steve.alchemy_recipe.effects_empty")
+                            : Component.literal(step.value()))
                     .addClass("attr_name");
             var bar = new UIElement()
                     .addClass("attr_bar")
@@ -155,7 +157,7 @@ public final class AlchemyEffectPanel {
 
         if (!added) {
             attributesList.addChild(new Label()
-                    .setText(Component.literal("\u65e0"))
+                    .setText(Component.translatable("ui.atelier_steve.alchemy_recipe.effects_empty"))
                     .addClass("effects_empty"));
         }
     }

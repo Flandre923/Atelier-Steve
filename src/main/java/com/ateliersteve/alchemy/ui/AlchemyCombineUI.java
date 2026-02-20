@@ -318,9 +318,9 @@ public final class AlchemyCombineUI {
         renderGridRef[0].run();
 
 
-        combineHint.setText(Component.literal("\u70bc\u91d1\u8c03\u548c"));
+        combineHint.setText(Component.translatable("ui.atelier_steve.alchemy_combine.title"));
         int successRate = computeSuccessRate(List.of());
-        successLabel.setText(Component.literal("\u5927\u6210\u529f\u6982\u7387"));
+        successLabel.setText(Component.translatable("ui.atelier_steve.alchemy_combine.success_rate"));
         successValue.setText(Component.literal(successRate + "%"));
         successFill.layout(layout -> layout.widthPercent(successRate));
 
@@ -362,7 +362,7 @@ public final class AlchemyCombineUI {
     ) {
         container.clearAllChildren();
         if (snapshot == null || snapshot.materials().isEmpty()) {
-            hint.setText(Component.literal("\u5df2\u9009\u6750\u6599\u4e3a\u7a7a"));
+            hint.setText(Component.translatable("ui.atelier_steve.alchemy_combine.materials_empty"));
             return;
         }
 
@@ -373,7 +373,7 @@ public final class AlchemyCombineUI {
             }
         }
         if (availableCount <= 0) {
-            hint.setText(Component.literal("\u5df2\u9009\u6750\u6599\u5df2\u7528\u5b8c"));
+            hint.setText(Component.translatable("ui.atelier_steve.alchemy_combine.materials_exhausted"));
         } else {
             hint.setText(Component.empty());
         }

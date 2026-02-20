@@ -172,11 +172,11 @@ public final class AlchemyMaterialSelectionUI {
         boolean hasItems = !basketStacks.isEmpty();
         boolean hasMatches = perIngredient.stream().anyMatch(matches -> !matches.isEmpty());
         if (!hasBasket) {
-            hintLabel.setText(Component.literal("附近没有采集篮"));
+            hintLabel.setText(Component.translatable("ui.atelier_steve.alchemy_material_selection.no_basket"));
         } else if (!hasItems) {
-            hintLabel.setText(Component.literal("采集篮是空的"));
+            hintLabel.setText(Component.translatable("ui.atelier_steve.alchemy_material_selection.basket_empty"));
         } else if (!hasMatches) {
-            hintLabel.setText(Component.literal("采集篮内没有匹配材料"));
+            hintLabel.setText(Component.translatable("ui.atelier_steve.alchemy_material_selection.no_matching_materials"));
         } else {
             hintLabel.setText(Component.empty());
         }
@@ -187,7 +187,7 @@ public final class AlchemyMaterialSelectionUI {
             AlchemyEffectPanel.buildEffectAttributes(recipe, values, attributesScroller);
         };
 
-        combineButtonLabel.setText(Component.literal("\u8fdb\u5165\u8c03\u548c"));
+        combineButtonLabel.setText(Component.translatable("ui.atelier_steve.alchemy_material_selection.enter_combine"));
         RPCEvent combineRpc = RPCEventBuilder.simple(ResourceLocation.class, BlockPos.class, Integer[].class,
                 (recipeId, pos, pairs) -> {
                     if (!(player instanceof ServerPlayer serverPlayer)) {
@@ -266,7 +266,7 @@ public final class AlchemyMaterialSelectionUI {
         refreshRef[0] = () -> {
             int index = selectedIndex.get();
             if (ingredients.isEmpty()) {
-                ingredientFilter.setText(Component.literal("No ingredients"));
+                ingredientFilter.setText(Component.translatable("ui.atelier_steve.alchemy_material_selection.no_ingredients"));
                 ingredientTabs.clearAllChildren();
             populateGrid(gridContent, List.of(), null, null);
                 updateEffects.run();
