@@ -7,9 +7,7 @@ import com.ateliersteve.alchemy.element.ElementComponent;
 import com.ateliersteve.registry.ModDataComponents;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -241,6 +239,26 @@ final class AlchemyCombineSessionSnapshot {
 
         List<PlacedMaterial> nextPlaced = new ArrayList<>(placedMaterials);
         nextPlaced.remove(target);
+
+        LinkedHashMap<String, Integer> nextUsed = new LinkedHashMap<>(usedComponentCounts);
+        int remaining = nextUsed.getOrDefault(target.componentId(), 0) - 1;
+        if (remaining <= 0) {
+            nextUsed.remove(target.componentId());
+        } else {
+            nextUsed.put(target.componentId(), remaining);
+        }
+
+        return with(selectedComponentId, previewX, previewY, nextUsed, List.copyOf(nextPlaced));
+    }
+
+    AlchemyCombineSessionSnapshot removeLastPlaced() {
+        if (placedMaterials.isEmpty()) {
+            return this;
+        }
+        PlacedMaterial target = placedMaterials.get(placedMaterials.size() - 1);
+
+        List<PlacedMaterial> nextPlaced = new ArrayList<>(placedMaterials);
+        nextPlaced.remove(nextPlaced.size() - 1);
 
         LinkedHashMap<String, Integer> nextUsed = new LinkedHashMap<>(usedComponentCounts);
         int remaining = nextUsed.getOrDefault(target.componentId(), 0) - 1;
@@ -491,7 +509,6 @@ final class AlchemyCombineSessionSnapshot {
     }
 
     static final class Timeline {
-        private final Deque<AlchemyCombineSessionSnapshot> history = new ArrayDeque<>();
         private AlchemyCombineSessionSnapshot current;
 
         Timeline(AlchemyCombineSessionSnapshot initial) {
@@ -510,16 +527,15 @@ final class AlchemyCombineSessionSnapshot {
             if (next == null || next == current) {
                 return false;
             }
-            history.push(current);
             current = next;
             return true;
         }
 
-        boolean undo() {
-            if (history.isEmpty()) {
+        boolean sync(AlchemyCombineSessionSnapshot snapshot) {
+            if (snapshot == null || snapshot == current) {
                 return false;
             }
-            current = history.pop();
+            current = snapshot;
             return true;
         }
     }

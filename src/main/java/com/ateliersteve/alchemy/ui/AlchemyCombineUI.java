@@ -153,9 +153,20 @@ public final class AlchemyCombineUI {
                 return;
             }
             AlchemyCombineSessionSnapshot synced = AlchemyCombineSessionSnapshot.fromSyncPayload(initialSnapshot, payload, GRID_SIZE);
+            sessionTimeline.sync(synced);
             COMBINE_SESSION_SERVER.put(serverPlayer.getUUID(), synced);
         });
         grid.addRPCEvent(syncSessionRpc);
+
+        RPCEvent openSelectionRpc = RPCEventBuilder.simple(Boolean.class, payload -> {
+            if (!(player instanceof ServerPlayer serverPlayer)) {
+                return;
+            }
+            returnReservedMaterials(serverPlayer, pending == null ? List.of() : pending.reservedMaterials());
+            serverPlayer.closeContainer();
+            serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
+        });
+        grid.addRPCEvent(openSelectionRpc);
 
         Runnable syncBoardState = () -> {
             Integer[] payload = combineBoard[0].toPayload();
@@ -176,53 +187,54 @@ public final class AlchemyCombineUI {
             if (e.button != 1) {
                 return;
             }
+            if (suppressBack[0]) {
+                suppressBack[0] = false;
+                return;
+            }
             if (sessionTimeline.current().isPreviewing()) {
-                suppressBack[0] = true;
                 if (sessionTimeline.apply(AlchemyCombineSessionSnapshot::cancelSelection)) {
+                    suppressBack[0] = true;
                     onSessionStateChanged(player, sessionTimeline.current());
                 }
                 rerender(renderGridRef, refreshSelectedListRef);
+                return;
+            }
+            if (sessionTimeline.apply(AlchemyCombineSessionSnapshot::removeLastPlaced)) {
+                suppressBack[0] = true;
+                onSessionStateChanged(player, sessionTimeline.current());
+                rerender(renderGridRef, refreshSelectedListRef);
+                return;
+            }
+            grid.sendEvent(openSelectionRpc, Boolean.TRUE);
+        });
+        root.addServerEventListener(UIEvents.MOUSE_DOWN, e -> {
+            if (e.button != 1 || !(player instanceof ServerPlayer serverPlayer)) {
                 return;
             }
             if (suppressBack[0]) {
                 suppressBack[0] = false;
                 return;
             }
-            if (recipe != null) {
-                AlchemyMaterialSelectionUI.requestOpenClient(player, recipe);
-            }
-        });
-        root.addServerEventListener(UIEvents.MOUSE_DOWN, e -> {
-            if (e.button != 1 || !(player instanceof ServerPlayer serverPlayer)) {
+            if (sessionTimeline.current().isPreviewing()) {
+                if (sessionTimeline.apply(AlchemyCombineSessionSnapshot::cancelSelection)) {
+                    onSessionStateChanged(player, sessionTimeline.current());
+                }
+                rerender(renderGridRef, refreshSelectedListRef);
                 return;
             }
-            if (sessionTimeline.current().isPreviewing() || suppressBack[0]) {
-                suppressBack[0] = false;
+            if (sessionTimeline.apply(AlchemyCombineSessionSnapshot::removeLastPlaced)) {
+                onSessionStateChanged(player, sessionTimeline.current());
+                rerender(renderGridRef, refreshSelectedListRef);
                 return;
             }
-            returnReservedMaterials(serverPlayer, pending == null ? List.of() : pending.reservedMaterials());
-            if (recipe != null) {
-                AlchemyMaterialSelectionUI.requestOpen(serverPlayer, recipe);
-            }
-            serverPlayer.closeContainer();
-            serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
         });
         root.addServerEventListener(UIEvents.KEY_DOWN, e -> {
             if (e.keyCode == GLFW.GLFW_KEY_ESCAPE && player instanceof ServerPlayer serverPlayer) {
                 returnReservedMaterials(serverPlayer, pending == null ? List.of() : pending.reservedMaterials());
-                if (recipe != null) {
-                    AlchemyMaterialSelectionUI.requestOpen(serverPlayer, recipe);
-                }
                 serverPlayer.closeContainer();
                 serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
             }
         });
-        root.addEventListener(UIEvents.KEY_DOWN, e -> {
-            if (e.keyCode == GLFW.GLFW_KEY_ESCAPE && recipe != null) {
-                AlchemyMaterialSelectionUI.requestOpenClient(player, recipe);
-            }
-        });
-
         ItemStack resultStack = resolveResultStack(recipe);
         combineTitle.setText(resultStack.isEmpty()
                 ? Component.literal(recipe == null ? "No Recipe" : recipe.result().toString())
@@ -262,15 +274,20 @@ public final class AlchemyCombineUI {
                     }
                     rerender(renderGridRef, refreshSelectedListRef);
                 } else if (button == 1) {
-                    suppressBack[0] = true;
-                    boolean changed = sessionTimeline.undo();
-                    if (!changed) {
-                        changed = sessionTimeline.apply(state -> state.removePlacedAt(x, y));
+                    boolean changed;
+                    if (sessionTimeline.current().isPreviewing()) {
+                        suppressBack[0] = true;
+                        changed = sessionTimeline.apply(AlchemyCombineSessionSnapshot::cancelSelection);
+                    } else {
+                        changed = sessionTimeline.apply(AlchemyCombineSessionSnapshot::removeLastPlaced);
+                        if (changed) {
+                            suppressBack[0] = true;
+                        }
                     }
                     if (changed) {
                         onSessionStateChanged(player, sessionTimeline.current());
+                        rerender(renderGridRef, refreshSelectedListRef);
                     }
-                    rerender(renderGridRef, refreshSelectedListRef);
                 }
             }
         });
@@ -348,16 +365,15 @@ public final class AlchemyCombineUI {
 
         for (AlchemyCombineSessionSnapshot.MaterialEntry material : snapshot.materials()) {
             ItemStack stack = material.stack();
-            int remaining = snapshot.remainingCount(material.materialId());
             boolean exhausted = snapshot.isExhausted(material.materialId());
             var row = new UIElement().addClass("selected_row");
             if (exhausted) {
                 row.addClass("disabled");
                 row.lss("opacity", "0.45");
             }
-            var name = new Label()
-                    .setText(Component.literal("[" + material.materialId() + "] " + stack.getHoverName().getString() + " x" + remaining))
-                    .addClass("selected_name");
+            var info = new UIElement().addClass("row_align_center").addClass("selected_prefix");
+            var icon = new StaticItemElement().setStack(stack).addClass("selected_icon");
+            info.addChildren(icon);
             var components = new UIElement().addClass("selected_components");
 
             if (material.components().isEmpty()) {
@@ -387,7 +403,7 @@ public final class AlchemyCombineUI {
                 }
             }
 
-            row.addChildren(name, components);
+            row.addChildren(info, components);
             container.addChild(row);
         }
     }
