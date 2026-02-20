@@ -467,12 +467,43 @@ final class AlchemyCombineSessionSnapshot {
             transformedCells.add(new IngredientCell(tx, ry, cell.element(), cell.cellType()));
         }
 
+        if (transformedCells.isEmpty()) {
+            return new MaterialComponentEntry(
+                    component.componentId(),
+                    component.element(),
+                    rotatedWidth,
+                    rotatedHeight,
+                    List.of()
+            );
+        }
+
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        for (IngredientCell cell : transformedCells) {
+            minX = Math.min(minX, cell.offsetX());
+            minY = Math.min(minY, cell.offsetY());
+            maxX = Math.max(maxX, cell.offsetX());
+            maxY = Math.max(maxY, cell.offsetY());
+        }
+
+        List<IngredientCell> normalizedCells = new ArrayList<>(transformedCells.size());
+        for (IngredientCell cell : transformedCells) {
+            normalizedCells.add(new IngredientCell(
+                    cell.offsetX() - minX,
+                    cell.offsetY() - minY,
+                    cell.element(),
+                    cell.cellType()
+            ));
+        }
+
         return new MaterialComponentEntry(
                 component.componentId(),
                 component.element(),
-                rotatedWidth,
-                rotatedHeight,
-                List.copyOf(transformedCells)
+                Math.max(1, maxX - minX + 1),
+                Math.max(1, maxY - minY + 1),
+                List.copyOf(normalizedCells)
         );
     }
 
