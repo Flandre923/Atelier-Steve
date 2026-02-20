@@ -296,6 +296,10 @@
             horizontal-align: right;
         }
 
+        .info_value_compact {
+            font-size: 10;
+        }
+
         .quality_section {
             flex-direction: column;
             background: rect(#ffffff, 4, 1, #b0b0b0);
@@ -333,6 +337,17 @@
         }
 
         .quality_segment_fill {
+            height: 6;
+        }
+
+        .quality_cycle_track {
+            flex-grow: 1;
+            min-width: 0;
+            height: 6;
+            background: rect(#d6d6d6, 1);
+        }
+
+        .quality_cycle_fill {
             height: 6;
         }
 
@@ -448,7 +463,7 @@
                         </element>
                         <element class="info_row">
                             <label id="craft_label" class="info_label info_label_text"/>
-                            <label id="craft_value" class="info_value info_value_text"/>
+                            <label id="craft_value" class="info_value info_value_text info_value_compact"/>
                         </element>
                     </element>
                 </element>

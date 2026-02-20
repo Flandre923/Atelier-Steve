@@ -16,7 +16,7 @@ import java.util.TreeSet;
 
 public final class AlchemyEffectPanel {
     private static final int QUALITY_MAX = 999;
-    private static final int QUALITY_SEGMENT_WIDTH = 12;
+    private static final int QUALITY_CYCLE_SIZE = 100;
     private static final List<Integer> QUALITY_COLORS = List.of(
             0x6fa3ff,
             0xffe66d,
@@ -43,29 +43,35 @@ public final class AlchemyEffectPanel {
 
     public static void buildQualityBar(UIElement bar, int quality) {
         bar.clearAllChildren();
-        int clamped = Math.max(0, Math.min(quality, QUALITY_MAX));
-        for (int i = 0; i < QUALITY_COLORS.size(); i++) {
-            int segmentStart = i * 100;
-            int segmentEnd = (i + 1) * 100;
-            int fillWidth = 0;
-            if (clamped >= segmentEnd) {
-                fillWidth = QUALITY_SEGMENT_WIDTH;
-            } else if (clamped > segmentStart) {
-                float ratio = (clamped - segmentStart) / 100f;
-                fillWidth = Math.max(1, Math.round(ratio * QUALITY_SEGMENT_WIDTH));
-            }
+        QualityCycleState state = resolveQualityCycleState(quality);
 
-            var segment = new UIElement().addClass("quality_segment");
-            if (fillWidth > 0) {
-                int fillWidthFinal = fillWidth;
-                var fill = new UIElement()
-                        .addClass("quality_segment_fill")
-                        .layout(layout -> layout.width(fillWidthFinal));
-                fill.lss("background", "rect(" + toHexColor(QUALITY_COLORS.get(i)) + ", 1)");
-                segment.addChild(fill);
-            }
-            bar.addChild(segment);
+        var track = new UIElement().addClass("quality_cycle_track");
+
+        if (state.fillPercent() > 0f) {
+            float fillPercent = state.fillPercent();
+            var fill = new UIElement()
+                    .addClass("quality_cycle_fill")
+                    .layout(layout -> layout.widthPercent(fillPercent));
+            fill.lss("background", "rect(" + toHexColor(state.color()) + ", 1)");
+            track.addChild(fill);
         }
+
+        bar.addChild(track);
+    }
+
+    private static QualityCycleState resolveQualityCycleState(int quality) {
+        int clamped = Math.max(0, Math.min(quality, QUALITY_MAX));
+        if (clamped <= 0) {
+            return new QualityCycleState(0, 0f, QUALITY_COLORS.get(0));
+        }
+
+        int cycleIndex = Math.min(QUALITY_COLORS.size() - 1, (clamped - 1) / QUALITY_CYCLE_SIZE);
+        int cycleProgress = ((clamped - 1) % QUALITY_CYCLE_SIZE) + 1;
+        float fillPercent = (cycleProgress * 100f) / QUALITY_CYCLE_SIZE;
+        return new QualityCycleState(cycleIndex, fillPercent, QUALITY_COLORS.get(cycleIndex));
+    }
+
+    private record QualityCycleState(int cycle, float fillPercent, int color) {
     }
 
     public static void buildEffectAttributes(

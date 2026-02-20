@@ -256,6 +256,17 @@
             height: 6;
         }
 
+        .quality_cycle_track {
+            flex-grow: 1;
+            min-width: 0;
+            height: 6;
+            background: rect(#d6d6d6, 1);
+        }
+
+        .quality_cycle_fill {
+            height: 6;
+        }
+
         .attributes_scroller {
             flex-grow: 1;
             width: 100%;
