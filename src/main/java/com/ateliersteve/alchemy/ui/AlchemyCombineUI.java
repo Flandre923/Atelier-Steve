@@ -39,13 +39,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class AlchemyCombineUI {
     private static final Map<UUID, PendingCombine> PENDING_COMBINE_SERVER = new ConcurrentHashMap<>();
     private static final Map<UUID, PendingCombine> PENDING_COMBINE_CLIENT = new ConcurrentHashMap<>();
+    private static final Map<UUID, AlchemyCombineSessionSnapshot> COMBINE_SESSION_SERVER = new ConcurrentHashMap<>();
+    private static final Map<UUID, AlchemyCombineSessionSnapshot> COMBINE_SESSION_CLIENT = new ConcurrentHashMap<>();
     private static final Map<UUID, Integer[]> COMBINE_BOARD_SERVER = new ConcurrentHashMap<>();
     private static final Map<UUID, Integer[]> COMBINE_BOARD_CLIENT = new ConcurrentHashMap<>();
     private static final int GRID_SIZE = 5;
@@ -56,17 +57,26 @@ public final class AlchemyCombineUI {
     }
 
     public static void requestOpen(ServerPlayer player, AlchemyRecipeDefinition recipe, List<ItemStack> selectedStacks) {
+        requestOpen(player, recipe, selectedStacks, List.of());
+    }
+
+    public static void requestOpen(
+            ServerPlayer player,
+            AlchemyRecipeDefinition recipe,
+            List<ItemStack> selectedStacks,
+            List<ReservedMaterialRef> reservedMaterials
+    ) {
         if (player == null || recipe == null) {
             return;
         }
-        PENDING_COMBINE_SERVER.put(player.getUUID(), new PendingCombine(recipe.id(), copyStacks(selectedStacks)));
+        PENDING_COMBINE_SERVER.put(player.getUUID(), new PendingCombine(recipe.id(), copyStacks(selectedStacks), copyReservedMaterials(reservedMaterials)));
     }
 
     public static void requestOpenClient(Player player, AlchemyRecipeDefinition recipe, List<ItemStack> selectedStacks) {
         if (player == null || recipe == null) {
             return;
         }
-        PENDING_COMBINE_CLIENT.put(player.getUUID(), new PendingCombine(recipe.id(), copyStacks(selectedStacks)));
+        PENDING_COMBINE_CLIENT.put(player.getUUID(), new PendingCombine(recipe.id(), copyStacks(selectedStacks), List.of()));
     }
 
     public static PendingCombine consumePendingCombine(Player player) {
@@ -93,6 +103,8 @@ public final class AlchemyCombineUI {
         AlchemyRecipeDefinition recipe = pending == null ? null : AlchemyRecipeRegistry.findById(pending.recipeId());
         List<ItemStack> selectedStacks = pending == null ? List.of() : pending.selectedStacks();
         List<ItemStack> ingredientStacks = selectedStacks == null ? List.of() : new ArrayList<>(selectedStacks);
+        AlchemyCombineSessionSnapshot initialSnapshot = AlchemyCombineSessionSnapshot.fromStacks(ingredientStacks);
+        AlchemyCombineSessionSnapshot.Timeline sessionTimeline = new AlchemyCombineSessionSnapshot.Timeline(initialSnapshot);
 
         var ui = UI.of(xml);
         var root = ui.select("#alchemy_combine_root").findFirst().orElseThrow();
@@ -117,15 +129,16 @@ public final class AlchemyCombineUI {
         var qualityBar = ui.select("#quality_bar").findFirst().orElseThrow();
         var attributesScroller = ui.select("#attributes_scroller").findFirst().orElseThrow();
 
-        Map<Integer, Integer> usedCounts = new HashMap<>();
-        List<PlacedIngredient> placedIngredients = new ArrayList<>();
         CombineBoardState[] combineBoard = new CombineBoardState[]{new CombineBoardState(GRID_SIZE, GRID_SIZE)};
-        SelectedIngredient[] selectedIngredient = new SelectedIngredient[1];
-        CombineState[] combineState = new CombineState[]{CombineState.IDLE};
-        int[] previewOrigin = new int[]{-1, -1};
         boolean[] suppressBack = new boolean[]{false};
         Runnable[] refreshSelectedListRef = new Runnable[1];
         Runnable[] renderGridRef = new Runnable[1];
+
+        if (player.level().isClientSide) {
+            COMBINE_SESSION_CLIENT.put(player.getUUID(), sessionTimeline.current());
+        } else {
+            COMBINE_SESSION_SERVER.put(player.getUUID(), sessionTimeline.current());
+        }
 
         RPCEvent syncBoardRpc = RPCEventBuilder.simple(Integer[].class, payload -> {
             if (!(player instanceof ServerPlayer serverPlayer) || payload == null) {
@@ -135,13 +148,24 @@ public final class AlchemyCombineUI {
         });
         grid.addRPCEvent(syncBoardRpc);
 
+        RPCEvent syncSessionRpc = RPCEventBuilder.simple(Integer[].class, payload -> {
+            if (!(player instanceof ServerPlayer serverPlayer) || payload == null) {
+                return;
+            }
+            AlchemyCombineSessionSnapshot synced = AlchemyCombineSessionSnapshot.fromSyncPayload(initialSnapshot, payload, GRID_SIZE);
+            COMBINE_SESSION_SERVER.put(serverPlayer.getUUID(), synced);
+        });
+        grid.addRPCEvent(syncSessionRpc);
+
         Runnable syncBoardState = () -> {
             Integer[] payload = combineBoard[0].toPayload();
             if (player.level().isClientSide) {
                 COMBINE_BOARD_CLIENT.put(player.getUUID(), payload);
                 grid.sendEvent(syncBoardRpc, (Object) payload);
+                grid.sendEvent(syncSessionRpc, (Object) sessionTimeline.current().toSyncPayload());
             } else {
                 COMBINE_BOARD_SERVER.put(player.getUUID(), payload);
+                COMBINE_SESSION_SERVER.put(player.getUUID(), sessionTimeline.current());
             }
         };
 
@@ -152,9 +176,12 @@ public final class AlchemyCombineUI {
             if (e.button != 1) {
                 return;
             }
-            if (combineState[0] == CombineState.PREVIEWING) {
+            if (sessionTimeline.current().isPreviewing()) {
                 suppressBack[0] = true;
-                handleRightClick(-1, -1, selectedIngredient, placedIngredients, usedCounts, combineState, previewOrigin, renderGridRef, refreshSelectedListRef);
+                if (sessionTimeline.apply(AlchemyCombineSessionSnapshot::cancelSelection)) {
+                    onSessionStateChanged(player, sessionTimeline.current());
+                }
+                rerender(renderGridRef, refreshSelectedListRef);
                 return;
             }
             if (suppressBack[0]) {
@@ -169,10 +196,11 @@ public final class AlchemyCombineUI {
             if (e.button != 1 || !(player instanceof ServerPlayer serverPlayer)) {
                 return;
             }
-            if (combineState[0] == CombineState.PREVIEWING || suppressBack[0]) {
+            if (sessionTimeline.current().isPreviewing() || suppressBack[0]) {
                 suppressBack[0] = false;
                 return;
             }
+            returnReservedMaterials(serverPlayer, pending == null ? List.of() : pending.reservedMaterials());
             if (recipe != null) {
                 AlchemyMaterialSelectionUI.requestOpen(serverPlayer, recipe);
             }
@@ -181,6 +209,7 @@ public final class AlchemyCombineUI {
         });
         root.addServerEventListener(UIEvents.KEY_DOWN, e -> {
             if (e.keyCode == GLFW.GLFW_KEY_ESCAPE && player instanceof ServerPlayer serverPlayer) {
+                returnReservedMaterials(serverPlayer, pending == null ? List.of() : pending.reservedMaterials());
                 if (recipe != null) {
                     AlchemyMaterialSelectionUI.requestOpen(serverPlayer, recipe);
                 }
@@ -202,34 +231,14 @@ public final class AlchemyCombineUI {
 
         refreshSelectedListRef[0] = () -> populateSelectedList(
                 selectedList,
-                ingredientStacks,
-                usedCounts,
+                sessionTimeline.current(),
                 selectedHint,
-                selectedIngredient[0] == null ? null : selectedIngredient[0].sourceIndex(),
-                (index, stack) -> {
-                    if (index < 0 || index >= ingredientStacks.size()) {
-                        return;
+                sessionTimeline.current().selectedComponentId(),
+                (materialId, componentId) -> {
+                    if (sessionTimeline.apply(state -> state.selectComponent(materialId, componentId))) {
+                        onSessionStateChanged(player, sessionTimeline.current());
                     }
-                    ItemStack currentStack = ingredientStacks.get(index);
-                    if (currentStack == null || currentStack.isEmpty()) {
-                        return;
-                    }
-                    int used = usedCounts.getOrDefault(index, 0);
-                    if (used >= currentStack.getCount()) {
-                        return;
-                    }
-                    SelectedIngredient candidate = buildSelectedIngredient(index, currentStack);
-                    if (candidate == null || candidate.cells().isEmpty()) {
-                        return;
-                    }
-                    selectedIngredient[0] = candidate;
-                    combineState[0] = CombineState.PREVIEWING;
-                    previewOrigin[0] = -1;
-                    previewOrigin[1] = -1;
-                    if (renderGridRef[0] != null) {
-                        renderGridRef[0].run();
-                    }
-                    refreshSelectedListRef[0].run();
+                    rerender(renderGridRef, refreshSelectedListRef);
                 }
         );
 
@@ -237,35 +246,38 @@ public final class AlchemyCombineUI {
         CombineGridView gridView = buildCombineGrid(grid, new CellHandler() {
             @Override
             public void onHover(int x, int y) {
-                if (combineState[0] != CombineState.PREVIEWING || selectedIngredient[0] == null) {
-                    return;
-                }
-                if (previewOrigin[0] == x && previewOrigin[1] == y) {
-                    return;
-                }
-                previewOrigin[0] = x;
-                previewOrigin[1] = y;
-                if (renderGridRef[0] != null) {
-                    renderGridRef[0].run();
+                if (sessionTimeline.apply(state -> state.hover(x, y))) {
+                    onSessionStateChanged(player, sessionTimeline.current());
+                    if (renderGridRef[0] != null) {
+                        renderGridRef[0].run();
+                    }
                 }
             }
 
             @Override
             public void onClick(int x, int y, int button) {
                 if (button == 0) {
-                    handleLeftClick(x, y, selectedIngredient, placedIngredients, usedCounts, combineState, previewOrigin, renderGridRef, refreshSelectedListRef);
+                    if (sessionTimeline.apply(state -> state.placeSelectedAt(x, y, GRID_SIZE))) {
+                        onSessionStateChanged(player, sessionTimeline.current());
+                    }
+                    rerender(renderGridRef, refreshSelectedListRef);
                 } else if (button == 1) {
                     suppressBack[0] = true;
-                    handleRightClick(x, y, selectedIngredient, placedIngredients, usedCounts, combineState, previewOrigin, renderGridRef, refreshSelectedListRef);
+                    boolean changed = sessionTimeline.undo();
+                    if (!changed) {
+                        changed = sessionTimeline.apply(state -> state.removePlacedAt(x, y));
+                    }
+                    if (changed) {
+                        onSessionStateChanged(player, sessionTimeline.current());
+                    }
+                    rerender(renderGridRef, refreshSelectedListRef);
                 }
             }
         });
 
         renderGridRef[0] = () -> {
-            SelectedIngredient current = selectedIngredient[0];
-            boolean previewing = combineState[0] == CombineState.PREVIEWING && current != null && previewOrigin[0] >= 0;
-            boolean valid = previewing && isPlacementValid(previewOrigin[0], previewOrigin[1], current.cells(), placedIngredients);
-            combineBoard[0].rebuild(placedIngredients, current, previewOrigin[0], previewOrigin[1], previewing, valid);
+            AlchemyCombineSessionSnapshot current = sessionTimeline.current();
+            combineBoard[0].rebuild(current, GRID_SIZE);
             renderCombineGrid(gridView, combineBoard[0]);
             syncBoardState.run();
         };
@@ -312,24 +324,22 @@ public final class AlchemyCombineUI {
 
     private static void populateSelectedList(
             UIElement container,
-            List<ItemStack> stacks,
-            Map<Integer, Integer> usedCounts,
+            AlchemyCombineSessionSnapshot snapshot,
             Label hint,
-            Integer selectedIndex,
+            String selectedComponentId,
             ItemSelectHandler onSelect
     ) {
         container.clearAllChildren();
-        if (stacks == null || stacks.isEmpty()) {
+        if (snapshot == null || snapshot.materials().isEmpty()) {
             hint.setText(Component.literal("\u5df2\u9009\u6750\u6599\u4e3a\u7a7a"));
             return;
         }
 
         int availableCount = 0;
-        for (int i = 0; i < stacks.size(); i++) {
-            if (usedCounts != null && usedCounts.getOrDefault(i, 0) >= stacks.get(i).getCount()) {
-                continue;
+        for (AlchemyCombineSessionSnapshot.MaterialEntry material : snapshot.materials()) {
+            if (!snapshot.isExhausted(material.materialId())) {
+                availableCount++;
             }
-            availableCount++;
         }
         if (availableCount <= 0) {
             hint.setText(Component.literal("\u5df2\u9009\u6750\u6599\u5df2\u7528\u5b8c"));
@@ -337,61 +347,68 @@ public final class AlchemyCombineUI {
         }
         hint.setText(Component.empty());
 
-        for (int i = 0; i < stacks.size(); i++) {
-            ItemStack stack = stacks.get(i);
-            int used = usedCounts == null ? 0 : usedCounts.getOrDefault(i, 0);
-            int remaining = Math.max(0, stack.getCount() - used);
-            boolean exhausted = usedCounts != null && usedCounts.getOrDefault(i, 0) >= stack.getCount();
+        for (AlchemyCombineSessionSnapshot.MaterialEntry material : snapshot.materials()) {
+            ItemStack stack = material.stack();
+            int remaining = snapshot.remainingCount(material.materialId());
+            boolean exhausted = snapshot.isExhausted(material.materialId());
             var row = new UIElement().addClass("selected_row");
-            if (selectedIndex != null && selectedIndex == i) {
-                row.addClass("selected");
-            }
             if (exhausted) {
                 row.addClass("disabled");
                 row.lss("opacity", "0.45");
             }
             var name = new Label()
-                    .setText(Component.literal(stack.getHoverName().getString() + " x" + remaining))
+                    .setText(Component.literal("[" + material.materialId() + "] " + stack.getHoverName().getString() + " x" + remaining))
                     .addClass("selected_name");
             var components = new UIElement().addClass("selected_components");
 
-            AlchemyItemData data = stack.get(ModDataComponents.ALCHEMY_DATA.get());
-            if (data == null || data.elements().isEmpty()) {
+            if (material.components().isEmpty()) {
                 components.addChild(new IngredientGridElement().setGridSize(3, 3).addClass("selected_component_grid"));
             } else {
-                for (ElementComponent elementComponent : data.elements()) {
-                    components.addChild(buildElementGrid(elementComponent));
+                for (String componentId : material.components().keySet()) {
+                    AlchemyCombineSessionSnapshot.MaterialComponentRef componentRef =
+                            snapshot.getIngredientComponent(material.materialId(), componentId);
+                    if (componentRef != null) {
+                        IngredientGridElement componentGrid = buildElementGrid(componentRef.component());
+                        boolean componentExhausted = snapshot.isComponentExhausted(componentId);
+                        boolean selected = selectedComponentId != null && selectedComponentId.equals(componentId);
+                        if (selected) {
+                            componentGrid.addClass("selected");
+                            row.addClass("selected");
+                        }
+                        if (componentExhausted) {
+                            componentGrid.addClass("disabled");
+                            componentGrid.lss("opacity", "0.45");
+                        }
+                        if (onSelect != null && !componentExhausted) {
+                            String materialId = material.materialId();
+                            componentGrid.addEventListener(UIEvents.CLICK, e -> onSelect.handle(materialId, componentId));
+                        }
+                        components.addChild(componentGrid);
+                    }
                 }
             }
 
             row.addChildren(name, components);
             container.addChild(row);
-
-            if (onSelect != null && !exhausted) {
-                int index = i;
-                row.addEventListener(UIEvents.CLICK, e -> onSelect.handle(index, stack));
-                name.addEventListener(UIEvents.CLICK, e -> onSelect.handle(index, stack));
-                components.addEventListener(UIEvents.CLICK, e -> onSelect.handle(index, stack));
-            }
         }
     }
 
-    private static IngredientGridElement buildElementGrid(ElementComponent component) {
-        var shape = component.shape();
+    private static IngredientGridElement buildElementGrid(AlchemyCombineSessionSnapshot.MaterialComponentEntry component) {
         IngredientGridElement grid = new IngredientGridElement();
         grid.setGridSize(3, 3)
                 .setElementColor(0xFF000000 | (component.element().getColor() & 0xFFFFFF));
         grid.addClass("selected_component_grid");
-        for (int y = 0; y < Math.min(shape.getHeight(), 3); y++) {
-            for (int x = 0; x < Math.min(shape.getWidth(), 3); x++) {
-                CellType cellType = shape.getCellAt(x, y);
+        for (AlchemyCombineSessionSnapshot.IngredientCell cell : component.cells()) {
+            if (cell.offsetX() < 0 || cell.offsetX() >= 3 || cell.offsetY() < 0 || cell.offsetY() >= 3) {
+                continue;
+            }
+            CellType cellType = cell.cellType();
                 IngredientGridElement.CellType displayType = switch (cellType) {
                     case NORMAL -> IngredientGridElement.CellType.NORMAL;
                     case LINK -> IngredientGridElement.CellType.LINK;
                     case EMPTY -> IngredientGridElement.CellType.EMPTY;
                 };
-                grid.setCell(x + 1, y + 1, displayType);
-            }
+                grid.setCell(cell.offsetX() + 1, cell.offsetY() + 1, displayType);
         }
         return grid;
     }
@@ -440,174 +457,6 @@ public final class AlchemyCombineUI {
         }
         grid.addChild(content);
         return new CombineGridView(cells);
-    }
-
-    private static void handleLeftClick(
-            int x,
-            int y,
-            SelectedIngredient[] selectedIngredient,
-            List<PlacedIngredient> placedIngredients,
-            Map<Integer, Integer> usedCounts,
-            CombineState[] combineState,
-            int[] previewOrigin,
-            Runnable[] renderGridRef,
-            Runnable[] refreshSelectedListRef
-    ) {
-        if (combineState[0] != CombineState.PREVIEWING || selectedIngredient[0] == null) {
-            return;
-        }
-        SelectedIngredient selected = selectedIngredient[0];
-        if (!isPlacementValid(x, y, selected.cells(), placedIngredients)) {
-            return;
-        }
-        placedIngredients.add(new PlacedIngredient(selected.sourceIndex(), selected.stack().copy(), selected.cells(), x, y, 0));
-        usedCounts.merge(selected.sourceIndex(), 1, Integer::sum);
-        selectedIngredient[0] = null;
-        combineState[0] = CombineState.PLACED;
-        previewOrigin[0] = -1;
-        previewOrigin[1] = -1;
-        if (refreshSelectedListRef[0] != null) {
-            refreshSelectedListRef[0].run();
-        }
-        if (renderGridRef[0] != null) {
-            renderGridRef[0].run();
-        }
-    }
-
-    private static void handleRightClick(
-            int x,
-            int y,
-            SelectedIngredient[] selectedIngredient,
-            List<PlacedIngredient> placedIngredients,
-            Map<Integer, Integer> usedCounts,
-            CombineState[] combineState,
-            int[] previewOrigin,
-            Runnable[] renderGridRef,
-            Runnable[] refreshSelectedListRef
-    ) {
-        if (combineState[0] == CombineState.PREVIEWING) {
-            selectedIngredient[0] = null;
-            combineState[0] = CombineState.IDLE;
-            previewOrigin[0] = -1;
-            previewOrigin[1] = -1;
-            if (refreshSelectedListRef[0] != null) {
-                refreshSelectedListRef[0].run();
-            }
-            if (renderGridRef[0] != null) {
-                renderGridRef[0].run();
-            }
-            return;
-        }
-        PlacedIngredient target = findPlacedIngredientAt(x, y, placedIngredients);
-        if (target == null) {
-            return;
-        }
-        placedIngredients.remove(target);
-        int remaining = usedCounts.getOrDefault(target.sourceIndex(), 0) - 1;
-        if (remaining <= 0) {
-            usedCounts.remove(target.sourceIndex());
-        } else {
-            usedCounts.put(target.sourceIndex(), remaining);
-        }
-        combineState[0] = CombineState.IDLE;
-        if (refreshSelectedListRef[0] != null) {
-            refreshSelectedListRef[0].run();
-        }
-        if (renderGridRef[0] != null) {
-            renderGridRef[0].run();
-        }
-    }
-
-    private static SelectedIngredient buildSelectedIngredient(int index, ItemStack stack) {
-        if (stack == null || stack.isEmpty()) {
-            return null;
-        }
-        List<IngredientCell> cells = buildIngredientCells(stack);
-        if (cells.isEmpty()) {
-            return null;
-        }
-        return new SelectedIngredient(index, stack.copy(), cells);
-    }
-
-    private static List<IngredientCell> buildIngredientCells(ItemStack stack) {
-        List<IngredientCell> cells = new ArrayList<>();
-        if (stack == null || stack.isEmpty()) {
-            return cells;
-        }
-        AlchemyItemData data = stack.get(ModDataComponents.ALCHEMY_DATA.get());
-        if (data == null || data.elements().isEmpty()) {
-            return cells;
-        }
-        for (ElementComponent component : data.elements()) {
-            if (component == null || component.shape() == null) {
-                continue;
-            }
-            AlchemyElement element = component.element();
-            var shape = component.shape();
-            for (int y = 0; y < shape.getHeight(); y++) {
-                for (int x = 0; x < shape.getWidth(); x++) {
-                    CellType cellType = shape.getCellAt(x, y);
-                    if (cellType == CellType.EMPTY) {
-                        continue;
-                    }
-                    cells.add(new IngredientCell(x, y, element, cellType));
-                }
-            }
-        }
-        return cells;
-    }
-
-    private static boolean isPlacementValid(int originX, int originY, List<IngredientCell> cells, List<PlacedIngredient> placed) {
-        if (cells == null || cells.isEmpty()) {
-            return false;
-        }
-        for (IngredientCell cell : cells) {
-            int gridX = originX + cell.offsetX();
-            int gridY = originY + cell.offsetY();
-            if (!isInsideGrid(gridX, gridY)) {
-                return false;
-            }
-            if (isCellOccupied(gridX, gridY, placed)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean isCellOccupied(int x, int y, List<PlacedIngredient> placed) {
-        if (placed == null || placed.isEmpty()) {
-            return false;
-        }
-        for (PlacedIngredient ingredient : placed) {
-            for (IngredientCell cell : ingredient.cells()) {
-                int gridX = ingredient.originX() + cell.offsetX();
-                int gridY = ingredient.originY() + cell.offsetY();
-                if (gridX == x && gridY == y) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private static PlacedIngredient findPlacedIngredientAt(int x, int y, List<PlacedIngredient> placed) {
-        if (placed == null || placed.isEmpty()) {
-            return null;
-        }
-        for (PlacedIngredient ingredient : placed) {
-            for (IngredientCell cell : ingredient.cells()) {
-                int gridX = ingredient.originX() + cell.offsetX();
-                int gridY = ingredient.originY() + cell.offsetY();
-                if (gridX == x && gridY == y) {
-                    return ingredient;
-                }
-            }
-        }
-        return null;
-    }
-
-    private static boolean isInsideGrid(int x, int y) {
-        return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
     }
 
     private static void renderCombineGrid(
@@ -702,36 +551,74 @@ public final class AlchemyCombineUI {
         return copied;
     }
 
+    private static List<ReservedMaterialRef> copyReservedMaterials(List<ReservedMaterialRef> refs) {
+        if (refs == null || refs.isEmpty()) {
+            return List.of();
+        }
+        List<ReservedMaterialRef> copied = new ArrayList<>(refs.size());
+        for (ReservedMaterialRef ref : refs) {
+            if (ref != null) {
+                copied.add(new ReservedMaterialRef(ref.basketPos(), ref.slotIndex(), ref.stack().copy()));
+            }
+        }
+        return copied;
+    }
+
+    private static void onSessionStateChanged(Player player, AlchemyCombineSessionSnapshot snapshot) {
+        if (player == null || snapshot == null) {
+            return;
+        }
+        if (player.level().isClientSide) {
+            COMBINE_SESSION_CLIENT.put(player.getUUID(), snapshot);
+        } else {
+            COMBINE_SESSION_SERVER.put(player.getUUID(), snapshot);
+        }
+    }
+
+    private static void rerender(Runnable[] renderGridRef, Runnable[] refreshSelectedListRef) {
+        if (refreshSelectedListRef != null && refreshSelectedListRef.length > 0 && refreshSelectedListRef[0] != null) {
+            refreshSelectedListRef[0].run();
+        }
+        if (renderGridRef != null && renderGridRef.length > 0 && renderGridRef[0] != null) {
+            renderGridRef[0].run();
+        }
+    }
+
+    private static void returnReservedMaterials(ServerPlayer player, List<ReservedMaterialRef> reservedMaterials) {
+        if (player == null || reservedMaterials == null || reservedMaterials.isEmpty()) {
+            return;
+        }
+        var level = player.level();
+        for (ReservedMaterialRef ref : reservedMaterials) {
+            if (ref == null || ref.stack() == null || ref.stack().isEmpty()) {
+                continue;
+            }
+            if (!(level.getBlockEntity(ref.basketPos()) instanceof com.ateliersteve.block.GatheringBasketBlockEntity basket)) {
+                continue;
+            }
+            ItemStackHandler inventory = basket.getInventory();
+            if (inventory == null) {
+                continue;
+            }
+            int slot = ref.slotIndex();
+            if (slot < 0 || slot >= inventory.getSlots()) {
+                continue;
+            }
+            ItemStack current = inventory.getStackInSlot(slot);
+            if (current.isEmpty()) {
+                inventory.setStackInSlot(slot, ref.stack().copy());
+            }
+        }
+    }
+
     private interface ItemSelectHandler {
-        void handle(int index, ItemStack stack);
+        void handle(String materialId, String componentId);
     }
 
     private interface CellHandler {
         void onHover(int x, int y);
 
         void onClick(int x, int y, int button);
-    }
-
-    private enum CombineState {
-        IDLE,
-        PREVIEWING,
-        PLACED
-    }
-
-    private record IngredientCell(int offsetX, int offsetY, AlchemyElement element, CellType cellType) {
-    }
-
-    private record SelectedIngredient(int sourceIndex, ItemStack stack, List<IngredientCell> cells) {
-    }
-
-    private record PlacedIngredient(
-            int sourceIndex,
-            ItemStack stack,
-            List<IngredientCell> cells,
-            int originX,
-            int originY,
-            int rotation
-    ) {
     }
 
     private static final class CombineGridView {
@@ -758,18 +645,17 @@ public final class AlchemyCombineUI {
             reset();
         }
 
-        private void rebuild(
-                List<PlacedIngredient> placedIngredients,
-                SelectedIngredient selectedIngredient,
-                int previewX,
-                int previewY,
-                boolean previewing,
-                boolean previewValid
-        ) {
+        private void rebuild(AlchemyCombineSessionSnapshot snapshot, int gridSize) {
             reset();
-            applyPlaced(placedIngredients);
-            if (previewing && selectedIngredient != null) {
-                applyPreview(selectedIngredient, previewX, previewY, previewValid);
+            if (snapshot == null) {
+                return;
+            }
+            applyPlaced(snapshot.placedMaterials(), gridSize);
+            if (snapshot.isPreviewing() && snapshot.selectedComponentId() != null && snapshot.selectedMaterialId() != null) {
+                var selected = snapshot.getIngredientComponent(snapshot.selectedMaterialId(), snapshot.selectedComponentId());
+                if (selected != null && snapshot.previewX() >= 0 && snapshot.previewY() >= 0) {
+                    applyPreview(selected.component(), snapshot.previewX(), snapshot.previewY(), snapshot.isPreviewPlacementValid(gridSize), gridSize);
+                }
             }
         }
 
@@ -796,15 +682,15 @@ public final class AlchemyCombineUI {
             }
         }
 
-        private void applyPlaced(List<PlacedIngredient> placedIngredients) {
+        private void applyPlaced(List<AlchemyCombineSessionSnapshot.PlacedMaterial> placedIngredients, int gridSize) {
             if (placedIngredients == null || placedIngredients.isEmpty()) {
                 return;
             }
-            for (PlacedIngredient ingredient : placedIngredients) {
-                for (IngredientCell cell : ingredient.cells()) {
+            for (AlchemyCombineSessionSnapshot.PlacedMaterial ingredient : placedIngredients) {
+                for (AlchemyCombineSessionSnapshot.IngredientCell cell : ingredient.cells()) {
                     int gridX = ingredient.originX() + cell.offsetX();
                     int gridY = ingredient.originY() + cell.offsetY();
-                    if (!isInsideGrid(gridX, gridY)) {
+                    if (!isInsideGrid(gridX, gridY, gridSize)) {
                         continue;
                     }
                     cells[gridY][gridX] = CombineBoardCellState.placed(cell.element(), cell.cellType() == CellType.LINK);
@@ -812,17 +698,27 @@ public final class AlchemyCombineUI {
             }
         }
 
-        private void applyPreview(SelectedIngredient selectedIngredient, int previewX, int previewY, boolean previewValid) {
-            for (IngredientCell cell : selectedIngredient.cells()) {
+        private void applyPreview(
+                AlchemyCombineSessionSnapshot.MaterialComponentEntry selectedIngredient,
+                int previewX,
+                int previewY,
+                boolean previewValid,
+                int gridSize
+        ) {
+            for (AlchemyCombineSessionSnapshot.IngredientCell cell : selectedIngredient.cells()) {
                 int gridX = previewX + cell.offsetX();
                 int gridY = previewY + cell.offsetY();
-                if (!isInsideGrid(gridX, gridY)) {
+                if (!isInsideGrid(gridX, gridY, gridSize)) {
                     continue;
                 }
                 cells[gridY][gridX] = previewValid
                         ? CombineBoardCellState.preview(cell.element(), cell.cellType() == CellType.LINK)
                         : CombineBoardCellState.invalidPreview();
             }
+        }
+
+        private boolean isInsideGrid(int x, int y, int gridSize) {
+            return x >= 0 && x < gridSize && y >= 0 && y < gridSize;
         }
     }
 
@@ -871,10 +767,12 @@ public final class AlchemyCombineUI {
     public static final class PendingCombine {
         private final ResourceLocation recipeId;
         private final List<ItemStack> selectedStacks;
+        private final List<ReservedMaterialRef> reservedMaterials;
 
-        private PendingCombine(ResourceLocation recipeId, List<ItemStack> selectedStacks) {
+        private PendingCombine(ResourceLocation recipeId, List<ItemStack> selectedStacks, List<ReservedMaterialRef> reservedMaterials) {
             this.recipeId = recipeId;
             this.selectedStacks = selectedStacks == null ? List.of() : selectedStacks;
+            this.reservedMaterials = reservedMaterials == null ? List.of() : reservedMaterials;
         }
 
         public ResourceLocation recipeId() {
@@ -884,5 +782,12 @@ public final class AlchemyCombineUI {
         public List<ItemStack> selectedStacks() {
             return selectedStacks;
         }
+
+        public List<ReservedMaterialRef> reservedMaterials() {
+            return reservedMaterials;
+        }
+    }
+
+    public record ReservedMaterialRef(BlockPos basketPos, int slotIndex, ItemStack stack) {
     }
 }

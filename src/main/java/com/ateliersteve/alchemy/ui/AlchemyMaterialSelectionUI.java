@@ -166,10 +166,10 @@ public final class AlchemyMaterialSelectionUI {
         AlchemyEffectPanel.buildEffectAttributes(recipe, Map.of(), attributesScroller);
 
         List<GatheringBasketBlockEntity> baskets = findNearbyBaskets(player, cauldronPos, SEARCH_RADIUS);
-        List<ItemStack> basketStacks = collectBasketStacks(baskets);
+        List<BasketStackRef> basketStacks = collectBasketStacks(baskets);
 
         List<AlchemyRecipeIngredient> ingredients = recipe == null ? List.of() : recipe.ingredients();
-        List<List<ItemStack>> perIngredient = new ArrayList<>();
+        List<List<BasketStackRef>> perIngredient = new ArrayList<>();
         for (AlchemyRecipeIngredient ingredient : ingredients) {
             perIngredient.add(filterStacksForIngredient(basketStacks, ingredient));
         }
@@ -203,7 +203,7 @@ public final class AlchemyMaterialSelectionUI {
                     if (targetRecipe == null) {
                         return;
                     }
-                    List<ItemStack> selected = new ArrayList<>();
+                    List<BasketStackRef> selectedRefs = new ArrayList<>();
                     if (pairs != null) {
                         for (int i = 0; i + 1 < pairs.length; i += 2) {
                             Integer ingredientIndex = pairs[i];
@@ -214,22 +214,36 @@ public final class AlchemyMaterialSelectionUI {
                             if (ingredientIndex < 0 || ingredientIndex >= perIngredient.size()) {
                                 continue;
                             }
-                            List<ItemStack> stacks = perIngredient.get(ingredientIndex);
-                            if (slotIndex < 0 || slotIndex >= stacks.size()) {
-                                continue;
-                            }
-                            ItemStack stack = stacks.get(slotIndex);
-                            if (!stack.isEmpty()) {
-                                selected.add(stack.copy());
-                            }
+                             List<BasketStackRef> stacks = perIngredient.get(ingredientIndex);
+                             if (slotIndex < 0 || slotIndex >= stacks.size()) {
+                                 continue;
+                             }
+                             BasketStackRef selectedRef = stacks.get(slotIndex);
+                             ItemStack stack = selectedRef.stack();
+                             if (!stack.isEmpty()) {
+                                 selectedRefs.add(selectedRef);
+                             }
+                          }
+                      }
+                    if (selectedRefs.isEmpty()) {
+                        return;
+                    }
+
+                    List<ItemStack> selected = new ArrayList<>(selectedRefs.size());
+                    for (BasketStackRef ref : selectedRefs) {
+                        if (ref != null && ref.stack() != null && !ref.stack().isEmpty()) {
+                            selected.add(ref.stack().copy());
                         }
                     }
                     if (selected.isEmpty()) {
                         return;
                     }
-                    AlchemyCombineUI.requestOpen(serverPlayer, targetRecipe, selected);
                     serverPlayer.closeContainer();
-                    serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, pos));
+                    serverPlayer.getServer().execute(() -> {
+                        List<AlchemyCombineUI.ReservedMaterialRef> reserved = reserveFromBaskets(serverPlayer, selectedRefs);
+                        AlchemyCombineUI.requestOpen(serverPlayer, targetRecipe, selected, reserved);
+                        BlockUIMenuType.openUI(serverPlayer, pos);
+                    });
                 });
         combineButton.addRPCEvent(combineRpc);
         Runnable updateCombineButton = () -> {
@@ -270,10 +284,10 @@ public final class AlchemyMaterialSelectionUI {
                 index = 0;
             }
             int indexFinal = index;
-            ingredientFilter.setText(buildIngredientFilterText(ingredients.get(index), perIngredient.get(index)));
+            ingredientFilter.setText(buildIngredientFilterText(ingredients.get(index), toStacks(perIngredient.get(index))));
             refreshIngredientTabs(ingredientTabs, ingredients, index, selectedIndex, selectedSlots, refreshRef[0]);
             LinkedHashSet<Integer> selectedSet = selectedSlots.get(indexFinal);
-            populateGrid(gridContent, perIngredient.get(indexFinal), selectedSet, (slot, stack) -> {
+            populateGrid(gridContent, toStacks(perIngredient.get(indexFinal)), selectedSet, (slot, stack) -> {
                 if (stack.isEmpty()) {
                     return;
                 }
@@ -466,40 +480,53 @@ public final class AlchemyMaterialSelectionUI {
         return baskets;
     }
 
-    private static List<ItemStack> collectBasketStacks(List<GatheringBasketBlockEntity> baskets) {
+    private static List<BasketStackRef> collectBasketStacks(List<GatheringBasketBlockEntity> baskets) {
         if (baskets == null || baskets.isEmpty()) {
             return List.of();
         }
-        List<ItemStack> stacks = new ArrayList<>();
+        List<BasketStackRef> stacks = new ArrayList<>();
         for (GatheringBasketBlockEntity basket : baskets) {
             ItemStackHandler handler = basket.getInventory();
             if (handler == null) {
                 continue;
             }
+            BlockPos basketPos = basket.getBlockPos();
             for (int i = 0; i < handler.getSlots(); i++) {
                 ItemStack stack = handler.getStackInSlot(i);
                 if (!stack.isEmpty()) {
-                    stacks.add(stack);
+                    stacks.add(new BasketStackRef(basketPos, i, stack.copy()));
                 }
             }
         }
         return stacks;
     }
 
-    private static List<ItemStack> filterStacksForIngredient(List<ItemStack> stacks, AlchemyRecipeIngredient ingredient) {
+    private static List<BasketStackRef> filterStacksForIngredient(List<BasketStackRef> stacks, AlchemyRecipeIngredient ingredient) {
         if (stacks == null || stacks.isEmpty() || ingredient == null) {
             return List.of();
         }
-        List<ItemStack> matches = new ArrayList<>();
-        for (ItemStack stack : stacks) {
-            if (stack.isEmpty()) {
+        List<BasketStackRef> matches = new ArrayList<>();
+        for (BasketStackRef stackRef : stacks) {
+            ItemStack stack = stackRef.stack();
+            if (stack == null || stack.isEmpty()) {
                 continue;
             }
             if (matchesIngredient(stack, ingredient)) {
-                matches.add(stack.copy());
+                matches.add(stackRef);
             }
         }
         return matches;
+    }
+
+    private static List<ItemStack> toStacks(List<BasketStackRef> refs) {
+        if (refs == null || refs.isEmpty()) {
+            return List.of();
+        }
+        List<ItemStack> stacks = new ArrayList<>(refs.size());
+        for (BasketStackRef ref : refs) {
+            stacks.add(ref == null || ref.stack() == null ? ItemStack.EMPTY : ref.stack().copy());
+        }
+        return stacks;
     }
 
     private static boolean matchesIngredient(ItemStack stack, AlchemyRecipeIngredient ingredient) {
@@ -596,7 +623,7 @@ public final class AlchemyMaterialSelectionUI {
     }
 
     private static List<ItemStack> collectSelectedStacks(
-            List<List<ItemStack>> perIngredient,
+            List<List<BasketStackRef>> perIngredient,
             Map<Integer, LinkedHashSet<Integer>> selectedSlots
     ) {
         List<ItemStack> selected = new ArrayList<>();
@@ -608,12 +635,12 @@ public final class AlchemyMaterialSelectionUI {
             if (index < 0 || index >= perIngredient.size()) {
                 continue;
             }
-            List<ItemStack> stacks = perIngredient.get(index);
+            List<BasketStackRef> stacks = perIngredient.get(index);
             for (Integer slot : entry.getValue()) {
                 if (slot == null || slot < 0 || slot >= stacks.size()) {
                     continue;
                 }
-                ItemStack stack = stacks.get(slot);
+                ItemStack stack = stacks.get(slot).stack();
                 if (!stack.isEmpty()) {
                     selected.add(stack.copy());
                 }
@@ -644,7 +671,7 @@ public final class AlchemyMaterialSelectionUI {
     }
 
     private static Map<String, Integer> computeSelectedElementValues(
-            List<List<ItemStack>> perIngredient,
+            List<List<BasketStackRef>> perIngredient,
             Map<Integer, LinkedHashSet<Integer>> selectedSlots
     ) {
         Map<String, Integer> values = new HashMap<>();
@@ -656,12 +683,12 @@ public final class AlchemyMaterialSelectionUI {
             if (index < 0 || index >= perIngredient.size()) {
                 continue;
             }
-            List<ItemStack> stacks = perIngredient.get(index);
+            List<BasketStackRef> stacks = perIngredient.get(index);
             for (Integer slot : entry.getValue()) {
                 if (slot == null || slot < 0 || slot >= stacks.size()) {
                     continue;
                 }
-                ItemStack stack = stacks.get(slot);
+                ItemStack stack = stacks.get(slot).stack();
                 if (stack.isEmpty()) {
                     continue;
                 }
@@ -676,6 +703,47 @@ public final class AlchemyMaterialSelectionUI {
             }
         }
         return values;
+    }
+
+    private static List<AlchemyCombineUI.ReservedMaterialRef> reserveFromBaskets(
+            ServerPlayer player,
+            List<BasketStackRef> selectedRefs
+    ) {
+        if (player == null || selectedRefs == null || selectedRefs.isEmpty()) {
+            return List.of();
+        }
+        List<AlchemyCombineUI.ReservedMaterialRef> reserved = new ArrayList<>();
+        java.util.Set<String> visitedSlots = new java.util.HashSet<>();
+        for (BasketStackRef ref : selectedRefs) {
+            if (ref == null || ref.stack() == null || ref.stack().isEmpty()) {
+                continue;
+            }
+            String key = ref.basketPos().asLong() + ":" + ref.slotIndex();
+            if (!visitedSlots.add(key)) {
+                continue;
+            }
+            if (!(player.level().getBlockEntity(ref.basketPos()) instanceof GatheringBasketBlockEntity basket)) {
+                continue;
+            }
+            ItemStackHandler inventory = basket.getInventory();
+            if (inventory == null) {
+                continue;
+            }
+            int slotIndex = ref.slotIndex();
+            if (slotIndex < 0 || slotIndex >= inventory.getSlots()) {
+                continue;
+            }
+            ItemStack current = inventory.getStackInSlot(slotIndex);
+            if (current.isEmpty()) {
+                continue;
+            }
+            inventory.setStackInSlot(slotIndex, ItemStack.EMPTY);
+            reserved.add(new AlchemyCombineUI.ReservedMaterialRef(ref.basketPos(), slotIndex, current.copy()));
+        }
+        return reserved;
+    }
+
+    private record BasketStackRef(BlockPos basketPos, int slotIndex, ItemStack stack) {
     }
 
 }
