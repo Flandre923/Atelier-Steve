@@ -332,16 +332,13 @@ public final class AlchemyCombineUI {
         setItemElementStack(previewItemSlot, resultStack);
 
         int effectCount = recipe == null ? 0 : recipe.effects().size();
-        int totalIngredients = recipe == null
-                ? 0
-                : recipe.ingredients().stream().mapToInt(AlchemyRecipeIngredient::count).sum();
         int level = effectCount;
         if (!resultStack.isEmpty() && resultStack.getItem() instanceof AlchemyItem alchemyItem) {
             level = alchemyItem.getLevel();
         }
         levelValue.setText(Component.literal(String.valueOf(level)));
         usageValue.setText(Component.literal("-"));
-        craftValue.setText(Component.literal(String.valueOf(totalIngredients)));
+        craftValue.setText(Component.literal("1"));
 
         AlchemyItemData alchemyData = resultStack.get(ModDataComponents.ALCHEMY_DATA.get());
         int quality = alchemyData == null ? 0 : alchemyData.quality();
@@ -355,6 +352,8 @@ public final class AlchemyCombineUI {
             successLabel.setText(Component.translatable("ui.atelier_steve.alchemy_combine.success_rate"));
             successValue.setText(Component.literal(successRate + "%"));
             successFill.layout(layout -> layout.widthPercent(successRate));
+            int quantity = computePlaceholderQuantity(values);
+            craftValue.setText(Component.literal(String.valueOf(quantity)));
             AlchemyEffectPanel.buildEffectAttributes(recipe, values, attributesScroller);
         };
         refreshComputedRef[0].run();
@@ -513,6 +512,15 @@ public final class AlchemyCombineUI {
     private static int computeSuccessRate(Map<String, Integer> values) {
         int total = values.values().stream().mapToInt(Integer::intValue).sum();
         return Math.min(99, total);
+    }
+
+    private static int computePlaceholderQuantity(Map<String, Integer> values) {
+        if (values == null || values.isEmpty()) {
+            return 1;
+        }
+        int total = values.values().stream().mapToInt(Integer::intValue).sum();
+        int quantity = 1 + (total / 12);
+        return Math.max(1, Math.min(10, quantity));
     }
 
     private static Map<String, Integer> computeCombinedElementValues(
