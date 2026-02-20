@@ -1,5 +1,6 @@
 package com.ateliersteve.alchemy.trait;
 
+import com.ateliersteve.alchemy.category.AlchemyCategoryMatcher;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
@@ -112,7 +113,7 @@ public class TraitManager {
     public static boolean canInheritTrait(ItemStack stack, TraitDefinition trait) {
         // Check if the item matches any of the trait's inheritable categories
         for (var category : trait.getInheritableCategories()) {
-            if (stack.is(category)) {
+            if (AlchemyCategoryMatcher.hasCategory(stack, category)) {
                 return true;
             }
         }

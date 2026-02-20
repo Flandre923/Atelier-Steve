@@ -2,6 +2,8 @@ package com.ateliersteve.alchemy.ui;
 
 import com.ateliersteve.AtelierSteve;
 import com.ateliersteve.alchemy.AlchemyItemData;
+import com.ateliersteve.alchemy.category.AlchemyCategoryMatcher;
+import com.ateliersteve.alchemy.category.AlchemyCategoryRegistry;
 import com.ateliersteve.alchemy.item.AlchemyItem;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeIngredient;
@@ -51,11 +53,6 @@ public final class AlchemyMaterialSelectionUI {
     private static final int GRID_SLOT_CAP = 200;
     private static final Map<UUID, ResourceLocation> PENDING_RECIPES_SERVER = new ConcurrentHashMap<>();
     private static final Map<UUID, ResourceLocation> PENDING_RECIPES_CLIENT = new ConcurrentHashMap<>();
-    private static final Map<ResourceLocation, ResourceLocation> TAG_CATEGORY_ICONS = Map.of(
-            AtelierSteve.id("category_gunpowder"), AtelierSteve.id("textures/gui/ingredients/category_gunpowder.png"),
-            AtelierSteve.id("category_water"), AtelierSteve.id("textures/gui/ingredients/category_water.png")
-    );
-
     private AlchemyMaterialSelectionUI() {
     }
 
@@ -445,7 +442,7 @@ public final class AlchemyMaterialSelectionUI {
         }
         if (ingredient.type() == AlchemyRecipeIngredient.Type.TAG && ingredient.tag().isPresent()) {
             ResourceLocation tagId = ingredient.tag().get().location();
-            return Component.literal("#" + tagId);
+            return Component.translatable(AlchemyCategoryRegistry.resolveTranslationKey(tagId));
         }
         if (ingredient.type() == AlchemyRecipeIngredient.Type.SPECIFIC && ingredient.itemId().isPresent()) {
             Item item = BuiltInRegistries.ITEM.get(ingredient.itemId().get());
@@ -534,7 +531,7 @@ public final class AlchemyMaterialSelectionUI {
         }
         if (ingredient.type() == AlchemyRecipeIngredient.Type.TAG && ingredient.tag().isPresent()) {
             TagKey<Item> tagKey = ingredient.tag().get();
-            return stack.is(tagKey);
+            return AlchemyCategoryMatcher.hasCategory(stack, tagKey);
         }
         return false;
     }
@@ -579,7 +576,7 @@ public final class AlchemyMaterialSelectionUI {
             return null;
         }
         ResourceLocation tagId = ingredient.tag().get().location();
-        return TAG_CATEGORY_ICONS.get(tagId);
+        return AlchemyCategoryRegistry.resolveIcon(tagId);
     }
 
     private static boolean isSelectionComplete(

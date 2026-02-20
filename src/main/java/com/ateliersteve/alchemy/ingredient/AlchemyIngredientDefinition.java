@@ -2,6 +2,7 @@ package com.ateliersteve.alchemy.ingredient;
 
 import com.ateliersteve.alchemy.element.ElementComponent;
 import com.ateliersteve.alchemy.element.ElementShapePresets;
+import com.ateliersteve.alchemy.category.AlchemyCategoryMatcher;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -40,7 +41,7 @@ public record AlchemyIngredientDefinition(
         }
 
         if (tag.isPresent()) {
-            if (!stack.is(tag.get())) {
+            if (!AlchemyCategoryMatcher.hasCategory(stack, tag.get())) {
                 return false;
             }
             matched = true;

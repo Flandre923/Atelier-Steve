@@ -1,6 +1,7 @@
 package com.ateliersteve.alchemy.ui;
 
 import com.ateliersteve.AtelierSteve;
+import com.ateliersteve.alchemy.category.AlchemyCategoryRegistry;
 import com.ateliersteve.alchemy.element.AlchemyElement;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
@@ -130,7 +131,7 @@ public final class AlchemyEffectPanel {
             var name = new Label()
                     .setText(step == null
                             ? Component.translatable("ui.atelier_steve.alchemy_recipe.effects_empty")
-                            : Component.literal(step.value()))
+                            : buildEffectName(group, step))
                     .addClass("attr_name");
             var bar = new UIElement()
                     .addClass("attr_bar")
@@ -171,5 +172,13 @@ public final class AlchemyEffectPanel {
 
     public static String toHexColor(int color) {
         return String.format("#%06X", color & 0xFFFFFF);
+    }
+
+    private static Component buildEffectName(AlchemyRecipeDefinition.EffectGroup group, AlchemyRecipeDefinition.EffectStep step) {
+        if ("grant_tag".equals(group.category()) && !step.grantCategories().isEmpty()) {
+            ResourceLocation categoryId = step.grantCategories().get(0);
+            return Component.translatable(AlchemyCategoryRegistry.resolveTranslationKey(categoryId));
+        }
+        return Component.literal(step.value());
     }
 }

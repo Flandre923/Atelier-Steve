@@ -1,5 +1,6 @@
 package com.ateliersteve.alchemy.item;
 
+import com.ateliersteve.AtelierSteve;
 import com.ateliersteve.alchemy.AlchemyItemData;
 import com.ateliersteve.alchemy.element.AlchemyElement;
 import com.ateliersteve.alchemy.element.CellType;
@@ -25,13 +26,14 @@ public final class AlchemyItemDefinitions {
             List.of(),
             List.of(NEUTRALIZER_RED_FIRE_COMPONENT),
             3,
-            0
+            0,
+            List.of(AtelierSteve.id("category_neutralizer"))
     );
 
     public static final List<AlchemyItemEffect> NEUTRALIZER_RED_EFFECTS = List.of(
             AlchemyItemEffect.simple("Fire Level Up +1"),
-            AlchemyItemEffect.simple("Grant Tag"),
+            AlchemyItemEffect.grantCategory("Grant Category: Fuel", AtelierSteve.id("category_fuel")),
             AlchemyItemEffect.simple("Heat Storage"),
-            new AlchemyItemEffect("Neutralize Power", List.of(NEUTRALIZER_RED_FIRE_COMPONENT))
+            new AlchemyItemEffect("Neutralize Power", List.of(NEUTRALIZER_RED_FIRE_COMPONENT), List.of())
     );
 }

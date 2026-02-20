@@ -152,7 +152,8 @@ public class AlchemyRecipeDataLoader {
                 int threshold = readInt(stepObj, "threshold", 0);
                 String value = readString(stepObj, "value", "");
                 List<ElementComponent> bonus = parseBonusElements(fileId, stepObj);
-                steps.add(new AlchemyRecipeDefinition.EffectStep(threshold, value, bonus));
+                List<ResourceLocation> grantCategories = parseGrantCategories(fileId, stepObj);
+                steps.add(new AlchemyRecipeDefinition.EffectStep(threshold, value, bonus, grantCategories));
             }
             groups.add(new AlchemyRecipeDefinition.EffectGroup(type, category, steps));
         }
@@ -175,6 +176,23 @@ public class AlchemyRecipeDataLoader {
                     .ifPresent(bonus::add);
         }
         return bonus;
+    }
+
+    private static List<ResourceLocation> parseGrantCategories(ResourceLocation fileId, JsonObject stepObj) {
+        if (!stepObj.has("grant_categories")) {
+            return List.of();
+        }
+        List<ResourceLocation> categories = new ArrayList<>();
+        JsonArray array = stepObj.getAsJsonArray("grant_categories");
+        for (JsonElement element : array) {
+            ResourceLocation categoryId = ResourceLocation.tryParse(element.getAsString());
+            if (categoryId == null) {
+                LOGGER.warn("Invalid grant category '{}' in {}", element, fileId);
+                continue;
+            }
+            categories.add(categoryId);
+        }
+        return categories;
     }
 
     private static ResourceLocation parseId(JsonObject obj, String key, ResourceLocation fileId, String label) {

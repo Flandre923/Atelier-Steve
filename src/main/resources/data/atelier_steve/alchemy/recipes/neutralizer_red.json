@@ -38,7 +38,13 @@
       "type": "thunder",
       "category": "grant_tag",
       "steps": [
-        {"threshold": 10, "value": "Grant Tag Fuel"}
+        {
+          "threshold": 10,
+          "value": "Grant Category Fuel",
+          "grant_categories": [
+            "atelier_steve:category_fuel"
+          ]
+        }
       ]
     },
     {

@@ -1,6 +1,8 @@
 package com.ateliersteve.alchemy.ui;
 
 import com.ateliersteve.AtelierSteve;
+import com.ateliersteve.alchemy.category.AlchemyCategoryMatcher;
+import com.ateliersteve.alchemy.category.AlchemyCategoryRegistry;
 import com.ateliersteve.ui.StaticItemElement;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import com.lowdragmc.lowdraglib2.gui.ui.UI;
@@ -27,18 +29,12 @@ import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
-import java.util.Map;
 
 public final class AlchemyRecipePreviewUI {
     private static final TagKey<Item> NEUTRALIZER_TAG = TagKey.create(
             Registries.ITEM,
             AtelierSteve.id("category_neutralizer")
     );
-    private static final Map<ResourceLocation, ResourceLocation> TAG_CATEGORY_ICONS = Map.of(
-            AtelierSteve.id("category_gunpowder"), AtelierSteve.id("textures/gui/ingredients/category_gunpowder.png"),
-            AtelierSteve.id("category_water"), AtelierSteve.id("textures/gui/ingredients/category_water.png")
-    );
-
     private AlchemyRecipePreviewUI() {
     }
 
@@ -155,7 +151,7 @@ public final class AlchemyRecipePreviewUI {
         Component subTagText = Component.empty();
         if (recipe != null) {
             ItemStack resultStack = resolveResultStack(recipe);
-            if (!resultStack.isEmpty() && resultStack.is(NEUTRALIZER_TAG)) {
+            if (!resultStack.isEmpty() && AlchemyCategoryMatcher.hasCategory(resultStack, NEUTRALIZER_TAG)) {
                 subTagText = Component.translatable("ui.atelier_steve.alchemy_recipe.neutralizer_tag");
             }
         }
@@ -329,7 +325,7 @@ public final class AlchemyRecipePreviewUI {
     private static Component buildIngredientName(AlchemyRecipeIngredient ingredient, ItemStack stack) {
         if (ingredient.type() == AlchemyRecipeIngredient.Type.TAG && ingredient.tag().isPresent()) {
             ResourceLocation tagId = ingredient.tag().get().location();
-            return Component.literal("#" + tagId);
+            return Component.translatable(AlchemyCategoryRegistry.resolveTranslationKey(tagId));
         }
         if (!stack.isEmpty()) {
             return stack.getHoverName();
@@ -348,6 +344,6 @@ public final class AlchemyRecipePreviewUI {
             return null;
         }
         ResourceLocation tagId = ingredient.tag().get().location();
-        return TAG_CATEGORY_ICONS.get(tagId);
+        return AlchemyCategoryRegistry.resolveIcon(tagId);
     }
 }

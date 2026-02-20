@@ -1,5 +1,6 @@
 package com.ateliersteve.alchemy.recipe;
 
+import com.ateliersteve.alchemy.AlchemyItemData;
 import com.ateliersteve.alchemy.element.ElementComponent;
 import net.minecraft.resources.ResourceLocation;
 
@@ -21,10 +22,27 @@ public record AlchemyRecipeDefinition(
             int value = elementValues.getOrDefault(group.type(), 0);
             EffectStep step = group.selectStep(value);
             if (step != null) {
-                resolved.add(new ResolvedEffect(group.category(), step.value(), step.bonusElements()));
+                resolved.add(new ResolvedEffect(group.category(), step.value(), step.bonusElements(), step.grantCategories()));
             }
         }
         return resolved;
+    }
+
+    public AlchemyItemData applyResolvedEffects(AlchemyItemData baseData, Map<String, Integer> elementValues) {
+        if (baseData == null) {
+            return AlchemyItemData.empty();
+        }
+        List<ElementComponent> mergedElements = new ArrayList<>(baseData.elements());
+        List<ResourceLocation> mergedCategories = new ArrayList<>(baseData.categories());
+        for (ResolvedEffect effect : resolveEffects(elementValues)) {
+            mergedElements.addAll(effect.bonusElements());
+            for (ResourceLocation category : effect.grantCategories()) {
+                if (!mergedCategories.contains(category)) {
+                    mergedCategories.add(category);
+                }
+            }
+        }
+        return new AlchemyItemData(baseData.traits(), mergedElements, baseData.cole(), baseData.quality(), mergedCategories);
     }
 
     public record RecipeGrid(int width, int height, List<RecipeCell> cells) {
@@ -51,9 +69,9 @@ public record AlchemyRecipeDefinition(
         }
     }
 
-    public record EffectStep(int threshold, String value, List<ElementComponent> bonusElements) {
+    public record EffectStep(int threshold, String value, List<ElementComponent> bonusElements, List<ResourceLocation> grantCategories) {
     }
 
-    public record ResolvedEffect(String category, String value, List<ElementComponent> bonusElements) {
+    public record ResolvedEffect(String category, String value, List<ElementComponent> bonusElements, List<ResourceLocation> grantCategories) {
     }
 }

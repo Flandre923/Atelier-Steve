@@ -2,6 +2,7 @@ package com.ateliersteve.alchemy;
 
 import com.ateliersteve.alchemy.element.AlchemyElement;
 import com.ateliersteve.alchemy.element.CellType;
+import com.ateliersteve.alchemy.category.AlchemyCategoryRegistry;
 import com.ateliersteve.alchemy.trait.AlchemyTrait;
 import com.ateliersteve.alchemy.trait.TraitDefinition;
 import com.ateliersteve.alchemy.trait.TraitRegistry;
@@ -47,6 +48,16 @@ public final class AlchemyTooltipText {
         if (data.quality() > 0) {
             tooltip.add(Component.translatable("tooltip.atelier_steve.quality", data.quality())
                     .withStyle(ChatFormatting.YELLOW));
+        }
+
+        if (!data.categories().isEmpty()) {
+            tooltip.add(Component.translatable("tooltip.atelier_steve.categories")
+                    .withStyle(ChatFormatting.GREEN));
+            for (var categoryId : data.categories()) {
+                tooltip.add(Component.literal("  - ")
+                        .append(Component.translatable(AlchemyCategoryRegistry.resolveTranslationKey(categoryId)))
+                        .withStyle(ChatFormatting.WHITE));
+            }
         }
 
         if (!data.traits().isEmpty()) {

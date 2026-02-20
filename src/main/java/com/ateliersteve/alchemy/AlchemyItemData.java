@@ -11,9 +11,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -22,12 +24,13 @@ import java.util.Objects;
  * Data component that stores alchemy data for an item.
  * Contains traits and element components.
  */
-public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent> elements, int cole, int quality) {
+public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent> elements, int cole, int quality, List<ResourceLocation> categories) {
     public static final Codec<AlchemyItemData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             TraitInstance.CODEC.listOf().fieldOf("traits").forGetter(AlchemyItemData::traits),
             ElementComponent.CODEC.listOf().fieldOf("elements").forGetter(AlchemyItemData::elements),
             Codec.INT.optionalFieldOf("cole", 0).forGetter(AlchemyItemData::cole),
-            Codec.INT.optionalFieldOf("quality", 0).forGetter(AlchemyItemData::quality)
+            Codec.INT.optionalFieldOf("quality", 0).forGetter(AlchemyItemData::quality),
+            ResourceLocation.CODEC.listOf().optionalFieldOf("categories", List.of()).forGetter(AlchemyItemData::categories)
     ).apply(instance, AlchemyItemData::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, AlchemyItemData> STREAM_CODEC = StreamCodec.composite(
@@ -35,8 +38,15 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
             ElementComponent.STREAM_CODEC.apply(ByteBufCodecs.list()), AlchemyItemData::elements,
             ByteBufCodecs.INT, AlchemyItemData::cole,
             ByteBufCodecs.INT, AlchemyItemData::quality,
+            ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.list()), AlchemyItemData::categories,
             AlchemyItemData::new
     );
+
+    public AlchemyItemData {
+        traits = traits == null ? List.of() : List.copyOf(traits);
+        elements = elements == null ? List.of() : List.copyOf(elements);
+        categories = categories == null ? List.of() : List.copyOf(categories);
+    }
 
     /**
      * Creates random alchemy data.
@@ -63,18 +73,35 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
     ) {
         List<TraitInstance> traits = generateRandomTraits(random, traitMin, traitMax);
         List<ElementComponent> elements = generateRandomElementsFromComponents(random, elementPresetPool, elementMin, elementMax);
-        return new AlchemyItemData(traits, elements, cole, quality);
+        return new AlchemyItemData(traits, elements, cole, quality, List.of());
     }
 
     /**
      * Creates empty alchemy data.
      */
     public static AlchemyItemData empty() {
-        return new AlchemyItemData(List.of(), List.of(), 0, 0);
+        return new AlchemyItemData(List.of(), List.of(), 0, 0, List.of());
     }
 
     public boolean isEmpty() {
-        return traits.isEmpty() && elements.isEmpty() && cole == 0 && quality == 0;
+        return traits.isEmpty() && elements.isEmpty() && cole == 0 && quality == 0 && categories.isEmpty();
+    }
+
+    public boolean hasCategory(ResourceLocation categoryId) {
+        return categoryId != null && categories.contains(categoryId);
+    }
+
+    public AlchemyItemData withAdditionalCategories(Collection<ResourceLocation> extraCategories) {
+        if (extraCategories == null || extraCategories.isEmpty()) {
+            return this;
+        }
+        List<ResourceLocation> merged = new ArrayList<>(categories);
+        for (ResourceLocation extraCategory : extraCategories) {
+            if (extraCategory != null && !merged.contains(extraCategory)) {
+                merged.add(extraCategory);
+            }
+        }
+        return new AlchemyItemData(traits, elements, cole, quality, merged);
     }
 
     private static List<TraitInstance> generateRandomTraits(RandomSource random, int min, int max) {
@@ -123,11 +150,12 @@ public record AlchemyItemData(List<TraitInstance> traits, List<ElementComponent>
         return cole == that.cole
                 && quality == that.quality
                 && Objects.equals(traits, that.traits)
-                && Objects.equals(elements, that.elements);
+                && Objects.equals(elements, that.elements)
+                && Objects.equals(categories, that.categories);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(traits, elements, cole, quality);
+        return Objects.hash(traits, elements, cole, quality, categories);
     }
 }

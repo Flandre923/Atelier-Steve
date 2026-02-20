@@ -3,6 +3,7 @@ package com.ateliersteve.alchemy.item;
 import com.ateliersteve.alchemy.AlchemyItemData;
 import com.ateliersteve.alchemy.element.ElementComponent;
 import com.ateliersteve.registry.ModDataComponents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,10 +38,16 @@ public class AlchemyItem extends Item {
 
     public AlchemyItemData createAlchemyDataWithEffects() {
         List<ElementComponent> elements = new ArrayList<>(baseData.elements());
+        List<ResourceLocation> categories = new ArrayList<>(baseData.categories());
         for (AlchemyItemEffect effect : effects) {
             elements.addAll(effect.bonusElements());
+            for (ResourceLocation category : effect.grantCategories()) {
+                if (!categories.contains(category)) {
+                    categories.add(category);
+                }
+            }
         }
-        return new AlchemyItemData(baseData.traits(), elements, baseData.cole(), baseData.quality());
+        return new AlchemyItemData(baseData.traits(), elements, baseData.cole(), baseData.quality(), categories);
     }
 
     public void applyBaseAlchemyData(ItemStack stack) {
