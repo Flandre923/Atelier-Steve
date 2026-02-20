@@ -32,7 +32,7 @@
         }
 
         .right_panel {
-            width: 150;
+            width: 168;
             flex-direction: column;
             height: 100%;
         }
@@ -250,16 +250,16 @@
         }
 
         .item_icon_container {
-            width: 52;
-            height: 52;
+            width: 44;
+            height: 44;
             align-items: center;
             justify-content: center;
             background: rect(#f0f0f0, 20, 2, #b0b0b0);
         }
 
         .preview_item_slot {
-            width: 32;
-            height: 32;
+            width: 24;
+            height: 24;
         }
 
         .info_panel {
@@ -297,7 +297,11 @@
         }
 
         .info_value_compact {
-            font-size: 10;
+            font-size: 9;
+        }
+
+        .info_value_text {
+            min-width: 20;
         }
 
         .quality_section {
