@@ -13,12 +13,12 @@ import com.ateliersteve.ui.ElementCellTileElement;
 import com.ateliersteve.ui.ElementCellTilePalette;
 import com.ateliersteve.ui.ElementCellTileSpec;
 import com.ateliersteve.ui.IngredientGridElement;
+import com.ateliersteve.ui.StaticItemElement;
 import com.ateliersteve.registry.ModDataComponents;
 import com.lowdragmc.lowdraglib2.gui.factory.BlockUIMenuType;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.ItemSlot;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
 import com.lowdragmc.lowdraglib2.gui.sync.rpc.RPCEvent;
@@ -87,11 +87,11 @@ public final class AlchemyCombineUI {
         boolean isClient = player.level().isClientSide;
         Map<UUID, PendingCombine> primary = isClient ? PENDING_COMBINE_CLIENT : PENDING_COMBINE_SERVER;
         PendingCombine pending = primary.remove(playerId);
-        if (pending != null) {
-            return pending;
+        if (pending == null) {
+            Map<UUID, PendingCombine> fallback = isClient ? PENDING_COMBINE_SERVER : PENDING_COMBINE_CLIENT;
+            pending = fallback.get(playerId);
         }
-        Map<UUID, PendingCombine> fallback = isClient ? PENDING_COMBINE_SERVER : PENDING_COMBINE_CLIENT;
-        return fallback.remove(playerId);
+        return pending;
     }
 
     public static ModularUI createUI(Player player, BlockPos cauldronPos, PendingCombine pending) {
@@ -117,7 +117,7 @@ public final class AlchemyCombineUI {
         var successLabel = (Label) ui.select("#success_label").findFirst().orElseThrow();
         var successFill = ui.select("#success_fill").findFirst().orElseThrow();
         var successValue = (Label) ui.select("#success_value").findFirst().orElseThrow();
-        var previewItemSlot = (ItemSlot) ui.select("#preview_item_slot").findFirst().orElseThrow();
+        var previewItemSlot = ui.select("#preview_item_slot").findFirst().orElseThrow();
         var levelLabel = (Label) ui.select("#level_label").findFirst().orElseThrow();
         var levelValue = (Label) ui.select("#level_value").findFirst().orElseThrow();
         var usageLabel = (Label) ui.select("#usage_label").findFirst().orElseThrow();
@@ -297,8 +297,7 @@ public final class AlchemyCombineUI {
         craftLabel.setText(Component.translatable("ui.atelier_steve.alchemy_recipe.craft_amount"));
         qualityLabel.setText(Component.translatable("ui.atelier_steve.alchemy_recipe.quality"));
 
-        var resultHandler = createDisplayHandler(List.of(resultStack));
-        previewItemSlot.bind(resultHandler, 0);
+        setItemElementStack(previewItemSlot, resultStack);
 
         int effectCount = recipe == null ? 0 : recipe.effects().size();
         int totalIngredients = recipe == null
@@ -356,11 +355,9 @@ public final class AlchemyCombineUI {
                 row.addClass("disabled");
                 row.lss("opacity", "0.45");
             }
-            ItemStack iconStack = stack.copy();
-            iconStack.setCount(Math.max(1, remaining));
-            var icon = new ItemSlot()
-                    .bind(createDisplayHandler(List.of(iconStack)), 0)
-                    .addClass("selected_icon");
+            var name = new Label()
+                    .setText(Component.literal("[" + material.materialId() + "] " + stack.getHoverName().getString() + " x" + remaining))
+                    .addClass("selected_name");
             var components = new UIElement().addClass("selected_components");
 
             if (material.components().isEmpty()) {
@@ -390,7 +387,7 @@ public final class AlchemyCombineUI {
                 }
             }
 
-            row.addChildren(icon, components);
+            row.addChildren(name, components);
             container.addChild(row);
         }
     }
@@ -508,25 +505,11 @@ public final class AlchemyCombineUI {
         return values;
     }
 
-    private static ItemStackHandler createDisplayHandler(List<ItemStack> stacks) {
-        var handler = new ItemStackHandler(stacks.size()) {
-            @Override
-            public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-                return stack;
-            }
-
-            @Override
-            public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                return ItemStack.EMPTY;
-            }
-        };
-
-        for (int i = 0; i < stacks.size(); i++) {
-            ItemStack stack = stacks.get(i);
-            handler.setStackInSlot(i, stack == null ? ItemStack.EMPTY : stack.copy());
-        }
-
-        return handler;
+    private static void setItemElementStack(UIElement element, ItemStack stack) {
+        element.clearAllChildren();
+        element.addChild(new StaticItemElement().setStack(stack)
+                .lss("width", "100%")
+                .lss("height", "100%"));
     }
 
     private static ItemStack resolveResultStack(AlchemyRecipeDefinition recipe) {

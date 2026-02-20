@@ -10,11 +10,11 @@ import com.ateliersteve.alchemy.ui.AlchemyCombineUI;
 import com.ateliersteve.alchemy.ui.AlchemyEffectPanel;
 import com.ateliersteve.block.GatheringBasketBlockEntity;
 import com.ateliersteve.registry.ModDataComponents;
+import com.ateliersteve.ui.StaticItemElement;
 import com.lowdragmc.lowdraglib2.gui.factory.BlockUIMenuType;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.ItemSlot;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
@@ -33,7 +33,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +80,14 @@ public final class AlchemyMaterialSelectionUI {
         Map<UUID, ResourceLocation> pending = player.level().isClientSide
                 ? PENDING_RECIPES_CLIENT
                 : PENDING_RECIPES_SERVER;
-        ResourceLocation id = pending.remove(player.getUUID());
+        UUID playerId = player.getUUID();
+        ResourceLocation id = pending.remove(playerId);
+        if (id == null) {
+            Map<UUID, ResourceLocation> fallback = player.level().isClientSide
+                    ? PENDING_RECIPES_SERVER
+                    : PENDING_RECIPES_CLIENT;
+            id = fallback.get(playerId);
+        }
         if (id == null) {
             return null;
         }
@@ -101,7 +107,7 @@ public final class AlchemyMaterialSelectionUI {
         var ingredientTabs = ui.select("#ingredient_tabs").findFirst().orElseThrow();
         var gridScroller = (ScrollerView) ui.select("#ingredient_grid").findFirst().orElseThrow();
         var hintLabel = (Label) ui.select("#basket_hint").findFirst().orElseThrow();
-        var previewItemSlot = (ItemSlot) ui.select("#preview_item_slot").findFirst().orElseThrow();
+        var previewItemSlot = ui.select("#preview_item_slot").findFirst().orElseThrow();
         var levelLabel = (Label) ui.select("#level_label").findFirst().orElseThrow();
         var levelValue = (Label) ui.select("#level_value").findFirst().orElseThrow();
         var usageLabel = (Label) ui.select("#usage_label").findFirst().orElseThrow();
@@ -121,18 +127,6 @@ public final class AlchemyMaterialSelectionUI {
         root.setFocusable(true);
         root.focus();
         root.addEventListener(UIEvents.MOUSE_DOWN, e -> root.focus());
-        root.addServerEventListener(UIEvents.MOUSE_DOWN, e -> {
-            if (e.button == 1 && player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.closeContainer();
-                serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
-            }
-        });
-        root.addServerEventListener(UIEvents.KEY_DOWN, e -> {
-            if (e.keyCode == GLFW.GLFW_KEY_ESCAPE && player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.closeContainer();
-                serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
-            }
-        });
 
         ItemStack resultStack = resolveResultStack(recipe);
         recipeTitle.setText(resultStack.isEmpty()
@@ -144,8 +138,7 @@ public final class AlchemyMaterialSelectionUI {
         craftLabel.setText(Component.translatable("ui.atelier_steve.alchemy_recipe.craft_amount"));
         qualityLabel.setText(Component.translatable("ui.atelier_steve.alchemy_recipe.quality"));
 
-        var resultHandler = createDisplayHandler(List.of(resultStack));
-        previewItemSlot.bind(resultHandler, 0);
+        setItemElementStack(previewItemSlot, resultStack);
 
         int effectCount = recipe == null ? 0 : recipe.effects().size();
         int totalIngredients = recipe == null
@@ -343,7 +336,7 @@ public final class AlchemyMaterialSelectionUI {
             BiConsumer<Integer, ItemStack> onStackClick
     ) {
         gridContent.clearAllChildren();
-        int slotCount = Math.max(Math.min(stacks.size(), GRID_SLOT_CAP), GRID_COLUMNS * VISIBLE_ROWS);
+        int slotCount = GRID_SLOT_CAP;
         List<ItemStack> gridStacks = new ArrayList<>(slotCount);
         for (int i = 0; i < slotCount; i++) {
             if (i < stacks.size()) {
@@ -353,7 +346,6 @@ public final class AlchemyMaterialSelectionUI {
             }
         }
 
-        var handler = createDisplayHandler(gridStacks);
         int totalRows = (int) Math.ceil((double) slotCount / GRID_COLUMNS);
         for (int row = 0; row < totalRows; row++) {
             var rowContainer = new UIElement().addClass("grid_row");
@@ -363,7 +355,7 @@ public final class AlchemyMaterialSelectionUI {
                     ItemStack stack = gridStacks.get(slot);
                     boolean isSelected = !stack.isEmpty() && selectedSlots != null && selectedSlots.contains(slot);
                     BiConsumer<Integer, ItemStack> clickHandler = stack.isEmpty() ? null : onStackClick;
-                    rowContainer.addChild(buildGridSlot(handler, slot, stack, isSelected, clickHandler));
+                    rowContainer.addChild(buildGridSlot(slot, stack, isSelected, clickHandler));
                 }
             }
             gridContent.addChild(rowContainer);
@@ -371,7 +363,6 @@ public final class AlchemyMaterialSelectionUI {
     }
 
     private static UIElement buildGridSlot(
-            ItemStackHandler handler,
             int slot,
             ItemStack stack,
             boolean selected,
@@ -381,7 +372,7 @@ public final class AlchemyMaterialSelectionUI {
         if (selected) {
             cell.addClass("selected");
         }
-        var slotElement = new ItemSlot().bind(handler, slot).addClass("grid_slot_item");
+        var slotElement = new StaticItemElement().setStack(stack).addClass("grid_slot_item");
         var check = new Label().setText(Component.literal("\u2713")).addClass("grid_slot_check");
         if (!selected) {
             check.addClass("hidden");
@@ -436,10 +427,16 @@ public final class AlchemyMaterialSelectionUI {
         }
         ItemStack stack = resolveIngredientStack(ingredient);
         if (!stack.isEmpty()) {
-            var handler = createDisplayHandler(List.of(stack));
-            return new ItemSlot().bind(handler, 0).addClass("ingredient_icon_slot");
+            return new StaticItemElement().setStack(stack).addClass("ingredient_icon_slot");
         }
         return new Label().setText(Component.literal("?")).addClass("ingredient_icon_fallback");
+    }
+
+    private static void setItemElementStack(UIElement element, ItemStack stack) {
+        element.clearAllChildren();
+        element.addChild(new StaticItemElement().setStack(stack)
+                .lss("width", "100%")
+                .lss("height", "100%"));
     }
 
     private static Component buildIngredientFilterText(AlchemyRecipeIngredient ingredient, List<ItemStack> matches) {
@@ -540,27 +537,6 @@ public final class AlchemyMaterialSelectionUI {
             return stack.is(tagKey);
         }
         return false;
-    }
-
-    private static ItemStackHandler createDisplayHandler(List<ItemStack> stacks) {
-        var handler = new ItemStackHandler(stacks.size()) {
-            @Override
-            public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-                return stack;
-            }
-
-            @Override
-            public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                return ItemStack.EMPTY;
-            }
-        };
-
-        for (int i = 0; i < stacks.size(); i++) {
-            ItemStack stack = stacks.get(i);
-            handler.setStackInSlot(i, stack == null ? ItemStack.EMPTY : stack.copy());
-        }
-
-        return handler;
     }
 
     private static ItemStack resolveResultStack(AlchemyRecipeDefinition recipe) {

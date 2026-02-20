@@ -384,7 +384,7 @@
             <element id="preview_card" class="preview_card">
                 <element id="top_section" class="top_section">
                     <element id="item_icon_container" class="item_icon_container">
-                        <item-slot id="preview_item_slot" class="preview_item_slot"/>
+                        <element id="preview_item_slot" class="preview_item_slot"/>
                     </element>
                     <element id="info_panel" class="info_panel">
                         <element class="info_row">

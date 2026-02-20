@@ -1,11 +1,11 @@
 package com.ateliersteve.alchemy.ui;
 
 import com.ateliersteve.AtelierSteve;
+import com.ateliersteve.ui.StaticItemElement;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
 import com.lowdragmc.lowdraglib2.gui.factory.BlockUIMenuType;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.ItemSlot;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
@@ -55,7 +55,7 @@ public final class AlchemyRecipePreviewUI {
         var itemList = (ScrollerView) ui.select("#item_list").findFirst().orElseThrow();
         var titleLabel = (Label) ui.select("#title_label").findFirst().orElseThrow();
         var levelText = (Label) ui.select("#level_text").findFirst().orElseThrow();
-        var bigIconSlot = (ItemSlot) ui.select("#big_icon_slot").findFirst().orElseThrow();
+        var bigIconSlot = ui.select("#big_icon_slot").findFirst().orElseThrow();
         var qtyLabel = (Label) ui.select("#qty_label").findFirst().orElseThrow();
         var subTag = ui.select("#sub_tag").findFirst().orElseThrow();
         var subTagLabel = (Label) ui.select("#sub_tag_label").findFirst().orElseThrow();
@@ -127,7 +127,7 @@ public final class AlchemyRecipePreviewUI {
             AlchemyRecipeDefinition recipe,
             Label titleLabel,
             Label levelText,
-            ItemSlot bigIconSlot,
+            UIElement bigIconSlot,
             Label qtyLabel,
             UIElement subTag,
             Label subTagLabel,
@@ -147,8 +147,7 @@ public final class AlchemyRecipePreviewUI {
         titleLabel.setText(title);
         levelText.setText(Component.literal("LV: " + effectCount));
 
-        var iconHandler = createDisplayHandler(List.of(resolveResultStack(recipe)));
-        bigIconSlot.bind(iconHandler, 0);
+        setItemElementStack(bigIconSlot, resolveResultStack(recipe));
 
         qtyLabel.setText(Component.translatable("ui.atelier_steve.alchemy_recipe.craft_amount")
                 .append(Component.literal(": " + totalIngredients)));
@@ -219,8 +218,8 @@ public final class AlchemyRecipePreviewUI {
                     .addClass("material_icon_tag")
                     .lss("background", "sprite(" + icon + ")");
         }
-        return new ItemSlot()
-                .bind(handler, slot)
+        return new StaticItemElement()
+                .setStack(handler.getStackInSlot(slot))
                 .addClass("material_icon");
     }
 
@@ -245,8 +244,8 @@ public final class AlchemyRecipePreviewUI {
                 .addClass("row_align_center")
                 .addClass("flex_grow");
 
-        var iconSlot = new ItemSlot()
-                .bind(handler, slot)
+        var iconSlot = new StaticItemElement()
+                .setStack(handler.getStackInSlot(slot))
                 .addClass("item_icon_small");
         var nameLabel = new Label()
                 .setText(name)
@@ -286,6 +285,13 @@ public final class AlchemyRecipePreviewUI {
         }
 
         return handler;
+    }
+
+    private static void setItemElementStack(UIElement element, ItemStack stack) {
+        element.clearAllChildren();
+        element.addChild(new StaticItemElement().setStack(stack)
+                .lss("width", "100%")
+                .lss("height", "100%"));
     }
 
     private static ItemStack resolveResultStack(AlchemyRecipeDefinition recipe) {

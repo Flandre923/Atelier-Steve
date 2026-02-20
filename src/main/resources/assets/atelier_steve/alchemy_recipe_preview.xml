@@ -184,7 +184,7 @@
             </element>
             <element id="detail_card" class="detail_card">
                 <element id="big_icon" class="big_icon">
-                    <item-slot id="big_icon_slot" class="big_icon_slot"/>
+                    <element id="big_icon_slot" class="big_icon_slot"/>
                 </element>
                 <element id="quantity_control" class="quantity_control">
                     <label id="level_text" class="level_text"/>

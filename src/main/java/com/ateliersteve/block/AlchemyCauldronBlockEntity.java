@@ -2,7 +2,7 @@ package com.ateliersteve.block;
 
 import com.ateliersteve.alchemy.ui.AlchemyCombineUI;
 import com.ateliersteve.alchemy.ui.AlchemyMaterialSelectionUI;
-import com.ateliersteve.alchemy.ui.AlchemyRecipePreviewUI;
+import com.ateliersteve.alchemy.recipe.AlchemyRecipeRegistry;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
 import com.ateliersteve.registry.ModBlockEntities;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
@@ -22,9 +22,10 @@ public class AlchemyCauldronBlockEntity extends BlockEntity {
             return AlchemyCombineUI.createUI(player, getBlockPos(), pendingCombine);
         }
         AlchemyRecipeDefinition pending = AlchemyMaterialSelectionUI.consumePendingRecipe(player);
-        if (pending != null) {
-            return AlchemyMaterialSelectionUI.createUI(player, getBlockPos(), pending);
+        if (pending == null) {
+            var recipes = AlchemyRecipeRegistry.getAll();
+            pending = recipes.isEmpty() ? null : recipes.get(0);
         }
-        return AlchemyRecipePreviewUI.createUI(player, getBlockPos());
+        return AlchemyMaterialSelectionUI.createUI(player, getBlockPos(), pending);
     }
 }
