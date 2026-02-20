@@ -356,9 +356,11 @@ public final class AlchemyCombineUI {
                 row.addClass("disabled");
                 row.lss("opacity", "0.45");
             }
-            var name = new Label()
-                    .setText(Component.literal("[" + material.materialId() + "] " + stack.getHoverName().getString() + " x" + remaining))
-                    .addClass("selected_name");
+            ItemStack iconStack = stack.copy();
+            iconStack.setCount(Math.max(1, remaining));
+            var icon = new ItemSlot()
+                    .bind(createDisplayHandler(List.of(iconStack)), 0)
+                    .addClass("selected_icon");
             var components = new UIElement().addClass("selected_components");
 
             if (material.components().isEmpty()) {
@@ -388,7 +390,7 @@ public final class AlchemyCombineUI {
                 }
             }
 
-            row.addChildren(name, components);
+            row.addChildren(icon, components);
             container.addChild(row);
         }
     }
