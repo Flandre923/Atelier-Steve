@@ -24,6 +24,12 @@ public final class DevUiCommand {
                                     PlayerUIMenuType.openUI(player, AtelierSteve.id("dev_grid_test"));
                                     return 1;
                                 }))
+                        .then(Commands.literal("cells")
+                                .executes(context -> {
+                                    var player = context.getSource().getPlayerOrException();
+                                    PlayerUIMenuType.openUI(player, AtelierSteve.id("dev_element_cells"));
+                                    return 1;
+                                }))
         );
     }
 }

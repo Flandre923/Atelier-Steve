@@ -34,12 +34,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class AlchemyCombineUI {
     private static final Map<UUID, PendingCombine> PENDING_COMBINE_SERVER = new ConcurrentHashMap<>();
     private static final Map<UUID, PendingCombine> PENDING_COMBINE_CLIENT = new ConcurrentHashMap<>();
+    private static final int GRID_SIZE = 5;
+    private static final int INVALID_PREVIEW_COLOR = 0xD9534F;
+    private static final float PREVIEW_ALPHA = 0.55f;
+    private static final float INVALID_PREVIEW_ALPHA = 0.6f;
+    private static final String GRID_BASE_BACKGROUND = "rect(#2b2b2b, 2)";
 
     private AlchemyCombineUI() {
     }
@@ -81,6 +87,7 @@ public final class AlchemyCombineUI {
 
         AlchemyRecipeDefinition recipe = pending == null ? null : AlchemyRecipeRegistry.findById(pending.recipeId());
         List<ItemStack> selectedStacks = pending == null ? List.of() : pending.selectedStacks();
+        List<ItemStack> ingredientStacks = selectedStacks == null ? List.of() : new ArrayList<>(selectedStacks);
 
         var ui = UI.of(xml);
         var root = ui.select("#alchemy_combine_root").findFirst().orElseThrow();
@@ -105,22 +112,48 @@ public final class AlchemyCombineUI {
         var qualityBar = ui.select("#quality_bar").findFirst().orElseThrow();
         var attributesScroller = ui.select("#attributes_scroller").findFirst().orElseThrow();
 
+        Map<Integer, Integer> usedCounts = new HashMap<>();
+        List<PlacedIngredient> placedIngredients = new ArrayList<>();
+        SelectedIngredient[] selectedIngredient = new SelectedIngredient[1];
+        CombineState[] combineState = new CombineState[]{CombineState.IDLE};
+        int[] previewOrigin = new int[]{-1, -1};
+        boolean[] suppressBack = new boolean[]{false};
+        Runnable[] refreshSelectedListRef = new Runnable[1];
+        Runnable[] renderGridRef = new Runnable[1];
+
         root.setFocusable(true);
         root.focus();
         root.addEventListener(UIEvents.MOUSE_DOWN, e -> root.focus());
         root.addEventListener(UIEvents.MOUSE_DOWN, e -> {
-            if (e.button == 1 && recipe != null) {
+            if (e.button != 1) {
+                return;
+            }
+            if (combineState[0] == CombineState.PREVIEWING) {
+                suppressBack[0] = true;
+                handleRightClick(-1, -1, selectedIngredient, placedIngredients, usedCounts, combineState, previewOrigin, renderGridRef, refreshSelectedListRef);
+                return;
+            }
+            if (suppressBack[0]) {
+                suppressBack[0] = false;
+                return;
+            }
+            if (recipe != null) {
                 AlchemyMaterialSelectionUI.requestOpenClient(player, recipe);
             }
         });
         root.addServerEventListener(UIEvents.MOUSE_DOWN, e -> {
-            if (e.button == 1 && player instanceof ServerPlayer serverPlayer) {
-                if (recipe != null) {
-                    AlchemyMaterialSelectionUI.requestOpen(serverPlayer, recipe);
-                }
-                serverPlayer.closeContainer();
-                serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
+            if (e.button != 1 || !(player instanceof ServerPlayer serverPlayer)) {
+                return;
             }
+            if (combineState[0] == CombineState.PREVIEWING || suppressBack[0]) {
+                suppressBack[0] = false;
+                return;
+            }
+            if (recipe != null) {
+                AlchemyMaterialSelectionUI.requestOpen(serverPlayer, recipe);
+            }
+            serverPlayer.closeContainer();
+            serverPlayer.getServer().execute(() -> BlockUIMenuType.openUI(serverPlayer, cauldronPos));
         });
         root.addServerEventListener(UIEvents.KEY_DOWN, e -> {
             if (e.keyCode == GLFW.GLFW_KEY_ESCAPE && player instanceof ServerPlayer serverPlayer) {
@@ -142,10 +175,78 @@ public final class AlchemyCombineUI {
                 ? Component.literal(recipe == null ? "No Recipe" : recipe.result().toString())
                 : resultStack.getHoverName());
 
-        populateSelectedList(selectedList, selectedStacks, selectedHint);
+
+        refreshSelectedListRef[0] = () -> populateSelectedList(
+                selectedList,
+                ingredientStacks,
+                usedCounts,
+                selectedHint,
+                selectedIngredient[0] == null ? null : selectedIngredient[0].sourceIndex(),
+                (index, stack) -> {
+                    if (index < 0 || index >= ingredientStacks.size()) {
+                        return;
+                    }
+                    ItemStack currentStack = ingredientStacks.get(index);
+                    if (currentStack == null || currentStack.isEmpty()) {
+                        return;
+                    }
+                    int used = usedCounts.getOrDefault(index, 0);
+                    if (used >= currentStack.getCount()) {
+                        return;
+                    }
+                    SelectedIngredient candidate = buildSelectedIngredient(index, currentStack);
+                    if (candidate == null || candidate.cells().isEmpty()) {
+                        return;
+                    }
+                    selectedIngredient[0] = candidate;
+                    combineState[0] = CombineState.PREVIEWING;
+                    previewOrigin[0] = -1;
+                    previewOrigin[1] = -1;
+                    if (renderGridRef[0] != null) {
+                        renderGridRef[0].run();
+                    }
+                    refreshSelectedListRef[0].run();
+                }
+        );
 
         buildStatsBar(statsBar, List.of());
-        buildCombineGrid(grid);
+        CombineGridView gridView = buildCombineGrid(grid, new CellHandler() {
+            @Override
+            public void onHover(int x, int y) {
+                if (combineState[0] != CombineState.PREVIEWING || selectedIngredient[0] == null) {
+                    return;
+                }
+                if (previewOrigin[0] == x && previewOrigin[1] == y) {
+                    return;
+                }
+                previewOrigin[0] = x;
+                previewOrigin[1] = y;
+                if (renderGridRef[0] != null) {
+                    renderGridRef[0].run();
+                }
+            }
+
+            @Override
+            public void onClick(int x, int y, int button) {
+                if (button == 0) {
+                    handleLeftClick(x, y, selectedIngredient, placedIngredients, usedCounts, combineState, previewOrigin, renderGridRef, refreshSelectedListRef);
+                } else if (button == 1) {
+                    suppressBack[0] = true;
+                    handleRightClick(x, y, selectedIngredient, placedIngredients, usedCounts, combineState, previewOrigin, renderGridRef, refreshSelectedListRef);
+                }
+            }
+        });
+
+        renderGridRef[0] = () -> {
+            SelectedIngredient current = selectedIngredient[0];
+            boolean previewing = combineState[0] == CombineState.PREVIEWING && current != null && previewOrigin[0] >= 0;
+            boolean valid = previewing && isPlacementValid(previewOrigin[0], previewOrigin[1], current.cells(), placedIngredients);
+            renderCombineGrid(gridView, placedIngredients, current, previewOrigin[0], previewOrigin[1], previewing, valid);
+        };
+
+        refreshSelectedListRef[0].run();
+        renderGridRef[0].run();
+
 
         combineHint.setText(Component.literal("\u70bc\u91d1\u8c03\u548c"));
         int successRate = computeSuccessRate(List.of());
@@ -183,10 +284,29 @@ public final class AlchemyCombineUI {
         return ModularUI.of(ui, player);
     }
 
-    private static void populateSelectedList(UIElement container, List<ItemStack> stacks, Label hint) {
+    private static void populateSelectedList(
+            UIElement container,
+            List<ItemStack> stacks,
+            Map<Integer, Integer> usedCounts,
+            Label hint,
+            Integer selectedIndex,
+            ItemSelectHandler onSelect
+    ) {
         container.clearAllChildren();
         if (stacks == null || stacks.isEmpty()) {
             hint.setText(Component.literal("\u5df2\u9009\u6750\u6599\u4e3a\u7a7a"));
+            return;
+        }
+
+        int availableCount = 0;
+        for (int i = 0; i < stacks.size(); i++) {
+            if (usedCounts != null && usedCounts.getOrDefault(i, 0) >= stacks.get(i).getCount()) {
+                continue;
+            }
+            availableCount++;
+        }
+        if (availableCount <= 0) {
+            hint.setText(Component.literal("\u5df2\u9009\u6750\u6599\u5df2\u7528\u5b8c"));
             return;
         }
         hint.setText(Component.empty());
@@ -194,7 +314,13 @@ public final class AlchemyCombineUI {
         var handler = createDisplayHandler(stacks);
         for (int i = 0; i < stacks.size(); i++) {
             ItemStack stack = stacks.get(i);
+            if (usedCounts != null && usedCounts.getOrDefault(i, 0) >= stack.getCount()) {
+                continue;
+            }
             var row = new UIElement().addClass("selected_row");
+            if (selectedIndex != null && selectedIndex == i) {
+                row.addClass("selected");
+            }
             var icon = new ItemSlot().bind(handler, i).addClass("selected_icon");
             var components = new UIElement().addClass("selected_components");
 
@@ -209,6 +335,13 @@ public final class AlchemyCombineUI {
 
             row.addChildren(icon, components);
             container.addChild(row);
+
+            if (onSelect != null) {
+                int index = i;
+                row.addEventListener(UIEvents.CLICK, e -> onSelect.handle(index, stack));
+                icon.addEventListener(UIEvents.CLICK, e -> onSelect.handle(index, stack));
+                components.addEventListener(UIEvents.CLICK, e -> onSelect.handle(index, stack));
+            }
         }
     }
 
@@ -254,17 +387,277 @@ public final class AlchemyCombineUI {
         }
     }
 
-    private static void buildCombineGrid(UIElement grid) {
+    private static CombineGridView buildCombineGrid(UIElement grid, CellHandler handler) {
         grid.clearAllChildren();
         var content = new UIElement().addClass("combine_grid_content");
-        for (int row = 0; row < 5; row++) {
+        UIElement[][] cells = new UIElement[GRID_SIZE][GRID_SIZE];
+        for (int row = 0; row < GRID_SIZE; row++) {
             var rowElement = new UIElement().addClass("combine_grid_row");
-            for (int col = 0; col < 5; col++) {
-                rowElement.addChild(new UIElement().addClass("combine_grid_cell"));
+            for (int col = 0; col < GRID_SIZE; col++) {
+                UIElement cell = new UIElement().addClass("combine_grid_cell");
+                int x = col;
+                int y = row;
+                if (handler != null) {
+                    cell.addEventListener(UIEvents.MOUSE_MOVE, e -> handler.onHover(x, y));
+                    cell.addEventListener(UIEvents.MOUSE_DOWN, e -> handler.onClick(x, y, e.button));
+                }
+                rowElement.addChild(cell);
+                cells[row][col] = cell;
             }
             content.addChild(rowElement);
         }
         grid.addChild(content);
+        return new CombineGridView(cells);
+    }
+
+    private static void handleLeftClick(
+            int x,
+            int y,
+            SelectedIngredient[] selectedIngredient,
+            List<PlacedIngredient> placedIngredients,
+            Map<Integer, Integer> usedCounts,
+            CombineState[] combineState,
+            int[] previewOrigin,
+            Runnable[] renderGridRef,
+            Runnable[] refreshSelectedListRef
+    ) {
+        if (combineState[0] != CombineState.PREVIEWING || selectedIngredient[0] == null) {
+            return;
+        }
+        SelectedIngredient selected = selectedIngredient[0];
+        if (!isPlacementValid(x, y, selected.cells(), placedIngredients)) {
+            return;
+        }
+        placedIngredients.add(new PlacedIngredient(selected.sourceIndex(), selected.stack().copy(), selected.cells(), x, y, 0));
+        usedCounts.merge(selected.sourceIndex(), 1, Integer::sum);
+        selectedIngredient[0] = null;
+        combineState[0] = CombineState.PLACED;
+        previewOrigin[0] = -1;
+        previewOrigin[1] = -1;
+        if (refreshSelectedListRef[0] != null) {
+            refreshSelectedListRef[0].run();
+        }
+        if (renderGridRef[0] != null) {
+            renderGridRef[0].run();
+        }
+    }
+
+    private static void handleRightClick(
+            int x,
+            int y,
+            SelectedIngredient[] selectedIngredient,
+            List<PlacedIngredient> placedIngredients,
+            Map<Integer, Integer> usedCounts,
+            CombineState[] combineState,
+            int[] previewOrigin,
+            Runnable[] renderGridRef,
+            Runnable[] refreshSelectedListRef
+    ) {
+        if (combineState[0] == CombineState.PREVIEWING) {
+            selectedIngredient[0] = null;
+            combineState[0] = CombineState.IDLE;
+            previewOrigin[0] = -1;
+            previewOrigin[1] = -1;
+            if (refreshSelectedListRef[0] != null) {
+                refreshSelectedListRef[0].run();
+            }
+            if (renderGridRef[0] != null) {
+                renderGridRef[0].run();
+            }
+            return;
+        }
+        PlacedIngredient target = findPlacedIngredientAt(x, y, placedIngredients);
+        if (target == null) {
+            return;
+        }
+        placedIngredients.remove(target);
+        int remaining = usedCounts.getOrDefault(target.sourceIndex(), 0) - 1;
+        if (remaining <= 0) {
+            usedCounts.remove(target.sourceIndex());
+        } else {
+            usedCounts.put(target.sourceIndex(), remaining);
+        }
+        combineState[0] = CombineState.IDLE;
+        if (refreshSelectedListRef[0] != null) {
+            refreshSelectedListRef[0].run();
+        }
+        if (renderGridRef[0] != null) {
+            renderGridRef[0].run();
+        }
+    }
+
+    private static SelectedIngredient buildSelectedIngredient(int index, ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return null;
+        }
+        List<IngredientCell> cells = buildIngredientCells(stack);
+        if (cells.isEmpty()) {
+            return null;
+        }
+        return new SelectedIngredient(index, stack.copy(), cells);
+    }
+
+    private static List<IngredientCell> buildIngredientCells(ItemStack stack) {
+        List<IngredientCell> cells = new ArrayList<>();
+        if (stack == null || stack.isEmpty()) {
+            return cells;
+        }
+        AlchemyItemData data = stack.get(ModDataComponents.ALCHEMY_DATA.get());
+        if (data == null || data.elements().isEmpty()) {
+            return cells;
+        }
+        for (ElementComponent component : data.elements()) {
+            if (component == null || component.shape() == null) {
+                continue;
+            }
+            int color = component.element().getColor();
+            var shape = component.shape();
+            for (int y = 0; y < shape.getHeight(); y++) {
+                for (int x = 0; x < shape.getWidth(); x++) {
+                    CellType cellType = shape.getCellAt(x, y);
+                    if (cellType == CellType.EMPTY) {
+                        continue;
+                    }
+                    cells.add(new IngredientCell(x, y, color, cellType));
+                }
+            }
+        }
+        return cells;
+    }
+
+    private static boolean isPlacementValid(int originX, int originY, List<IngredientCell> cells, List<PlacedIngredient> placed) {
+        if (cells == null || cells.isEmpty()) {
+            return false;
+        }
+        for (IngredientCell cell : cells) {
+            int gridX = originX + cell.offsetX();
+            int gridY = originY + cell.offsetY();
+            if (!isInsideGrid(gridX, gridY)) {
+                return false;
+            }
+            if (isCellOccupied(gridX, gridY, placed)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isCellOccupied(int x, int y, List<PlacedIngredient> placed) {
+        if (placed == null || placed.isEmpty()) {
+            return false;
+        }
+        for (PlacedIngredient ingredient : placed) {
+            for (IngredientCell cell : ingredient.cells()) {
+                int gridX = ingredient.originX() + cell.offsetX();
+                int gridY = ingredient.originY() + cell.offsetY();
+                if (gridX == x && gridY == y) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static PlacedIngredient findPlacedIngredientAt(int x, int y, List<PlacedIngredient> placed) {
+        if (placed == null || placed.isEmpty()) {
+            return null;
+        }
+        for (PlacedIngredient ingredient : placed) {
+            for (IngredientCell cell : ingredient.cells()) {
+                int gridX = ingredient.originX() + cell.offsetX();
+                int gridY = ingredient.originY() + cell.offsetY();
+                if (gridX == x && gridY == y) {
+                    return ingredient;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static boolean isInsideGrid(int x, int y) {
+        return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
+    }
+
+    private static void renderCombineGrid(
+            CombineGridView gridView,
+            List<PlacedIngredient> placedIngredients,
+            SelectedIngredient selectedIngredient,
+            int previewX,
+            int previewY,
+            boolean previewing,
+            boolean previewValid
+    ) {
+        CellVisual[][] placedVisuals = new CellVisual[GRID_SIZE][GRID_SIZE];
+        if (placedIngredients != null) {
+            for (PlacedIngredient ingredient : placedIngredients) {
+                for (IngredientCell cell : ingredient.cells()) {
+                    int gridX = ingredient.originX() + cell.offsetX();
+                    int gridY = ingredient.originY() + cell.offsetY();
+                    if (!isInsideGrid(gridX, gridY)) {
+                        continue;
+                    }
+                    int color = cell.cellType() == CellType.LINK ? brightenColor(cell.color(), 0.2f) : cell.color();
+                    placedVisuals[gridY][gridX] = new CellVisual(color, 1.0f);
+                }
+            }
+        }
+
+        CellVisual[][] previewVisuals = null;
+        if (previewing && selectedIngredient != null) {
+            previewVisuals = new CellVisual[GRID_SIZE][GRID_SIZE];
+            for (IngredientCell cell : selectedIngredient.cells()) {
+                int gridX = previewX + cell.offsetX();
+                int gridY = previewY + cell.offsetY();
+                if (!isInsideGrid(gridX, gridY)) {
+                    continue;
+                }
+                int color = previewValid
+                        ? (cell.cellType() == CellType.LINK ? brightenColor(cell.color(), 0.2f) : cell.color())
+                        : INVALID_PREVIEW_COLOR;
+                float alpha = previewValid ? PREVIEW_ALPHA : INVALID_PREVIEW_ALPHA;
+                previewVisuals[gridY][gridX] = new CellVisual(color, alpha);
+            }
+        }
+
+        for (int y = 0; y < GRID_SIZE; y++) {
+            for (int x = 0; x < GRID_SIZE; x++) {
+                UIElement cell = gridView.cellAt(x, y);
+                CellVisual previewCell = previewVisuals == null ? null : previewVisuals[y][x];
+                CellVisual placedCell = placedVisuals[y][x];
+                if (previewCell != null) {
+                    cell.lss("background", buildCellBackground(previewCell.color(), previewCell.alpha()));
+                } else if (placedCell != null) {
+                    cell.lss("background", buildCellBackground(placedCell.color(), placedCell.alpha()));
+                } else {
+                    cell.lss("background", GRID_BASE_BACKGROUND);
+                }
+            }
+        }
+    }
+
+    private static String buildCellBackground(int color, float alpha) {
+        if (alpha >= 0.99f) {
+            return "rect(" + AlchemyEffectPanel.toHexColor(color) + ", 2)";
+        }
+        return "rect(" + toRgba(color, alpha) + ", 2)";
+    }
+
+    private static String toRgba(int color, float alpha) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+        float clamped = Math.max(0f, Math.min(1f, alpha));
+        return "rgba(" + r + ", " + g + ", " + b + ", " + clamped + ")";
+    }
+
+    private static int brightenColor(int color, float ratio) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+        int nr = r + Math.round((255 - r) * ratio);
+        int ng = g + Math.round((255 - g) * ratio);
+        int nb = b + Math.round((255 - b) * ratio);
+        return (nr << 16) | (ng << 8) | nb;
     }
 
     private static int computeSuccessRate(List<ItemStack> stacks) {
@@ -343,6 +736,53 @@ public final class AlchemyCombineUI {
             }
         }
         return copied;
+    }
+
+    private interface ItemSelectHandler {
+        void handle(int index, ItemStack stack);
+    }
+
+    private interface CellHandler {
+        void onHover(int x, int y);
+
+        void onClick(int x, int y, int button);
+    }
+
+    private enum CombineState {
+        IDLE,
+        PREVIEWING,
+        PLACED
+    }
+
+    private record IngredientCell(int offsetX, int offsetY, int color, CellType cellType) {
+    }
+
+    private record SelectedIngredient(int sourceIndex, ItemStack stack, List<IngredientCell> cells) {
+    }
+
+    private record PlacedIngredient(
+            int sourceIndex,
+            ItemStack stack,
+            List<IngredientCell> cells,
+            int originX,
+            int originY,
+            int rotation
+    ) {
+    }
+
+    private record CellVisual(int color, float alpha) {
+    }
+
+    private static final class CombineGridView {
+        private final UIElement[][] cells;
+
+        private CombineGridView(UIElement[][] cells) {
+            this.cells = cells;
+        }
+
+        private UIElement cellAt(int x, int y) {
+            return cells[y][x];
+        }
     }
 
     public static final class PendingCombine {

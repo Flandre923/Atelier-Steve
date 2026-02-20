@@ -11,6 +11,7 @@ public final class DevUiBootstrap {
     public static void register() {
         PlayerUIMenuType.register(AtelierSteve.id("dev_showcase"), player -> DevShowcaseUI::createUI);
         PlayerUIMenuType.register(AtelierSteve.id("dev_grid_test"), player -> DevIngredientGridTestUI::createUI);
+        PlayerUIMenuType.register(AtelierSteve.id("dev_element_cells"), player -> DevElementCellCatalogUI::createUI);
         NeoForge.EVENT_BUS.addListener(DevUiCommand::register);
     }
 }

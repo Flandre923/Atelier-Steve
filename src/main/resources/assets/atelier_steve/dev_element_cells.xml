@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ldlib2-ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Low-Drag-MC/LDLib2/refs/heads/1.21/ldlib2-ui.xsd">
+    <stylesheet location="ldlib2:lss/mc.lss"/>
+    <style>
+        #dev_cells_root {
+            width: 450;
+            height: 300;
+            flex-direction: column;
+            padding-all: 8;
+            gap-all: 6;
+            background: rect(rgba(0, 0, 0, 150), 6);
+        }
+
+        .panel {
+            flex-direction: column;
+            background: rect(#c6c6c6, 4, 1, #555555);
+            padding-all: 8;
+            gap-all: 6;
+            width: 100%;
+            height: 100%;
+        }
+
+        .header {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            background: rect(#8e8e8e, 3);
+            padding-horizontal: 6;
+            padding-vertical: 4;
+        }
+
+        .title {
+            color: #101010;
+        }
+
+        .subtitle {
+            color: #2f2f2f;
+            horizontal-align: right;
+        }
+
+        .sections {
+            width: 100%;
+            min-height: 220;
+            background: rect(rgba(0, 0, 0, 35), 3);
+            padding-all: 6;
+        }
+
+        .sections_content {
+            flex-direction: column;
+            gap-all: 8;
+            width: 100%;
+        }
+
+        .cell_section {
+            flex-direction: column;
+            gap-all: 4;
+            width: 100%;
+        }
+
+        .section_title {
+            color: #252525;
+        }
+
+        .section_rows {
+            flex-direction: column;
+            gap-all: 4;
+            width: 100%;
+        }
+
+        .cell_row {
+            flex-direction: row;
+            gap-all: 6;
+            width: 100%;
+        }
+
+        .cell_card {
+            width: 98;
+            height: 36;
+            flex-direction: row;
+            align-items: center;
+            gap-all: 6;
+            background: rect(#efe8db, 2, 1, #807768);
+            padding-horizontal: 6;
+            padding-vertical: 4;
+        }
+
+        .cell_name {
+            color: #2c241c;
+        }
+    </style>
+    <root id="dev_cells_root">
+        <element class="panel">
+            <element class="header">
+                <label id="dev_title" class="title"/>
+                <label id="dev_subtitle" class="subtitle"/>
+            </element>
+            <scroller-view class="sections">
+                <element id="sections" class="sections_content"/>
+            </scroller-view>
+        </element>
+    </root>
+</ldlib2-ui>

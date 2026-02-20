@@ -163,6 +163,10 @@
             padding-vertical: 2;
         }
 
+        .selected_row.selected {
+            background: rect(rgba(245, 220, 170, 120), 2);
+        }
+
         .selected_components {
             flex-direction: row;
             align-items: center;
