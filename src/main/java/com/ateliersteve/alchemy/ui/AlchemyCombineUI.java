@@ -754,7 +754,8 @@ public final class AlchemyCombineUI {
         }
 
         private static CombineBoardCellState preview(AlchemyElement element, boolean link) {
-            return new CombineBoardCellState(ElementCellTilePalette.filled(element, link), PREVIEW_ALPHA, element, link, true, false);
+            float alpha = link ? 0.8f : PREVIEW_ALPHA;
+            return new CombineBoardCellState(ElementCellTilePalette.preview(element, link), alpha, element, link, true, false);
         }
 
         private static CombineBoardCellState invalidPreview() {

@@ -215,6 +215,41 @@ public final class ElementCellTilePalette {
         };
     }
 
+    public static ElementCellTileSpec preview(AlchemyElement element, boolean link) {
+        ElementCellTileSpec base = filled(element, link);
+        if (!link || base == null) {
+            return base;
+        }
+        return new ElementCellTileSpec(
+                base.id() + "_preview",
+                base.label() + " Preview",
+                brighten(base.fillColor(), 0.62f),
+                brighten(base.squareColor(), 0.68f),
+                base.iconTexture(),
+                brighten(base.iconColor(), 0.75f),
+                base.iconInset()
+        );
+    }
+
+    private static Integer brighten(Integer color, float ratio) {
+        if (color == null) {
+            return null;
+        }
+        int argb = color;
+        int a = (argb >>> 24) & 0xFF;
+        int r = (argb >>> 16) & 0xFF;
+        int g = (argb >>> 8) & 0xFF;
+        int b = argb & 0xFF;
+        r = brightenChannel(r, ratio);
+        g = brightenChannel(g, ratio);
+        b = brightenChannel(b, ratio);
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    private static int brightenChannel(int value, float ratio) {
+        return Math.min(255, Math.round(value + (255 - value) * ratio));
+    }
+
     private static ElementCellTileSpec byId(String id) {
         return SPECS_BY_ID.get(id);
     }
