@@ -359,51 +359,50 @@ public final class AlchemyCombineUI {
         }
         if (availableCount <= 0) {
             hint.setText(Component.literal("\u5df2\u9009\u6750\u6599\u5df2\u7528\u5b8c"));
-            return;
+        } else {
+            hint.setText(Component.empty());
         }
-        hint.setText(Component.empty());
 
         for (AlchemyCombineSessionSnapshot.MaterialEntry material : snapshot.materials()) {
             ItemStack stack = material.stack();
             boolean exhausted = snapshot.isExhausted(material.materialId());
             var row = new UIElement().addClass("selected_row");
-            if (exhausted) {
-                row.addClass("disabled");
-                row.lss("opacity", "0.45");
-            }
             var info = new UIElement().addClass("row_align_center").addClass("selected_prefix");
             var icon = new StaticItemElement().setStack(stack).addClass("selected_icon");
             info.addChildren(icon);
-            var components = new UIElement().addClass("selected_components");
+            row.addChild(info);
 
-            if (material.components().isEmpty()) {
-                components.addChild(new IngredientGridElement().setGridSize(3, 3).addClass("selected_component_grid"));
-            } else {
-                for (String componentId : material.components().keySet()) {
-                    AlchemyCombineSessionSnapshot.MaterialComponentRef componentRef =
-                            snapshot.getIngredientComponent(material.materialId(), componentId);
-                    if (componentRef != null) {
-                        IngredientGridElement componentGrid = buildElementGrid(componentRef.component());
-                        boolean componentExhausted = snapshot.isComponentExhausted(componentId);
-                        boolean selected = selectedComponentId != null && selectedComponentId.equals(componentId);
-                        if (selected) {
-                            componentGrid.addClass("selected");
-                            row.addClass("selected");
+            if (!exhausted) {
+                var components = new UIElement().addClass("selected_components");
+
+                if (material.components().isEmpty()) {
+                    components.addChild(new IngredientGridElement().setGridSize(3, 3).addClass("selected_component_grid"));
+                } else {
+                    for (String componentId : material.components().keySet()) {
+                        AlchemyCombineSessionSnapshot.MaterialComponentRef componentRef =
+                                snapshot.getIngredientComponent(material.materialId(), componentId);
+                        if (componentRef != null) {
+                            IngredientGridElement componentGrid = buildElementGrid(componentRef.component());
+                            boolean componentExhausted = snapshot.isComponentExhausted(componentId);
+                            boolean selected = selectedComponentId != null && selectedComponentId.equals(componentId);
+                            if (selected) {
+                                componentGrid.addClass("selected");
+                                row.addClass("selected");
+                            }
+                            if (componentExhausted) {
+                                componentGrid.addClass("disabled");
+                                componentGrid.lss("opacity", "0.45");
+                            }
+                            if (onSelect != null && !componentExhausted) {
+                                String materialId = material.materialId();
+                                componentGrid.addEventListener(UIEvents.CLICK, e -> onSelect.handle(materialId, componentId));
+                            }
+                            components.addChild(componentGrid);
                         }
-                        if (componentExhausted) {
-                            componentGrid.addClass("disabled");
-                            componentGrid.lss("opacity", "0.45");
-                        }
-                        if (onSelect != null && !componentExhausted) {
-                            String materialId = material.materialId();
-                            componentGrid.addEventListener(UIEvents.CLICK, e -> onSelect.handle(materialId, componentId));
-                        }
-                        components.addChild(componentGrid);
                     }
                 }
+                row.addChild(components);
             }
-
-            row.addChildren(info, components);
             container.addChild(row);
         }
     }
