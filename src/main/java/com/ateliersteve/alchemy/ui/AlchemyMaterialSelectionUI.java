@@ -49,6 +49,7 @@ public final class AlchemyMaterialSelectionUI {
     private static final int SEARCH_RADIUS = 6;
     private static final int GRID_COLUMNS = 4;
     private static final int VISIBLE_ROWS = 5;
+    private static final int GRID_SLOT_CAP = 200;
     private static final Map<UUID, ResourceLocation> PENDING_RECIPES_SERVER = new ConcurrentHashMap<>();
     private static final Map<UUID, ResourceLocation> PENDING_RECIPES_CLIENT = new ConcurrentHashMap<>();
     private static final Map<ResourceLocation, ResourceLocation> TAG_CATEGORY_ICONS = Map.of(
@@ -342,7 +343,7 @@ public final class AlchemyMaterialSelectionUI {
             BiConsumer<Integer, ItemStack> onStackClick
     ) {
         gridContent.clearAllChildren();
-        int slotCount = Math.max(stacks.size(), GRID_COLUMNS * VISIBLE_ROWS);
+        int slotCount = Math.max(Math.min(stacks.size(), GRID_SLOT_CAP), GRID_COLUMNS * VISIBLE_ROWS);
         List<ItemStack> gridStacks = new ArrayList<>(slotCount);
         for (int i = 0; i < slotCount; i++) {
             if (i < stacks.size()) {
