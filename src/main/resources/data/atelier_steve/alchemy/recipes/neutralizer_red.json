@@ -28,6 +28,7 @@
     {
       "type": "fire",
       "category": "fire_level",
+      "locked_slots": 3,
       "steps": [
         {"threshold": 5, "value": "Fire Level Up +1"},
         {"threshold": 12, "value": "Fire Level Up +2"},
@@ -37,6 +38,7 @@
     {
       "type": "thunder",
       "category": "grant_tag",
+      "locked_slots": 2,
       "steps": [
         {
           "threshold": 10,
@@ -50,6 +52,7 @@
     {
       "type": "fire",
       "category": "heat_storage",
+      "locked_slots": 2,
       "steps": [
         {
           "threshold": 5,
@@ -84,6 +87,7 @@
     {
       "type": "fire",
       "category": "neutralize_power",
+      "locked_slots": 3,
       "steps": [
         {
           "threshold": 8,

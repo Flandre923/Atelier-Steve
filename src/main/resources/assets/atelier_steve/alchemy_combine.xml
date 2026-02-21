@@ -416,6 +416,11 @@
             align-self: flex-end;
         }
 
+        .bar_segment_locked {
+            background: rect(#7a7a7a, 1);
+            opacity: 0.65;
+        }
+
         .effects_empty {
             color: #2b2b2b;
         }

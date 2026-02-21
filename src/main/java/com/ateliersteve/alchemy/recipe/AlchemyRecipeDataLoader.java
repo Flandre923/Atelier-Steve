@@ -145,6 +145,7 @@ public class AlchemyRecipeDataLoader {
             JsonObject obj = element.getAsJsonObject();
             String type = readString(obj, "type", "");
             String category = readString(obj, "category", type);
+            int lockedSlots = Math.max(0, readInt(obj, "locked_slots", 0));
             JsonArray stepsArray = obj.has("steps") ? obj.getAsJsonArray("steps") : new JsonArray();
             List<AlchemyRecipeDefinition.EffectStep> steps = new ArrayList<>();
             for (JsonElement stepElement : stepsArray) {
@@ -155,7 +156,7 @@ public class AlchemyRecipeDataLoader {
                 List<ResourceLocation> grantCategories = parseGrantCategories(fileId, stepObj);
                 steps.add(new AlchemyRecipeDefinition.EffectStep(threshold, value, bonus, grantCategories));
             }
-            groups.add(new AlchemyRecipeDefinition.EffectGroup(type, category, steps));
+            groups.add(new AlchemyRecipeDefinition.EffectGroup(type, category, lockedSlots, steps));
         }
         return groups;
     }

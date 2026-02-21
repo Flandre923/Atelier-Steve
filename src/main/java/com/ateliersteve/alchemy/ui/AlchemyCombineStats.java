@@ -1,6 +1,7 @@
 package com.ateliersteve.alchemy.ui;
 
 import com.ateliersteve.alchemy.AlchemyItemData;
+import com.ateliersteve.alchemy.element.CellType;
 import com.ateliersteve.alchemy.element.ElementComponent;
 import com.ateliersteve.alchemy.item.AlchemyItem;
 import com.ateliersteve.alchemy.recipe.AlchemyRecipeDefinition;
@@ -86,6 +87,7 @@ final class AlchemyCombineStats {
             AlchemyRecipeDefinition recipe
     ) {
         Map<String, Integer> insertedValues = computeInsertedElementValues(snapshot);
+        Map<String, Integer> chainCounts = computeChainCounts(snapshot);
         if (recipe == null || insertedValues.isEmpty()) {
             return insertedValues;
         }
@@ -93,7 +95,7 @@ final class AlchemyCombineStats {
         Map<String, Integer> values = new HashMap<>(insertedValues);
         int maxIterations = Math.max(1, recipe.effects().size() + 1);
         for (int i = 0; i < maxIterations; i++) {
-            List<AlchemyRecipeDefinition.ResolvedEffect> resolvedEffects = recipe.resolveEffects(values);
+            List<AlchemyRecipeDefinition.ResolvedEffect> resolvedEffects = recipe.resolveEffects(values, chainCounts);
             Map<String, Integer> next = new HashMap<>(insertedValues);
             applyEnhancedElementBonuses(next, insertedValues, resolvedEffects);
             if (next.equals(values)) {
@@ -102,6 +104,53 @@ final class AlchemyCombineStats {
             values = next;
         }
         return values;
+    }
+
+    static Map<String, Integer> computeChainCounts(AlchemyCombineSessionSnapshot snapshot) {
+        Map<String, Integer> counts = new HashMap<>();
+        if (snapshot == null || snapshot.placedMaterials().isEmpty()) {
+            return counts;
+        }
+
+        Map<Long, AlchemyCombineSessionSnapshot.IngredientCell> linkCells = new HashMap<>();
+        for (AlchemyCombineSessionSnapshot.PlacedMaterial placed : snapshot.placedMaterials()) {
+            if (placed == null || placed.cells() == null || placed.cells().isEmpty()) {
+                continue;
+            }
+            for (AlchemyCombineSessionSnapshot.IngredientCell cell : placed.cells()) {
+                if (cell == null || cell.cellType() != CellType.LINK) {
+                    continue;
+                }
+                int x = placed.originX() + cell.offsetX();
+                int y = placed.originY() + cell.offsetY();
+                linkCells.put(toKey(x, y), cell);
+            }
+        }
+
+        int[][] directions = new int[][]{
+                {1, 0},
+                {0, 1},
+                {1, 1},
+                {-1, 1}
+        };
+        for (Map.Entry<Long, AlchemyCombineSessionSnapshot.IngredientCell> entry : linkCells.entrySet()) {
+            long key = entry.getKey();
+            int x = (int) (key >> 32);
+            int y = (int) key;
+            var cell = entry.getValue();
+            if (cell == null || cell.element() == null) {
+                continue;
+            }
+            for (int[] direction : directions) {
+                long neighborKey = toKey(x + direction[0], y + direction[1]);
+                var neighbor = linkCells.get(neighborKey);
+                if (neighbor == null || neighbor.element() != cell.element()) {
+                    continue;
+                }
+                counts.merge(cell.element().getSerializedName(), 1, Integer::sum);
+            }
+        }
+        return counts;
     }
 
     static ItemStack resolveResultStack(AlchemyRecipeDefinition recipe) {
@@ -174,5 +223,9 @@ final class AlchemyCombineStats {
                 }
             }
         }
+    }
+
+    private static long toKey(int x, int y) {
+        return ((long) x << 32) | (y & 0xffffffffL);
     }
 }

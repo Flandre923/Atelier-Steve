@@ -85,6 +85,7 @@ public final class AlchemyEffectPanel {
     public static void buildEffectAttributes(
             AlchemyRecipeDefinition recipe,
             Map<String, Integer> elementValues,
+            Map<String, Integer> chainCounts,
             UIElement attributesScroller
     ) {
         attributesScroller.clearAllChildren();
@@ -118,7 +119,9 @@ public final class AlchemyEffectPanel {
                 continue;
             }
 
-            int value = Math.min(elementValues.getOrDefault(group.type(), 0), max);
+            int chainCount = chainCounts == null ? 0 : chainCounts.getOrDefault(group.type(), 0);
+            int unlockedCap = group.resolveUnlockedCap(chainCount);
+            int value = Math.min(elementValues.getOrDefault(group.type(), 0), unlockedCap);
             AlchemyElement element = AlchemyElement.fromName(group.type());
             String color = toHexColor(element.getColor());
             AlchemyRecipeDefinition.EffectStep step = group.selectStep(value);
@@ -151,7 +154,9 @@ public final class AlchemyEffectPanel {
                 if (positions.contains(n)) {
                     segment.addClass("bar_segment_key");
                 }
-                if (n <= value) {
+                if (n > unlockedCap) {
+                    segment.addClass("bar_segment_locked");
+                } else if (n <= value) {
                     segment.lss("background", "rect(" + color + ", 1)");
                 }
                 bar.addChild(segment);

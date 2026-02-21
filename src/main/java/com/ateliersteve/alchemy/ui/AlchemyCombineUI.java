@@ -303,6 +303,7 @@ public final class AlchemyCombineUI {
 
         refreshComputedRef[0] = () -> {
             Map<String, Integer> values = AlchemyCombineStats.computeCombinedElementValues(sessionTimeline.current(), recipe);
+            Map<String, Integer> chainCounts = AlchemyCombineStats.computeChainCounts(sessionTimeline.current());
             AlchemyCombineStats.buildStatsBar(statsBar, values);
             int successRate = AlchemyCombineStats.computeSuccessRate(values);
             successLabel.setText(Component.translatable("ui.atelier_steve.alchemy_combine.success_rate"));
@@ -315,7 +316,7 @@ public final class AlchemyCombineUI {
                     ? Component.literal("-")
                     : Component.literal(String.valueOf(computedQuality)));
             AlchemyEffectPanel.buildQualityBar(qualityBar, computedQuality);
-            AlchemyEffectPanel.buildEffectAttributes(recipe, values, attributesScroller);
+            AlchemyEffectPanel.buildEffectAttributes(recipe, values, chainCounts, attributesScroller);
         };
         refreshComputedRef[0].run();
 

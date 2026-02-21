@@ -17,9 +17,18 @@ public record AlchemyRecipeDefinition(
         List<EffectGroup> effects
 ) {
     public List<ResolvedEffect> resolveEffects(Map<String, Integer> elementValues) {
+        return resolveEffects(elementValues, Map.of());
+    }
+
+    public List<ResolvedEffect> resolveEffects(
+            Map<String, Integer> elementValues,
+            Map<String, Integer> chainCounts
+    ) {
         List<ResolvedEffect> resolved = new ArrayList<>();
         for (EffectGroup group : effects) {
-            int value = elementValues.getOrDefault(group.type(), 0);
+            int chainCount = chainCounts == null ? 0 : chainCounts.getOrDefault(group.type(), 0);
+            int unlockedCap = group.resolveUnlockedCap(chainCount);
+            int value = Math.min(elementValues.getOrDefault(group.type(), 0), unlockedCap);
             EffectStep step = group.selectStep(value);
             if (step != null) {
                 resolved.add(new ResolvedEffect(group.category(), step.value(), step.bonusElements(), step.grantCategories()));
@@ -54,7 +63,7 @@ public record AlchemyRecipeDefinition(
     public record UnlockCondition(AlchemyRecipeIngredient.Type type, ResourceLocation id, int count) {
     }
 
-    public record EffectGroup(String type, String category, List<EffectStep> steps) {
+    public record EffectGroup(String type, String category, int lockedSlots, List<EffectStep> steps) {
         public EffectStep selectStep(int value) {
             EffectStep best = null;
             for (EffectStep step : steps) {
@@ -66,6 +75,26 @@ public record AlchemyRecipeDefinition(
                 }
             }
             return best;
+        }
+
+        public int maxThreshold() {
+            int max = 0;
+            for (EffectStep step : steps) {
+                if (step.threshold() > max) {
+                    max = step.threshold();
+                }
+            }
+            return max;
+        }
+
+        public int resolveUnlockedCap(int chainCount) {
+            int max = maxThreshold();
+            if (max <= 0) {
+                return 0;
+            }
+            int effectiveLockedSlots = Math.max(0, Math.min(lockedSlots, max));
+            int remainingLocked = Math.max(0, effectiveLockedSlots - Math.max(0, chainCount));
+            return Math.max(0, max - remainingLocked);
         }
     }
 

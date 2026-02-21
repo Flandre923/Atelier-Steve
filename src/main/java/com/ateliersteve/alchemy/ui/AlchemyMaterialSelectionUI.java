@@ -154,7 +154,7 @@ public final class AlchemyMaterialSelectionUI {
         qualityValue.setText(quality <= 0 ? Component.literal("-") : Component.literal(String.valueOf(quality)));
         AlchemyEffectPanel.buildQualityBar(qualityBar, quality);
 
-        AlchemyEffectPanel.buildEffectAttributes(recipe, Map.of(), attributesScroller);
+        AlchemyEffectPanel.buildEffectAttributes(recipe, Map.of(), Map.of(), attributesScroller);
 
         List<GatheringBasketBlockEntity> baskets = findNearbyBaskets(player, cauldronPos, SEARCH_RADIUS);
         List<BasketStackRef> basketStacks = collectBasketStacks(baskets);
@@ -181,7 +181,7 @@ public final class AlchemyMaterialSelectionUI {
         Map<Integer, LinkedHashSet<Integer>> selectedSlots = new HashMap<>();
         Runnable updateEffects = () -> {
             Map<String, Integer> values = computeSelectedElementValues(perIngredient, selectedSlots);
-            AlchemyEffectPanel.buildEffectAttributes(recipe, values, attributesScroller);
+            AlchemyEffectPanel.buildEffectAttributes(recipe, values, Map.of(), attributesScroller);
         };
 
         combineButtonLabel.setText(Component.translatable("ui.atelier_steve.alchemy_material_selection.enter_combine"));
