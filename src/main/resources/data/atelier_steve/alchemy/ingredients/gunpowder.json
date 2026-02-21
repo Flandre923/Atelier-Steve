@@ -1,0 +1,80 @@
+{
+  "target": {
+    "item": "minecraft:gunpowder"
+  },
+  "traits": {
+    "min": 0,
+    "max": 3
+  },
+  "elements": {
+    "min": 1,
+    "max": 3,
+    "presets": [
+      {
+        "element": "thunder",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 0, 0, 0, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "thunder",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [1, 1, 0, 0, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "thunder",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 1, 0, 0, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "thunder",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 0, 0, 1, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "thunder",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [1, 1, 0, 0, 0, 2, 0, 0, 0]
+        }
+      },
+      {
+        "element": "thunder",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [1, 0, 0, 0, 1, 0, 2, 0, 0]
+        }
+      },
+      {
+        "element": "light",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [1, 0, 0, 0, 0, 0, 0, 0, 0]
+        }
+      },
+      {
+        "element": "fire",
+        "shape": {
+          "width": 3,
+          "height": 3,
+          "cells": [2, 1, 0, 0, 0, 0, 0, 0, 0]
+        }
+      }
+    ]
+  },
+  "priority": 100
+}
