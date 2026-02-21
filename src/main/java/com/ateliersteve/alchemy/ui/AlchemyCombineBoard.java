@@ -46,33 +46,43 @@ final class AlchemyCombineBoard {
             for (int x = 0; x < boardState.width(); x++) {
                 ElementCellTileElement cell = gridView.cellAt(x, y);
                 CellState state = boardState.cellAt(x, y);
-                boolean connectLeft = isConnected(boardState, x, y, x - 1, y);
-                boolean connectRight = isConnected(boardState, x, y, x + 1, y);
-                boolean connectUp = isConnected(boardState, x, y, x, y - 1);
-                boolean connectDown = isConnected(boardState, x, y, x, y + 1);
-                boolean connectUpLeft = isConnected(boardState, x, y, x - 1, y - 1);
-                boolean connectUpRight = isConnected(boardState, x, y, x + 1, y - 1);
-                boolean connectDownLeft = isConnected(boardState, x, y, x - 1, y + 1);
-                boolean connectDownRight = isConnected(boardState, x, y, x + 1, y + 1);
-                Integer connectorColor = resolveConnectorColor(state);
+                boolean componentConnectLeft = isComponentConnected(boardState, x, y, x - 1, y);
+                boolean componentConnectRight = isComponentConnected(boardState, x, y, x + 1, y);
+                boolean componentConnectUp = isComponentConnected(boardState, x, y, x, y - 1);
+                boolean componentConnectDown = isComponentConnected(boardState, x, y, x, y + 1);
+                boolean connectUpLeft = isComponentConnected(boardState, x, y, x - 1, y - 1);
+                boolean connectUpRight = isComponentConnected(boardState, x, y, x + 1, y - 1);
+                boolean connectDownLeft = isComponentConnected(boardState, x, y, x - 1, y + 1);
+                boolean connectDownRight = isComponentConnected(boardState, x, y, x + 1, y + 1);
+                boolean chainConnectLeft = isChainConnected(boardState, x, y, x - 1, y);
+                boolean chainConnectRight = isChainConnected(boardState, x, y, x + 1, y);
+                boolean chainConnectUp = isChainConnected(boardState, x, y, x, y - 1);
+                boolean chainConnectDown = isChainConnected(boardState, x, y, x, y + 1);
+                Integer componentConnectorColor = resolveComponentConnectorColor(state);
+                Integer chainConnectorColor = resolveChainConnectorColor(state);
                 cell.applySpec(
                         state.spec(),
-                        connectorColor,
-                        connectLeft,
-                        connectRight,
-                        connectUp,
-                        connectDown,
+                        componentConnectorColor,
+                        chainConnectorColor,
+                        componentConnectLeft,
+                        componentConnectRight,
+                        componentConnectUp,
+                        componentConnectDown,
                         connectUpLeft,
                         connectUpRight,
                         connectDownLeft,
-                        connectDownRight
+                        connectDownRight,
+                        chainConnectLeft,
+                        chainConnectRight,
+                        chainConnectUp,
+                        chainConnectDown
                 );
                 cell.lss("opacity", String.valueOf(state.opacity()));
             }
         }
     }
 
-    private static boolean isConnected(State boardState, int x, int y, int otherX, int otherY) {
+    private static boolean isComponentConnected(State boardState, int x, int y, int otherX, int otherY) {
         if (boardState == null || otherX < 0 || otherX >= boardState.width() || otherY < 0 || otherY >= boardState.height()) {
             return false;
         }
@@ -84,7 +94,22 @@ final class AlchemyCombineBoard {
         return current.groupId().equals(other.groupId());
     }
 
-    private static Integer resolveConnectorColor(CellState state) {
+    private static boolean isChainConnected(State boardState, int x, int y, int otherX, int otherY) {
+        if (boardState == null || otherX < 0 || otherX >= boardState.width() || otherY < 0 || otherY >= boardState.height()) {
+            return false;
+        }
+        CellState current = boardState.cellAt(x, y);
+        CellState other = boardState.cellAt(otherX, otherY);
+        if (current == null || other == null || !current.link() || !other.link()) {
+            return false;
+        }
+        if (current.element() == null || other.element() == null) {
+            return false;
+        }
+        return current.element() == other.element();
+    }
+
+    private static Integer resolveComponentConnectorColor(CellState state) {
         if (state == null || state.spec() == null || state.groupId() == null) {
             return null;
         }
@@ -96,6 +121,17 @@ final class AlchemyCombineBoard {
             return 0xFF000000 | (state.element().getColor() & 0xFFFFFF);
         }
         return state.spec().squareColor();
+    }
+
+    private static Integer resolveChainConnectorColor(CellState state) {
+        if (state == null || state.spec() == null || !state.link() || state.element() == null) {
+            return null;
+        }
+        ElementCellTileSpec baseSpec = ElementCellTilePalette.filled(state.element(), true);
+        if (baseSpec != null && baseSpec.iconColor() != null) {
+            return baseSpec.iconColor();
+        }
+        return 0xFF000000 | (state.element().getColor() & 0xFFFFFF);
     }
 
     interface CellHandler {

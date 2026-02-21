@@ -66,11 +66,24 @@ public final class IngredientGridElement extends UIElement {
             return;
         }
 
+        String colorHex = AlchemyEffectPanel.toHexColor(elementColor);
+
         for (int row = 1; row <= rows; row++) {
             UIElement rowElement = new UIElement().addClass("ingredient_row");
             for (int col = 1; col <= columns; col++) {
                 CellType type = cells.getOrDefault(new CellPos(col, row), CellType.EMPTY);
                 UIElement cell = new UIElement().addClass("ingredient_cell");
+                cell.lss("position", "relative");
+                if (type != CellType.EMPTY) {
+                    boolean connectedHorizontal = isFilled(col - 1, row) || isFilled(col + 1, row);
+                    boolean connectedVertical = isFilled(col, row - 1) || isFilled(col, row + 1);
+                    if (connectedHorizontal) {
+                        cell.addChild(createHorizontalConnector(colorHex));
+                    }
+                    if (connectedVertical) {
+                        cell.addChild(createVerticalConnector(colorHex));
+                    }
+                }
                 switch (type) {
                     case LINK -> {
                         cell.addClass("ingredient_cell_link");
@@ -88,6 +101,32 @@ public final class IngredientGridElement extends UIElement {
             }
             addChild(rowElement);
         }
+    }
+
+    private boolean isFilled(int x, int y) {
+        return cells.getOrDefault(new CellPos(x, y), CellType.EMPTY) != CellType.EMPTY;
+    }
+
+    private UIElement createHorizontalConnector(String colorHex) {
+        UIElement connector = new UIElement();
+        connector.lss("position", "absolute");
+        connector.lss("top", "3");
+        connector.lss("left", "0");
+        connector.lss("width", "8");
+        connector.lss("height", "2");
+        connector.lss("background", "rect(" + colorHex + ", 1)");
+        return connector;
+    }
+
+    private UIElement createVerticalConnector(String colorHex) {
+        UIElement connector = new UIElement();
+        connector.lss("position", "absolute");
+        connector.lss("left", "3");
+        connector.lss("top", "0");
+        connector.lss("width", "2");
+        connector.lss("height", "8");
+        connector.lss("background", "rect(" + colorHex + ", 1)");
+        return connector;
     }
 
     private record CellPos(int x, int y) {
