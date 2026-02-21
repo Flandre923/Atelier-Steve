@@ -33,9 +33,9 @@ public final class ElementCellTilePalette {
     public static final int FILLED_ICE_ICON_COLOR = 0xFF4B93A4;
     public static final int FILLED_ICE_LINK_ICON_COLOR = 0xFFE0FBFF;
     
-    public static final int FILLED_LIGHT_BG_COLOR = 0xFF473B42;
-    public static final int FILLED_LIGHT_ICON_COLOR = 0xFF9B8B98;
-    public static final int FILLED_LIGHT_LINK_ICON_COLOR = 0xFFE8BCEB;
+    public static final int FILLED_LIGHT_BG_COLOR = 0xFF4D3F5A;
+    public static final int FILLED_LIGHT_ICON_COLOR = 0xFFB9A5DE;
+    public static final int FILLED_LIGHT_LINK_ICON_COLOR = 0xFFF1D7FF;
 
     public static final int FILLED_WIND_BG_COLOR = 0xFF23501D;
     public static final int FILLED_WIND_ICON_COLOR = 0xFF346628;

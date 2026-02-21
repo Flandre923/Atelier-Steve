@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class AlchemyIngredientRegistry {
+    private static final int QUALITY_MAX = 999;
     private static final List<AlchemyIngredientDefinition> DEFINITIONS = new ArrayList<>();
 
     public interface QualityModifier {
@@ -53,7 +54,7 @@ public class AlchemyIngredientRegistry {
         if (definition == null) {
             return AlchemyItemData.createRandom(random);
         }
-        int baseQuality = definition.quality();
+        int baseQuality = random.nextInt(QUALITY_MAX) + 1;
         int adjustedQuality = qualityModifier == null
                 ? baseQuality
                 : qualityModifier.adjustQuality(stack, definition, baseQuality);

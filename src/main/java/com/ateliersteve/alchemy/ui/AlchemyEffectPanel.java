@@ -47,13 +47,14 @@ public final class AlchemyEffectPanel {
         QualityCycleState state = resolveQualityCycleState(quality);
 
         var track = new UIElement().addClass("quality_cycle_track");
+        track.lss("background", "rect(" + toHexColor(state.baseColor()) + ", 1)");
 
         if (state.fillPercent() > 0f) {
             float fillPercent = state.fillPercent();
             var fill = new UIElement()
                     .addClass("quality_cycle_fill")
                     .layout(layout -> layout.widthPercent(fillPercent));
-            fill.lss("background", "rect(" + toHexColor(state.color()) + ", 1)");
+            fill.lss("background", "rect(" + toHexColor(state.fillColor()) + ", 1)");
             track.addChild(fill);
         }
 
@@ -63,16 +64,22 @@ public final class AlchemyEffectPanel {
     private static QualityCycleState resolveQualityCycleState(int quality) {
         int clamped = Math.max(0, Math.min(quality, QUALITY_MAX));
         if (clamped <= 0) {
-            return new QualityCycleState(0, 0f, QUALITY_COLORS.get(0));
+            int first = QUALITY_COLORS.get(0);
+            return new QualityCycleState(0f, first, first);
         }
 
         int cycleIndex = Math.min(QUALITY_COLORS.size() - 1, (clamped - 1) / QUALITY_CYCLE_SIZE);
+        int baseCycleIndex = Math.max(0, cycleIndex - 1);
         int cycleProgress = ((clamped - 1) % QUALITY_CYCLE_SIZE) + 1;
         float fillPercent = (cycleProgress * 100f) / QUALITY_CYCLE_SIZE;
-        return new QualityCycleState(cycleIndex, fillPercent, QUALITY_COLORS.get(cycleIndex));
+        return new QualityCycleState(
+                fillPercent,
+                QUALITY_COLORS.get(baseCycleIndex),
+                QUALITY_COLORS.get(cycleIndex)
+        );
     }
 
-    private record QualityCycleState(int cycle, float fillPercent, int color) {
+    private record QualityCycleState(float fillPercent, int baseColor, int fillColor) {
     }
 
     public static void buildEffectAttributes(

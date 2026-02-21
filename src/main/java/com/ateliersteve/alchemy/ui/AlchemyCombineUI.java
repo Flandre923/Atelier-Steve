@@ -354,6 +354,11 @@ public final class AlchemyCombineUI {
             successFill.layout(layout -> layout.widthPercent(successRate));
             int quantity = computePlaceholderQuantity(values);
             craftValue.setText(Component.literal(String.valueOf(quantity)));
+            int computedQuality = computeCombinedQuality(sessionTimeline.current());
+            qualityValue.setText(computedQuality <= 0
+                    ? Component.literal("-")
+                    : Component.literal(String.valueOf(computedQuality)));
+            AlchemyEffectPanel.buildQualityBar(qualityBar, computedQuality);
             AlchemyEffectPanel.buildEffectAttributes(recipe, values, attributesScroller);
         };
         refreshComputedRef[0].run();
@@ -521,6 +526,29 @@ public final class AlchemyCombineUI {
         int total = values.values().stream().mapToInt(Integer::intValue).sum();
         int quantity = 1 + (total / 12);
         return Math.max(1, Math.min(10, quantity));
+    }
+
+    private static int computeCombinedQuality(AlchemyCombineSessionSnapshot snapshot) {
+        if (snapshot == null || snapshot.placedMaterials().isEmpty()) {
+            return 0;
+        }
+        int totalQuality = 0;
+        int totalCells = 0;
+        for (AlchemyCombineSessionSnapshot.PlacedMaterial placed : snapshot.placedMaterials()) {
+            if (placed == null || placed.cells() == null || placed.cells().isEmpty()) {
+                continue;
+            }
+            int cellCount = placed.cells().size();
+            AlchemyItemData data = placed.stack().get(ModDataComponents.ALCHEMY_DATA.get());
+            int quality = data == null ? 0 : data.quality();
+            totalQuality += quality * cellCount;
+            totalCells += cellCount;
+        }
+        if (totalCells <= 0) {
+            return 0;
+        }
+        int average = Math.round((float) totalQuality / totalCells);
+        return Math.max(0, Math.min(999, average));
     }
 
     private static Map<String, Integer> computeCombinedElementValues(
