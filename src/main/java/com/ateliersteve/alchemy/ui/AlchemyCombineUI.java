@@ -25,16 +25,9 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class AlchemyCombineUI {
-    private static final Map<UUID, PendingCombine> PENDING_COMBINE_SERVER = new ConcurrentHashMap<>();
-    private static final Map<UUID, PendingCombine> PENDING_COMBINE_CLIENT = new ConcurrentHashMap<>();
-    private static final Map<UUID, AlchemyCombineSessionSnapshot> COMBINE_SESSION_SERVER = new ConcurrentHashMap<>();
-    private static final Map<UUID, AlchemyCombineSessionSnapshot> COMBINE_SESSION_CLIENT = new ConcurrentHashMap<>();
-    private static final Map<UUID, Integer[]> COMBINE_BOARD_SERVER = new ConcurrentHashMap<>();
-    private static final Map<UUID, Integer[]> COMBINE_BOARD_CLIENT = new ConcurrentHashMap<>();
+    private static final AlchemyCombineSessionStorage STORAGE = new AlchemyCombineSessionStorage();
     private static final int GRID_SIZE = 5;
 
     private AlchemyCombineUI() {
@@ -53,29 +46,21 @@ public final class AlchemyCombineUI {
         if (player == null || recipe == null) {
             return;
         }
-        PENDING_COMBINE_SERVER.put(player.getUUID(), new PendingCombine(recipe.id(), copyStacks(selectedStacks), copyReservedMaterials(reservedMaterials)));
+        STORAGE.requestServer(player.getUUID(), recipe.id(), selectedStacks, reservedMaterials);
     }
 
     public static void requestOpenClient(Player player, AlchemyRecipeDefinition recipe, List<ItemStack> selectedStacks) {
         if (player == null || recipe == null) {
             return;
         }
-        PENDING_COMBINE_CLIENT.put(player.getUUID(), new PendingCombine(recipe.id(), copyStacks(selectedStacks), List.of()));
+        STORAGE.requestClient(player.getUUID(), recipe.id(), selectedStacks);
     }
 
     public static PendingCombine consumePendingCombine(Player player) {
         if (player == null) {
             return null;
         }
-        UUID playerId = player.getUUID();
-        boolean isClient = player.level().isClientSide;
-        Map<UUID, PendingCombine> primary = isClient ? PENDING_COMBINE_CLIENT : PENDING_COMBINE_SERVER;
-        PendingCombine pending = primary.remove(playerId);
-        if (pending == null) {
-            Map<UUID, PendingCombine> fallback = isClient ? PENDING_COMBINE_SERVER : PENDING_COMBINE_CLIENT;
-            pending = fallback.get(playerId);
-        }
-        return pending;
+        return STORAGE.consumePending(player.getUUID(), player.level().isClientSide);
     }
 
     public static ModularUI createUI(Player player, BlockPos cauldronPos, PendingCombine pending) {
@@ -125,7 +110,7 @@ public final class AlchemyCombineUI {
             if (!(player instanceof ServerPlayer serverPlayer) || payload == null) {
                 return;
             }
-            COMBINE_BOARD_SERVER.put(serverPlayer.getUUID(), payload);
+            STORAGE.storeServerBoard(serverPlayer.getUUID(), payload);
         });
         grid.addRPCEvent(syncBoardRpc);
 
@@ -135,7 +120,7 @@ public final class AlchemyCombineUI {
             }
             AlchemyCombineSessionSnapshot synced = AlchemyCombineSessionSnapshot.fromSyncPayload(initialSnapshot, payload, GRID_SIZE);
             sessionTimeline.sync(synced);
-            COMBINE_SESSION_SERVER.put(serverPlayer.getUUID(), synced);
+            STORAGE.storeServerSession(serverPlayer.getUUID(), synced);
         });
         grid.addRPCEvent(syncSessionRpc);
 
@@ -152,12 +137,12 @@ public final class AlchemyCombineUI {
         Runnable syncBoardState = () -> {
             Integer[] payload = combineBoard[0].writePayload();
             if (player.level().isClientSide) {
-                COMBINE_BOARD_CLIENT.put(player.getUUID(), payload);
+                STORAGE.storeBoard(player.getUUID(), true, payload);
                 grid.sendEvent(syncBoardRpc, (Object) payload);
                 grid.sendEvent(syncSessionRpc, (Object) sessionTimeline.current().toSyncPayload());
             } else {
-                COMBINE_BOARD_SERVER.put(player.getUUID(), payload);
-                COMBINE_SESSION_SERVER.put(player.getUUID(), sessionTimeline.current());
+                STORAGE.storeBoard(player.getUUID(), false, payload);
+                STORAGE.storeSession(player.getUUID(), false, sessionTimeline.current());
             }
         };
 
@@ -344,41 +329,11 @@ public final class AlchemyCombineUI {
                 .lss("height", "100%"));
     }
 
-    private static List<ItemStack> copyStacks(List<ItemStack> stacks) {
-        if (stacks == null) {
-            return List.of();
-        }
-        List<ItemStack> copied = new ArrayList<>(stacks.size());
-        for (ItemStack stack : stacks) {
-            if (stack != null && !stack.isEmpty()) {
-                copied.add(stack.copy());
-            }
-        }
-        return copied;
-    }
-
-    private static List<ReservedMaterialRef> copyReservedMaterials(List<ReservedMaterialRef> refs) {
-        if (refs == null || refs.isEmpty()) {
-            return List.of();
-        }
-        List<ReservedMaterialRef> copied = new ArrayList<>(refs.size());
-        for (ReservedMaterialRef ref : refs) {
-            if (ref != null) {
-                copied.add(new ReservedMaterialRef(ref.basketPos(), ref.slotIndex(), ref.stack().copy()));
-            }
-        }
-        return copied;
-    }
-
     private static void onSessionStateChanged(Player player, AlchemyCombineSessionSnapshot snapshot) {
         if (player == null || snapshot == null) {
             return;
         }
-        if (player.level().isClientSide) {
-            COMBINE_SESSION_CLIENT.put(player.getUUID(), snapshot);
-        } else {
-            COMBINE_SESSION_SERVER.put(player.getUUID(), snapshot);
-        }
+        STORAGE.storeSession(player.getUUID(), player.level().isClientSide, snapshot);
     }
 
     private static void rerender(Runnable[] renderGridRef, Runnable[] refreshSelectedListRef) {
@@ -422,7 +377,7 @@ public final class AlchemyCombineUI {
         private final List<ItemStack> selectedStacks;
         private final List<ReservedMaterialRef> reservedMaterials;
 
-        private PendingCombine(ResourceLocation recipeId, List<ItemStack> selectedStacks, List<ReservedMaterialRef> reservedMaterials) {
+        PendingCombine(ResourceLocation recipeId, List<ItemStack> selectedStacks, List<ReservedMaterialRef> reservedMaterials) {
             this.recipeId = recipeId;
             this.selectedStacks = selectedStacks == null ? List.of() : selectedStacks;
             this.reservedMaterials = reservedMaterials == null ? List.of() : reservedMaterials;
